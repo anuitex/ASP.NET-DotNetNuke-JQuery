@@ -1,0 +1,44 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<dynamic>
+@using DotNetNuke.Web.Client.ClientResourceManagement;
+@using Newtonsoft.Json;
+
+@{
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/rzc-bootstrap.css", 100, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/rzc-bootstrap-theme.css", 101, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/font-awesome.css", 102, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/angular-toastr.css", 103, "DnnPageHeaderProvider");
+    if (Model.Product != null && Model.Product.Booking)
+    {
+        ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/pickadate.default.css", 104, "DnnPageHeaderProvider");
+        ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/pickadate.default.date.css", 105, "DnnPageHeaderProvider");
+        ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/pickadate.default.time.css", 106, "DnnPageHeaderProvider");
+    }
+
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/angular.min.js", 100, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/angular-messages.min.js", 101, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/angular-toastr.tpls.js", 102, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/angular-rating.js", 103, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/ui-bootstrap.min.js", 104, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/ProductDetails/Scripts/rzc-gallery.js", 105, "DnnPageHeaderProvider");
+    if (Model.Product != null && Model.Product.Booking)
+    {
+        ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/picker.js", 106, "DnnPageHeaderProvider");
+        ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/picker.date.js", 107, "DnnPageHeaderProvider");
+        ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/picker.time.js", 108, "DnnPageHeaderProvider");
+    }
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/ng-pickadate.js", 109, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/razorcart.core.js", 110, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/ProductDetails/Scripts/razorcart.details.js", 111, "DnnPageHeaderProvider");
+
+    string startupScript = "angular.bootstrap(angular.element(document.getElementById('rzcContainer_" + Dnn.ModuleContext.ModuleId + "')), ['RazorCart']);";
+    Dnn.DnnPage.ClientScript.RegisterStartupScript(Dnn.DnnPage.GetType(), string.Concat("rzc-init-", Dnn.ModuleContext.ModuleId), startupScript, true);
+}
+
+<div id="rzcContainer_@Dnn.ModuleContext.ModuleId" class="rzc-bootstrap" ng-controller="detailsCtrl as details" ng-init="details.init(@JsonConvert.SerializeObject(Model))" ng-form="rzcForm_@Dnn.ModuleContext.ModuleId" ng-cloak>
+    @RenderBody()
+    <div class="rc-backdrop" ng-if="details.rebinding">
+        <div class="rc-backdrop-container">
+            <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+        </div>
+    </div>
+</div>

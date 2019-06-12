@@ -1,0 +1,32 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.QuickOrder.Models.EntryModel>
+@using DotNetNuke.Web.Mvc.Helpers
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>@Dnn.LocalizeString("Product")</th>
+                <th>@Dnn.LocalizeString("Quantity")</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody ng-init="entry.getEntryForm(entry.entryFormSize)">
+            <tr ng-repeat="row in entry.entryForm">
+                <td><input type="text" class="form-control" ng-model="entry.products[row]" /></td>
+                <td><input type="number" class="form-control" ng-model="entry.quantities[row]" value="1" step="1" min="1" max="999999" /></td>
+                <td class="text-right">
+                    <i class="fa fa-trash-o fa-lg" role="button" ng-click="entry.deleteEntry($index)"></i>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="row">
+    <div class="col-xxs-6 text-left">
+        <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("AddToCart")" ng-click="entry.addToCart()" />
+        <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("NewLine")" ng-click="entry.addEntry()" />
+    </div>
+    <div class="col-xxs-6 text-right">
+        <input type="reset" class="btn btn-danger" value="@Dnn.LocalizeString("Clear")" ng-click="entry.resetForm()" />
+    </div>
+</div>

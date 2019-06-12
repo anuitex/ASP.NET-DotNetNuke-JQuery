@@ -1,0 +1,322 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.CustomerModel>
+@using System.Web.Mvc.Html;
+@using System.Data.SqlTypes;
+@using System.Globalization;
+
+<!-- Bootstrap DatePicker CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/bootstrap-datepicker.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Select2 CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2-bootstrap.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Bootstrap DatePicker JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/bootstrap-datepicker.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Select2 JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/select2.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Manage Customers</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Submitted)
+        {
+            <div class="alert alert-success alert-dismissable">
+                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                @Model.SaveMessage
+            </div>
+        }
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Customer", new { StoreID = Model.StoreID, CustomerID = Model.Customer.CustomerID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Username</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("DNNLogin", Model.Users, new { })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Company Name</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("CompanyName", Model.Customer.CompanyName, new { @class = "form-control", @placeholder = "Company Name" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">First Name</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("FirstName", Model.Customer.FirstName, new { @class = "form-control", @placeholder = "First Name", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Last Name</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("LastName", Model.Customer.LastName, new { @class = "form-control", @placeholder = "Last Name", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Address Line 1</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Address1", Model.Customer.Address1, new { @class = "form-control", @placeholder = "Address Line 1", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Address Line 2</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Address2", Model.Customer.Address2, new { @class = "form-control", @placeholder = "Address Line 2" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">City</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("City", Model.Customer.City, new { @class = "form-control", @placeholder = "City", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Postal Code</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Zip", Model.Customer.Zip, new { @class = "form-control", @placeholder = "Postal Code", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Country</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("Country", Model.Countries, "-- Select --", new { @class = "form-control", @onchange = "defaultCountryChange(this.value);", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Region</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("State", Model.Regions, "-- Select --", new { @class = "form-control", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Email Address</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Email", Model.Customer.Email, new { @class = "form-control", @placeholder = "Email Address", @type = "email", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Home Phone</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("HomePhone", Model.Customer.HomePhone, new { @class = "form-control", @placeholder = "Home Phone" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Work Phone</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("WorkPhone", Model.Customer.WorkPhone, new { @class = "form-control", @placeholder = "Work Phone" })
+                        </div>
+                    </div>
+                    @if (Convert.ToBoolean(Model.StoreConfig["SmsBookingReminder"]))
+                    {
+                        <div class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label">Reminder Opt-In</label>
+                            <div class="col-md-6 col-sm-8">
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("Remind", Model.Customer.Remind, new { @onchange = "checkBoxChange(this);" })
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" data-show="conditional" data-cond-option="Remind" data-cond-value="true" style="display: none;">
+                            <label class="col-md-3 col-sm-4 control-label">Phone Carrier</label>
+                            <div class="col-md-6 col-sm-8">
+                                @Html.DropDownList("PhoneCarrier", Model.Carriers, "-- Select --", new { @class = "form-control", @required = "required" })
+                            </div>
+                        </div>
+                    }
+                    @if (Convert.ToBoolean(Model.StoreConfig["ShowCustomerOptIn"]))
+                    {
+                        <div class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label">Newsletter Opt-In</label>
+                            <div class="col-md-6 col-sm-8">
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("Contact", Model.Customer.Contact, new { @onchange = "checkBoxChange(this);" })
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Billing Address Line 1</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("BillingAddress1", Model.Customer.BillingAddress1, new { @class = "form-control", @placeholder = "Address Line 1", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Billing Address Line 2</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("BillingAddress2", Model.Customer.BillingAddress2, new { @class = "form-control", @placeholder = "Address Line 2" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Billing City</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("BillingCity", Model.Customer.BillingCity, new { @class = "form-control", @placeholder = "City", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Billing Postal Code</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("BillingZip", Model.Customer.BillingZip, new { @class = "form-control", @placeholder = "Postal Code", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Billing Country</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("BillingCountry", Model.BillingCountries, "-- Select --", new { @class = "form-control", @onchange = "defaultBillingCountryChange(this.value);", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Billing Region</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("BillingState", Model.BillingRegions, "-- Select --", new { @class = "form-control", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Anniversary Date</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="input-group date" data-provide="datepicker" data-date-format="@Model.ShortDateFormat.Replace("M", "m")">
+                                @Html.TextBox("AnniversaryDate", Model.Customer.AnniversaryDate.HasValue && Model.Customer.AnniversaryDate.Value > SqlDateTime.MinValue.Value ? Model.Customer.AnniversaryDate.Value.ToString(Model.ShortDateFormat) : string.Empty,
+                                                     new { @class = "form-control", @placeholder = "Anniversary Date" })
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Tax ID</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("TaxID", Model.Customer.TaxID, new { @class = "form-control", @placeholder = "Tax ID" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Credit Limit</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("CreditLimit", Model.Customer.CreditLimit.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Credit Limit", @type = "number", @step = "0.01", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Bid Limit</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("BidLimit", Model.Customer.BidLimit.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Bid Limit", @type = "number", @step = "0.01", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Create Date</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.LabelFor(m => m.Customer.DateCreated, Model.Customer.DateCreated.ToString(), new { @class = "form-control label-ellipsis" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Modify Date</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.LabelFor(m => m.Customer.DateModified, Model.Customer.DateModified.ToString(), new { @class = "form-control label-ellipsis" })
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    <a class="btn btn-default" href="@Url.Action("Index", "Customer", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        // Select-2
+        $('#DNNLogin').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            placeholder: "Select a username",
+            ajax: {
+                type: 'POST',
+                url: '@Url.Action("ListUsers", "Customer", new { StoreID = Model.StoreID })',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        'search[value]': params.term,
+                        'length': 25,
+                        'start': 0
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: $.map(data.data, function (item) {
+                            return {
+                                id: item.Username,
+                                text: item.DisplayName + ' (' + item.Username + ')'
+                            };
+                        })
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 2
+        });
+    });
+    function defaultCountryChange(value) {
+        var regionDDL = $('select[name="State"]');
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ListRegions", "Setup", new { StoreID = Model.StoreID })',
+            data: { 'Country': value },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                regionDDL.html('');
+                regionDDL.append($('<option></option>').val('').html('-- Select --'));
+                var data = JSON.parse(JSON.stringify(response));
+                $.each(data, function (index, option) {
+                    regionDDL.append($('<option></option>').val(option.Value).html(option.Text));
+                });
+            },
+            error: function (response, status, error) {
+                console.log(error);
+            }
+        });
+    }
+    function defaultBillingCountryChange(value) {
+        var regionDDL = $('select[name="BillingState"]');
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ListRegions", "Setup", new { StoreID = Model.StoreID })',
+            data: { 'Country': value },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                regionDDL.html('');
+                regionDDL.append($('<option></option>').val('').html('-- Select --'));
+                var data = JSON.parse(JSON.stringify(response));
+                $.each(data, function (index, option) {
+                    regionDDL.append($('<option></option>').val(option.Value).html(option.Text));
+                });
+            },
+            error: function (response, status, error) {
+                console.log(error);
+            }
+        });
+    }
+</script>

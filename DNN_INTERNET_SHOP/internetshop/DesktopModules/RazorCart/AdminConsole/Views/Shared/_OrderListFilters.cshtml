@@ -1,0 +1,102 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.OrderModel>
+@using System.Web.Mvc.Html;
+
+<!-- Date Range Template -->
+<div id="tblOrders_datefilter" class="form-inline text-center" style="display: none;">
+    <div class="form-group col-md-12 input-daterange" data-provide="datepicker" style="margin-bottom: 5px;">
+        <div class="input-group date">
+            <input type="text" class="form-control input-sm" aria-controls="tblOrders" placeholder="From" />
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+        <div class="input-group date">
+            <input type="text" class="form-control input-sm" aria-controls="tblOrders" placeholder="To" />
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+    </div>
+</div>
+<!-- Status Drop-Down Template -->
+<div id="tblOrders_statusfilter" class="form-inline" style="display: none;">
+    <div class="form-group col-md-12 input-status" style="margin-bottom: 5px;">
+        @Html.DropDownList("Status", Model.Statuses, "-- Status --", new { @class = "form-control input-sm", @aria_controls = "tblOrders" })
+        <select id="PayStatus" name="PayStatus" class="form-control input-sm" aria-controls="tblOrders">
+            <option value="" selected="selected">-- Pay Status --</option>
+            <option value="Unpaid">Unpaid</option>
+            <option value="PartiallyPaid">Partially Paid</option>
+            <option value="Paid">Paid</option>
+        </select>
+        @Html.DropDownList("PayMethod", Model.PaymentMethods, "-- Pay Method --", new { @class = "form-control input-sm", @aria_controls = "tblOrders" })
+        @Html.DropDownList("TransType", Model.PaymentTransTypes, "-- Trans Type --", new { @class = "form-control input-sm", @aria_controls = "tblOrders" })
+    </div>
+</div>
+
+<script type="text/javascript">
+    (function () {
+        this.RZCDateTimePicker = function (selector, options) {
+            return this.init(selector, options);
+        }
+        this.RZCDateTimePicker.prototype.init = function (selector, options) {
+            var dPickers = [];
+            this.selector = selector;
+            this.options = merge(defaults, options);
+            if (this.selector && typeof this.selector === 'string') {
+                dPickers = getDPickers(this.selector);
+            }
+            for (var i = 0; i < dPickers.length; i++) {
+                bindDPicker(this.options, dPickers[i]);
+            }
+            return dPickers.map(function (dPicker) { return dPicker.item; });
+        }
+        var defaults = {
+            format: 'MM/DD/YYYY',
+            showTodayButton: true,
+            showClear: true,
+            showClose: true,
+            useCurrent: false
+        };
+        var merge = function () {
+            var result = {};
+            for (var i = 0; i < arguments.length; i++) {
+                var source = arguments[i];
+                if (source && Object.prototype.toString.call(source) === '[object Object]') {
+                    for (var prop in source) {
+                        result[prop] = source[prop];
+                    }
+                }
+            }
+            return result;
+        };
+        var getDPickers = function (selector) {
+            var dPickers = [];
+            $(selector).each(function (index, dPicker) {
+                var $dPicker = $(dPicker);
+                if ($dPicker.hasClass('input-daterange')) {
+                    var $frm = $dPicker.find('.date').eq(0);
+                    var $to = $dPicker.find('.date').eq(1);
+                    dPickers.push({ item: $frm, linkItem: $to, linkMethod: 'minDate' });
+                    dPickers.push({ item: $to, linkItem: $frm, linkMethod: 'maxDate' });
+                } else {
+                    dPickers.push({ item: $dPicker });
+                }
+            });
+            return dPickers;
+        };
+        var bindDPicker = function (options, dPicker) {
+            dPicker.item.datetimepicker(options).on('dp.change', function (e) {
+                switch (dPicker.linkMethod) {
+                    case 'minDate':
+                        dPicker.linkItem.data("DateTimePicker").minDate(e.date);
+                        break;
+                    case 'maxDate':
+                        dPicker.linkItem.data("DateTimePicker").maxDate(e.date);
+                        break;
+                }
+            }).find('input[type="text"]').click(function () {
+                dPicker.item.data("DateTimePicker").toggle();
+            });
+        };
+    }());
+</script>

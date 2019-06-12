@@ -1,0 +1,49 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.LicenseModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">License Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Submitted)
+        {
+            <div class="alert alert-success alert-dismissable">
+                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                @Model.SaveMessage
+            </div>
+        }
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "License", new { StoreID = Model.StoreID, LicenseKeyID = Model.LicenseInfo.LicenseKeyID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Hostname</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Hostname", Model.LicenseInfo.Hostname, new { @class = "form-control", @placeholder = "Hostname" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">License Key</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextArea("LicenseKey", Model.LicenseInfo.LicenseKey, new { @class = "form-control", @placeholder = "License Key", @rows = "5" })
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    <a class="btn btn-default" href="@Url.Action("Index", "License", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->

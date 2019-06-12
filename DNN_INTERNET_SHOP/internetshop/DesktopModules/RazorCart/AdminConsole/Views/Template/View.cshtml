@@ -1,0 +1,77 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.TemplateModel>
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+
+<!-- Bootstrap DatePicker CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/bootstrap-treeview.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Bootstrap DatePicker JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/bootstrap-treeview.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Manage Views</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Submitted)
+        {
+            <div class="alert alert-warning alert-dismissable">
+                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                @Model.SaveMessage
+            </div>
+        }
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Template", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="row flexrow">
+                @foreach (var viewFolder in Model.ViewFolders)
+                {
+                    <div class="col-lg-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <span class="panel-title">@viewFolder.FriendlyName</span>
+                                <div class="pull-right">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                            Actions
+                                            <span class="caret"></span>
+                                        </button>
+                                        <input type="hidden" id="action" />
+                                        <ul class="dropdown-menu pull-right" role="menu">
+                                            <li>
+                                                <a href="#" onclick="event.preventDefault(); $('#action').attr('name', 'Copy').val('@(viewFolder.DesktopModuleID)'); $('form').submit();">Copy Viewset</a>
+                                            </li>
+                                            <li>
+                                                <a href="#" onclick="event.preventDefault(); if (confirm('This will delete all the module custom viewset! Are you sure?')) { $('#action').attr('name', 'Delete').val('@(viewFolder.DesktopModuleID)'); $('form').submit(); }">Delete Viewset</a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a href="#" onclick="event.preventDefault(); if ($('#@(viewFolder.ModuleName.Replace(".", "-"))').treeview('getSelected').length > 0) { $('#action').attr('name', 'Edit').val($('#@(viewFolder.ModuleName.Replace(".", "-"))').treeview('getSelected')[0].path); $('form').submit(); } else { alert('Please select a view file to edit!'); }">Edit Selected</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body details">
+                                <div id="@(viewFolder.ModuleName.Replace(".", "-"))"></div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        @foreach (var viewFolder in Model.ViewFolders)
+        {
+            JObject data = JObject.FromObject(new { viewFolder.FolderStructure });
+            <text>var folder = @(Html.Raw(data.ToString(Formatting.None)));</text>
+            <text>$('#@(viewFolder.ModuleName.Replace(".", "-"))').treeview({ data: folder.FolderStructure, showTags: true, multiSelect: false });</text>
+        }
+    });
+</script>

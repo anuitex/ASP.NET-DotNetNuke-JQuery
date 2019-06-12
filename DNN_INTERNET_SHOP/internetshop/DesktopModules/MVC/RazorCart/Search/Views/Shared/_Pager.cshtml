@@ -1,0 +1,32 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Search.Models.SearchResultsPagerModel>
+
+<ul class="pagination" style="margin: 0;">
+    <li>
+        <a href="#" data-page="1">
+            <<
+        </a>
+    </li>
+    <li>
+        <a href="#" data-page="@Math.Max(Model.PageNo - 1, 1)">
+            <
+        </a>
+    </li>
+    @foreach (var i in Model.ListingPages)
+    {
+        <li @(i == Model.PageNo ? "class=active" : "")>
+            <a href="#" data-page="@i">
+                @i
+            </a>
+        </li>
+    }
+    <li>
+        <a href="#" data-page="@Math.Min(Model.PageNo + 1, Model.LastPage)">
+            >
+        </a>
+    </li>
+    <li>
+        <a href="#" data-page="@Model.LastPage">
+            >>
+        </a>
+    </li>
+</ul>

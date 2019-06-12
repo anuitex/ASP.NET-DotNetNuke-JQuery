@@ -1,0 +1,90 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ShippingModel>
+@using System.Web.Mvc.Html;
+@using System.Globalization;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Shipping Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @Html.Partial("_ShippingMenu")
+        <div class="tab-content">
+            <div class="tab-pane active">
+                <div class="container-fluid">
+                    <div class="row">
+                        @if (Model.Submitted)
+                        {
+                            <div class="alert alert-success alert-dismissable">
+                                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                @Model.SaveMessage
+                            </div>
+                        }
+                        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Shipping", new { StoreID = Model.StoreID, ShipCostID = Model.ShipByAmount.ShipCostID })" autocomplete="off">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Ship Method</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("ShipMethodID", Model.Methods, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Product Category</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("CategoryID", Model.Categories, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">@(Convert.ToBoolean(Model.StoreConfig["OverrideCarrierMethods"]) ? "Subtotal From" : "Amount From")</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("AmountFrom", Model.ShipByAmount.AmountFrom.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Amount From", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">@(Convert.ToBoolean(Model.StoreConfig["OverrideCarrierMethods"]) ? "Subtotal To" : "Amount To")</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("AmountTo", Model.ShipByAmount.AmountTo.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Amount To", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Shipping Cost</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("Price", Model.ShipByAmount.Price.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Shipping Cost", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Is International</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("IsIntl", Model.ShipByAmount.IsIntl, new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("Amount", "Shipping", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- /.form -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.row -->

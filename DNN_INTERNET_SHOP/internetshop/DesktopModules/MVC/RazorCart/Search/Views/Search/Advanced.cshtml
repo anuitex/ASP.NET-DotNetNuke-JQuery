@@ -1,0 +1,81 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Search.Models.AdvancedSearchModel>
+@using System.Web.Mvc;
+@using DotNetNuke.Web.Mvc.Helpers;
+@using DotNetNuke.Web.Client.ClientResourceManagement;
+
+@{
+    int tabModuleID = Dnn.ModuleContext.TabModuleId;
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/Search/Content/Scripts/razorCart.advancedSearch.js", 101, "DnnPageHeaderProvider");
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading @(Model.IsCollapsible ? "show-collapse-icon" : "")">
+        <h4 class="panel-title">
+            <a class="no-underline accordion-toggle @(Model.IsCollapsible && Model.StartCollapsed ? "collapsed" : "")" data-toggle="collapse" href="#advancedSearchCollapse_@tabModuleID">
+                Advanced Search
+            </a>
+        </h4>
+    </div>
+    <div id="@(Model.IsCollapsible ? "advancedSearchCollapse_" + tabModuleID : "")" class="panel-collapse collapse @(Model.IsCollapsible && Model.StartCollapsed ? "" : "in")">
+        <div class="panel-body text-left">
+            <div class="form-horizontal">
+                @foreach (var category in Model.Categories)
+                {
+                    <div class="form-group side-padding-8">
+                        @Html.Label("ddlCategory_" + tabModuleID + "_" + category.CategoryID, category.CategoryName, new { @class = "control-label side-padding-0 right-padding-6 col-sm-3 col-md-4" })
+                        <div class="col-sm-9 col-md-8 side-padding-0">
+                            @Html.DropDownList("ddlCategory_" + tabModuleID + "_" + category.CategoryID,
+                                new SelectList(category.Categories, "CategoryID", "CategoryName", category.SelectedCatID),
+                                new { @class = "form-control ac-dropdown", @data_showSubCat = category.ShowSubCatDropDown.ToString().ToLower() })
+                        </div>
+                    </div>
+                }
+                @if (Model.EnablePriceFilter)
+                {
+                    <div class="form-group side-padding-8">
+                        @Html.Label("ddlPrice_" + tabModuleID, "Price Range", new { @class = "control-label side-padding-0 right-padding-6 col-sm-3 col-md-4" })
+                        <div class="col-sm-9 col-md-8 side-padding-0">
+                            @Html.DropDownList("ddlPrice_" + tabModuleID, Model.PriceList, new { @class = "form-control ac-dropdown" })
+                        </div>
+                    </div>
+                }
+                <div class="form-group side-padding-8">
+                    @Html.Label("txtKeywords_" + tabModuleID, "Keyword(s)", new { @class = "control-label side-padding-0 right-padding-6 col-sm-3 col-md-4" })
+                    <div class="col-sm-9 col-md-8 side-padding-0">
+                        @Html.TextBox("txtKeywords_" + tabModuleID, Model.Keywords, new { @class = "form-control" })
+                    </div>
+                </div>
+                @if (Request.IsAuthenticated)
+                {
+                    <div class="form-group side-padding-8">
+                        @Html.Label("chkSaveSearch_" + tabModuleID, "Save Search", new { @class = "control-label side-padding-0 right-padding-6 col-sm-3 col-md-4" })
+                        <div class="col-sm-9 col-md-8 side-padding-0">
+                            <span style="width: 25px; float: left; display: inline-block; padding-top: 7px;">
+                                <input class="chk-save-search" value="true" type="checkbox" id="@("chkSaveSearch_" + tabModuleID)" name="@("chkSaveSearch_" + tabModuleID)" @(Model.SaveSearch ? "checked": "") />
+                            </span>
+                            <span style="width: calc(100% - 25px); float: left; display: inline-block;">
+                                @Html.TextBox("txtSavedSearchName_" + tabModuleID, Model.SavedSearchName, new { @class = "form-control txt-save-search", @validation_group = "advanced-search" })
+                            </span>
+                        </div>
+                    </div>
+                }
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <div class="btn-group btn-group-justified">
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-block btn-primary" name="submitAdvancedSearch_@tabModuleID" value="Search" validation-group="advanced-search">
+                                    Search <i class="fa fa-search" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-block btn-warning" name="submitAdvancedSearch_@tabModuleID" value="Clear">
+                                    New Search <i class="fa fa-eraser" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

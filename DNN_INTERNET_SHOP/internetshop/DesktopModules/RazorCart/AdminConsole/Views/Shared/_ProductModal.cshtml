@@ -1,0 +1,260 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<div class="modal fade" id="productModal1" role="dialog" tabindex="-1" aria-labelledby="productModalLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" action="@Url.Action("Clone", "Product", new { StoreID = Model.StoreID })">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="productModalLabel1">Clone Product</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="ModelNumber">Product SKU</label>
+                        @Html.TextBox("ModelNumber", string.Empty, new { @class = "form-control", @placeholder = "Product SKU", @required = "required" })
+                    </div>
+                    <div class="form-group">
+                        <label for="ModelName">Product Name</label>
+                        @Html.TextBox("ModelName", string.Empty, new { @class = "form-control", @placeholder = "Product Name", @required = "required" })
+                    </div>
+                    <div class="form-group">
+                        <label>Include Options</label>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("Categories", false, new { @onchange = "checkBoxChange(this);" }) Categories
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("Variants", false, new { @onchange = "checkBoxChange(this);" }) Variants
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("RelatedProducts", false, new { @onchange = "checkBoxChange(this);" }) Related Products
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("SearchKeywords", false, new { @onchange = "checkBoxChange(this);" }) Search Keywords
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("CustomFields", false, new { @onchange = "checkBoxChange(this);" }) Custom Fields
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("Images", false, new { @onchange = "checkBoxChange(this);" }) Images
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("Discounts", false, new { @onchange = "checkBoxChange(this);" }) Discounts
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("Roles", false, new { @onchange = "checkBoxChange(this);" }) Roles
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("Localization", false, new { @onchange = "checkBoxChange(this);" }) Localization
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @Html.Hidden("ProductID", string.Empty)
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-clone"></i> Clone</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="productModal2" role="dialog" tabindex="-1" aria-labelledby="productModalLabel2" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" enctype="multipart/form-data" action="@Url.Action("Import", "Product", new { StoreID = Model.StoreID })">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="productModalLabel2">Import Products</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3">Import Type</label>
+                            <div class="col-sm-9">
+                                <div class="radio inline">
+                                    <label>
+                                        @Html.RadioButton("ImportType", "Products", true, new { @required = "required" }) Products
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="radio inline">
+                                    <label>
+                                        @Html.RadioButton("ImportType", "ProductImages", false, new { @required = "required" }) Product Images
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="radio inline">
+                                    <label>
+                                        @Html.RadioButton("ImportType", "VariantGroups", false, new { @required = "required" }) Variant Groups
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="radio inline">
+                                    <label>
+                                        @Html.RadioButton("ImportType", "Variants", false, new { @required = "required" }) Variants
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="radio inline">
+                                    <label>
+                                        @Html.RadioButton("ImportType", "CustomFields", false, new { @required = "required" }) Custom Fields
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ImportSheet">CSV File</label>
+                        <div class="input-group">
+                            <label class="input-group-btn">
+                                <span class="btn btn-primary">
+                                    Browse&hellip; @Html.TextBox("ImportSheet", string.Empty, new { @type = "file", @style = "opacity: 0; width: 1px; height: 1px", @required = "required" })
+                                </span>
+                            </label>
+                            @Html.TextBox("ImportSheet_FileName", string.Empty, new { @class = "form-control", @placeholder = "Select CSV file to upload", @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-download"></i> Import</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="productModal3" role="dialog" tabindex="-1" aria-labelledby="productModalLabel3" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" action="@Url.Action("Export", "Product", new { StoreID = Model.StoreID })">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="productModalLabel3">Export Products</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3">Export Type</label>
+                            <div class="col-sm-9">
+                                <div class="radio inline">
+                                    <label>
+                                        @Html.RadioButton("ExportType", "Products", true, new { @required = "required" }) Products
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="radio inline">
+                                    <label>
+                                        @Html.RadioButton("ExportType", "ProductImages", false, new { @required = "required" }) Product Images
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="radio inline">
+                                    <label>
+                                        @Html.RadioButton("ExportType", "VariantGroups", false, new { @required = "required" }) Variant Groups
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="radio inline">
+                                    <label>
+                                        @Html.RadioButton("ExportType", "Variants", false, new { @required = "required" }) Variants
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="radio inline">
+                                    <label>
+                                        @Html.RadioButton("ExportType", "CustomFields", false, new { @required = "required" }) Custom Fields
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        @Html.Hidden("SearchDt", string.Empty)
+                        @Html.Hidden("ColumnDt", string.Empty)
+                        @Html.Hidden("DirectionDt", string.Empty)
+                        <i class="fa fa-upload"></i> Export
+                    </button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.modal -->

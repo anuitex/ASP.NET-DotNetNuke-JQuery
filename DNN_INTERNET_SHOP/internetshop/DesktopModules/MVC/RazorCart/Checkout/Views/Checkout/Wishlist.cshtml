@@ -1,0 +1,117 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Checkout.Models.CheckoutModel>
+@using DotNetNuke.Web.Mvc.Helpers
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="form-group">
+            <div class="btn-group">
+                <button class="btn btn-default" ng-click="checkout.share($event)" ng-disabled="(checkout.wishlist.length < 1)">
+                    <i class="fa fa-share-square-o"></i> @Dnn.LocalizeString("Share")
+                </button>
+                <button class="btn btn-default" ng-click="checkout.restore($event)" ng-disabled="(checkout.wishlist.length < 1) || checkout.restoring">
+                    <i class="fa fa-cart-plus"></i> @Dnn.LocalizeString("MoveToCart")
+                </button>
+                <button class="btn btn-default" ng-click="checkout.unsave($event)" ng-disabled="(checkout.wishlist.length < 1) || checkout.unsaving">
+                    <i class="fa fa-trash-o"></i> @Dnn.LocalizeString("Delete")
+                </button>
+                <button class="btn btn-default" ng-click="checkout.print($event)" ng-disabled="(checkout.wishlist.length < 1)">
+                    <i class="fa fa-print"></i> @Dnn.LocalizeString("Print")
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="rzc-basket">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>@Dnn.LocalizeString("Description")</th>
+                    <th>@Dnn.LocalizeString("Created")</th>
+                </tr>
+            </thead>
+            <tbody ng-repeat="savedCart in checkout.wishlist">
+                <tr>
+                    <td>
+                        <i class="fa fa-pencil fa-1x" ng-click="checkout.editSavedCart($index)" role="button"></i>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="savedCart.Checked" />
+                    </td>
+                    <td ng-click="checkout.showSaved($index)" role="button" ng-if="!savedCart.EditMode">{{savedCart.Description}}</td>
+                    <td ng-if="savedCart.EditMode"><input type="text" ng-model="savedCart.Description" /> <i class="fa fa-floppy-o fa-1x" ng-click="checkout.editSavedCartDescription($index)" role="button"></i></td>
+                    <td ng-click="checkout.showSaved($index)" role="button">{{savedCart.CreateDate | date : '@Model.Culture.DateTimeFormat.FullDateTimePattern.Replace("dddd", "EEEE").Replace("tt", "a")'}}</td>
+                </tr>
+                <tr>
+                    <td colspan="4" ng-if="savedCart.Visible">
+                        <div class="rzc-basket">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>@Dnn.LocalizeString("SKU")</th>
+                                        <th>@Dnn.LocalizeString("ProductName")</th>
+                                        @if (Model.AllowPriceView)
+                                        {
+                                            <th class="text-right">@Dnn.LocalizeString("UnitCost")</th>
+                                            <th class="text-right">@Dnn.LocalizeString("Quantity")</th>
+                                            <th class="text-right">@Dnn.LocalizeString("LineTotal")</th>
+                                        }
+                                        else
+                                        {
+                                            <th class="text-right">@Dnn.LocalizeString("Quantity")</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="cartItem in savedCart.CartItems">
+                                    <tr>
+                                        <td>{{cartItem.ProductSku}}</td>
+                                        <td><a ng-href="{{cartItem.ProductDetailUrl}}">{{cartItem.ProductName}}</a></td>
+                                        @if (Model.AllowPriceView)
+                                        {
+                                            <td class="text-right">{{cartItem.UnitCost | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                                            <td class="text-right">{{cartItem.Quantity | number : 2}}</td>
+                                            <td class="text-right">{{cartItem.UnitCost * cartItem.Quantity | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-right">{{cartItem.Quantity | number : 2}}</td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5" ng-if="cartItem.CartVariants.length > 0">
+                                            <ul>
+                                                <li ng-repeat="itemVariant in cartItem.CartVariants">
+                                                    {{itemVariant.VariantHasText ? (itemVariant.VariantName + ': ' + itemVariant.VariantText) : (itemVariant.VariantGroup + ': ' + itemVariant.VariantName)}}
+                                                    {{itemVariant.PriceCalculated ? '- ' + (itemVariant.PriceCalculated | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits) : ''}}
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody ng-if="savedCart.CartItems.length < 1">
+                                    <tr>
+                                        <td colspan="5"><span>@Dnn.LocalizeString("NoSavedCartItems")</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody ng-if="checkout.wishlist.length < 1">
+                <tr>
+                    <td colspan="4"><span>@Dnn.LocalizeString("NoWishlist")</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="form-group">
+        <div class="col-xs-12 text-center">
+            <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("Back")" onclick="window.location.href='@Url.Action("Index", "Checkout", new { })';" />
+        </div>
+    </div>
+</div>

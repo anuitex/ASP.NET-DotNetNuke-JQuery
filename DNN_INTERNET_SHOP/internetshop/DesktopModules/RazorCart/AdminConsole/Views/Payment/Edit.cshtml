@@ -1,0 +1,221 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.PaymentModel>
+@using System.Web.Mvc.Html;
+@using System.Globalization;
+@using RazorCart.Service.Gateway;
+
+<!-- Select2 CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2-bootstrap.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Select2 JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/select2.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Payment Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Submitted)
+        {
+            <div class="alert alert-success alert-dismissable">
+                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                @Model.SaveMessage
+            </div>
+        }
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Payment", new { StoreID = Model.StoreID, PayMethodID = Model.PaymentMethod.PayMethodID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Active</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("Active", Model.PaymentMethod.Active, new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Method Name</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("MethodName", Model.PaymentMethod.Name, new { @class = "form-control", @placeholder = "Method Name", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Method Type</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("MethodType", Model.MethodTypes, "-- Select --", new { @class = "form-control", @required = "required", @onchange = "methodTypeChange(this.value);" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Gateway</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("GatewayCode", Model.GatewayList, "-- Select --", new { @class = "form-control", @required = "required", @onchange = "methodTypeSelected(this.value);" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Surcharge Percentage</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("SurchargePercentage", Model.PaymentMethod.SurchargePercentage.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Surcharge Percentage", @type = "number", @step = "0.01", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Surcharge Amount</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("SurchargeAmount", Model.PaymentMethod.SurchargeAmount.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Surcharge Amount", @type = "number", @step = "0.01", @required = "required" })
+                        </div>
+                    </div>
+                    @{
+                        CredentialsField providerField = Model.CredentialsFields.FindLast(cf => cf.Type == CredentialsType.Provider);
+                        CredentialsField userIDField = Model.CredentialsFields.FindLast(cf => cf.Type == CredentialsType.UserID);
+                        CredentialsField passwordField = Model.CredentialsFields.FindLast(cf => cf.Type == CredentialsType.Password);
+                        CredentialsField keyField = Model.CredentialsFields.FindLast(cf => cf.Type == CredentialsType.Key);
+                        CredentialsField htmlField = Model.CredentialsFields.FindLast(cf => cf.Type == CredentialsType.Html);
+                    }
+                    @Html.Hidden("UseProvider", (providerField != null).ToString().ToLower())
+                    <div class="form-group" data-show="conditional" data-cond-option="UseProvider" data-cond-value="true" style="display: none;">
+                        <label class="col-md-3 col-sm-4 control-label" id="lblProvider">@(providerField != null ? providerField.Label : "Provider/Vendor")</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("GatewayProvider", Model.PaymentMethod.GatewayProvider, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    @Html.Hidden("UseUserID", (userIDField != null).ToString().ToLower())
+                    <div class="form-group" data-show="conditional" data-cond-option="UseUserID" data-cond-value="true" style="display: none;">
+                        <label class="col-md-3 col-sm-4 control-label" id="lblUserID">@(userIDField != null ? userIDField.Label : "API Login")</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("GatewayUserID", Model.PaymentMethod.GatewayUserID, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    @Html.Hidden("UsePassword", (passwordField != null).ToString().ToLower())
+                    <div class="form-group" data-show="conditional" data-cond-option="UsePassword" data-cond-value="true" style="display: none;">
+                        <label class="col-md-3 col-sm-4 control-label" id="lblPassword">@(passwordField != null ? passwordField.Label : "API Password")</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("GatewayPassword", Model.PaymentMethod.GatewayPassword, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    @Html.Hidden("UseKey", (keyField != null).ToString().ToLower())
+                    <div class="form-group" data-show="conditional" data-cond-option="UseKey" data-cond-value="true" style="display: none;">
+                        <label class="col-md-3 col-sm-4 control-label" id="lblKey">@(keyField != null ? keyField.Label : "API Key")</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("GatewayKey", Model.PaymentMethod.GatewayKey, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    @Html.Hidden("UseHtml", (htmlField != null).ToString().ToLower())
+                    <div class="form-group" data-show="conditional" data-cond-option="UseHtml" data-cond-value="true" style="display: none;">
+                        <label class="col-md-3 col-sm-4 control-label" id="lblHtml">@(htmlField != null ? htmlField.Label : "")</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div id="dvHtmlContent">@Html.Raw(htmlField != null ? htmlField.HtmlContent : "")</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Roles</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.ListBox("Roles", Model.PortalRoles)
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    <a class="btn btn-default" href="@Url.Action("Index", "Payment", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        // Select-2
+        $('[id="Roles"]').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            placeholder: "Select security roles",
+            minimumInputLength: 0,
+        });
+    });
+    function methodTypeChange(value) {
+        var gatewayDDL = $('select[name="GatewayCode"]');
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GatewayList", "Payment", new { StoreID = Model.StoreID })',
+            data: { 'Method': value },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                gatewayDDL.html('');
+                gatewayDDL.append($('<option></option>').val('').html('-- Select --'));
+                var data = JSON.parse(JSON.stringify(response));
+                $.each(data, function (index, option) {
+                    gatewayDDL.append($('<option></option>').val(option.Value).html(option.Text));
+                });
+            },
+            error: function (response, status, error) {
+                console.log(error);
+            }
+        });
+    }
+    function methodTypeSelected(value) {
+        $('#UseProvider').val(false).change();
+        $('#UseUserID').val(false).change();
+        $('#UsePassword').val(false).change();
+        $('#UseKey').val(false).change();
+        $('#UseHtml').val(false).change();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GatewayConfig", "Payment", new { StoreID = Model.StoreID })',
+            data: { 'Name': value },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                var data = JSON.parse(JSON.stringify(response));
+                $.each(data, function (index, option) {
+                    switch (option.Type) {
+                        case "Provider":
+                            $('#UseProvider').val(true).change();
+                            if (option.Label)
+                                $('#lblProvider').html(option.Label);
+                            break;
+                        case "UserID":
+                            $('#UseUserID').val(true).change();
+                            if (option.Label)
+                                $('#lblUserID').html(option.Label);
+                            break;
+                        case "Password":
+                            $('#UsePassword').val(true).change();
+                            if (option.Label)
+                                $('#lblPassword').html(option.Label);
+                            break;
+                        case "Key":
+                            $('#UseKey').val(true).change();
+                            if (option.Label)
+                                $('#lblKey').html(option.Label);
+                            break;
+                        case "Html":
+                            $('#UseHtml').val(true).change();
+                            if (option.Label)
+                                $('#lblHtml').html(option.Label);
+                            if (option.HtmlContent)
+                                $('#dvHtmlContent').html(option.HtmlContent);
+                            break;
+                    }
+                });
+            },
+            error: function (response, status, error) {
+                console.log(error);
+            }
+        });
+    }
+</script>

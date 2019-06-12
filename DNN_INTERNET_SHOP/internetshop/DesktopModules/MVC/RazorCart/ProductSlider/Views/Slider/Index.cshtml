@@ -1,0 +1,38 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.ProductSlider.Models.SliderModel>
+@using DotNetNuke.Web.Mvc.Helpers
+
+<div id="owl-carousel-@(Dnn.ModuleContext.ModuleId)" class="owl-carousel owl-theme" ng-init="slider.carousel()">
+    <div ng-repeat="product in slider.products">
+        <div class="col-item">
+            <div class="photo">
+                <a ng-href="{{product.ProductDetailUrl}}">
+                    <img class="img-responsive" ng-src="{{product.ThumbImage}}" err-src="@DotNetNuke.Common.Globals.DesktopModulePath" err-size="200" alt="{{product.ModelName}}" />
+                </a>
+            </div>
+            <div class="info">
+                <div class="row">
+                    <div class="price col-md-12">
+                        <h5 class="group-item-heading">{{product.ModelName}}</h5>
+                        <h5 class="price-text-color">
+                            <label ng-class="{'strike-through': slider.isSaleEnabled && product.IsUnderSale}">
+                                {{(product.BundleUnitCost || product.UnitCost) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                            </label>
+                            <label ng-if="slider.isSaleEnabled && product.IsUnderSale">
+                                {{(product.BundleSalePrice || product.SalePrice) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                            </label>
+                        </h5>
+                    </div>
+                </div>
+                <div class="separator clear-left">
+                    <p class="btn-add">
+                        <button type="button" class="btn btn-link btn-sm no-padding" ng-click="slider.addToCart($index)"><i class="fa fa-shopping-cart"></i>@Dnn.LocalizeString("Buy")</button>
+                    </p>
+                    <p class="btn-details">
+                        <a class="btn btn-link btn-sm no-padding" ng-href="{{product.ProductDetailUrl}}"><i class="fa fa-list"></i>@Dnn.LocalizeString("Details")</a>
+                    </p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,281 @@
+﻿/************************************************************/
+/*****              SqlDataProvider                     *****/
+/*****                                                  *****/
+/*****                                                  *****/
+/***** Note: To manually execute this script you must   *****/
+/*****       perform a search and replace operation     *****/
+/*****       for {databaseOwner} and {objectQualifier}  *****/
+/*****                                                  *****/
+/************************************************************/
+
+
+
+/************************************************************/
+/*****               Create Tables                      *****/
+/************************************************************/
+
+
+
+/************************************************************/
+/*****                Alter Tables                      *****/
+/************************************************************/
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_GiftCards') AND type IN (N'U'))
+BEGIN
+	IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_GiftCards') AND name = N'FormattedCode')
+	BEGIN
+		ALTER TABLE
+			{databaseOwner}{objectQualifier}RZC_GiftCards
+		ADD
+			[FormattedCode] NVARCHAR(50)
+	END
+END
+GO
+
+
+
+/************************************************************/
+/*****                Drop Sprocs                       *****/
+/************************************************************/
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_CreateGiftCard') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateGiftCard
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_UpdateGiftCard') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_UpdateGiftCard
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_ListGiftCardsByFilter') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_ListGiftCardsByFilter
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_GetGiftCardByCode') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_GetGiftCardByCode
+GO
+
+
+
+/************************************************************/
+/*****               Create Sprocs                      *****/
+/************************************************************/
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateGiftCard
+	@Active BIT = NULL,
+	@OrderDetailID INT = NULL,
+	@ProductID INT = NULL,
+	@ProductName NVARCHAR(200) = NULL,
+	@Amount MONEY = NULL,
+	@UsedAmount MONEY = NULL,
+	@Type VARCHAR(50) = NULL,
+	@FormattedCode NVARCHAR(50) = NULL,
+	@Code NVARCHAR(50) = NULL,
+	@Subject NVARCHAR(200) = NULL,
+	@Message NVARCHAR(1000) = NULL,
+	@SenderCustomerID INT = NULL,
+	@SenderUserID INT = NULL,
+	@ReceiverCustomerID INT = NULL,
+	@ReceiverUserID INT = NULL,
+	@ReceiverName NVARCHAR(100) = NULL,
+	@ReceiverEmail VARCHAR(100) = NULL,
+	@ReceiverPhone VARCHAR(50) = NULL,
+	@ExpiryDate DATETIME = NULL,
+	@CreatedBy INT = NULL,
+	@StoreID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	INSERT INTO
+		{databaseOwner}{objectQualifier}RZC_GiftCards
+		([Active]
+		,[OrderDetailID]
+		,[ProductID]
+		,[ProductName]
+		,[Amount]
+		,[UsedAmount]
+		,[Type]
+		,[FormattedCode]
+		,[Code]
+		,[Subject]
+		,[Message]
+		,[SenderCustomerID]
+		,[SenderUserID]
+		,[ReceiverCustomerID]
+		,[ReceiverUserID]
+		,[ReceiverName]
+		,[ReceiverEmail]
+		,[ReceiverPhone]
+		,[ExpiryDate]
+		,[CreateDate]
+		,[CreatedBy]
+		,[StoreID]
+		,[PortalID])
+	VALUES
+		(@Active
+		,@OrderDetailID
+		,@ProductID
+		,@ProductName
+		,@Amount
+		,@UsedAmount
+		,@Type
+		,@FormattedCode
+		,@Code
+		,@Subject
+		,@Message
+		,@SenderCustomerID
+		,@SenderUserID
+		,@ReceiverCustomerID
+		,@ReceiverUserID
+		,@ReceiverName
+		,@ReceiverEmail
+		,@ReceiverPhone
+		,@ExpiryDate
+		,GETDATE()
+		,@CreatedBy
+		,@StoreID
+		,@PortalID)
+	SELECT SCOPE_IDENTITY()
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_UpdateGiftCard
+	@GiftCardID INT = NULL,
+	@Active BIT = NULL,
+	@OrderDetailID INT = NULL,
+	@ProductID INT = NULL,
+	@ProductName NVARCHAR(200) = NULL,
+	@Amount MONEY = NULL,
+	@UsedAmount MONEY = NULL,
+	@Type VARCHAR(50) = NULL,
+	@FormattedCode NVARCHAR(50) = NULL,
+	@Code NVARCHAR(50) = NULL,
+	@Subject NVARCHAR(200) = NULL,
+	@Message NVARCHAR(1000) = NULL,
+	@SenderCustomerID INT = NULL,
+	@SenderUserID INT = NULL,
+	@ReceiverCustomerID INT = NULL,
+	@ReceiverUserID INT = NULL,
+	@ReceiverName NVARCHAR(100) = NULL,
+	@ReceiverEmail VARCHAR(100) = NULL,
+	@ReceiverPhone VARCHAR(50) = NULL,
+	@ExpiryDate DATETIME = NULL,
+	@ModifiedBy INT = NULL,
+	@StoreID INT = NULL
+AS
+BEGIN
+	UPDATE
+		{databaseOwner}{objectQualifier}RZC_GiftCards
+	SET
+		[Active] = @Active,
+		[OrderDetailID] = @OrderDetailID,
+		[ProductID] = @ProductID,
+		[ProductName] = @ProductName,
+		[Amount] = @Amount,
+		[UsedAmount] = @UsedAmount,
+		[Type] = @Type,
+		[FormattedCode] = @FormattedCode,
+		[Code] = @Code,
+		[Subject] = @Subject,
+		[Message] = @Message,
+		[SenderCustomerID] = @SenderCustomerID,
+		[SenderUserID] = @SenderUserID,
+		[ReceiverCustomerID] = @ReceiverCustomerID,
+		[ReceiverUserID] = @ReceiverUserID,
+		[ReceiverName] = @ReceiverName,
+		[ReceiverEmail] = @ReceiverEmail,
+		[ReceiverPhone] = @ReceiverPhone,
+		[ExpiryDate] = @ExpiryDate,
+		[ModifyDate] = GETDATE(),
+		[ModifiedBy] = @ModifiedBy,
+		[StoreID] = @StoreID
+	WHERE
+		[GiftCardID] = @GiftCardID
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_ListGiftCardsByFilter
+	@PageNumber INT = NULL,
+	@PageSize INT = NULL,
+	@SearchValue NVARCHAR(256) = NULL,
+	@StoreID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	SET NOCOUNT ON;
+	DECLARE @PageRecordStart INT
+	DECLARE @PageRecordEnd INT
+	SET @PageRecordStart = ((@PageNumber - 1) * @PageSize) + 1
+	SET @PageRecordEnd = @PageNumber * @PageSize
+	;WITH [GiftCardsPage] AS
+	(
+		SELECT
+			ROW_NUMBER() OVER (ORDER BY C.[GiftCardID] ASC) AS [RowNo], C.*
+		FROM
+			{databaseOwner}{objectQualifier}RZC_GiftCards C
+		WHERE
+			(C.[StoreID] = @StoreID)
+			AND C.[PortalID] = @PortalID
+			AND (NULLIF(@SearchValue, '') IS NULL OR (
+					C.[Code] LIKE '%' + @SearchValue + '%'
+					OR C.[FormattedCode] LIKE '%' + @SearchValue + '%'
+					OR C.[ProductName] LIKE '%' + @SearchValue + '%'
+				)
+			)
+	)
+	SELECT
+		C.*, D.[OrderID],
+		TotalRecords = (
+			SELECT COUNT(*) FROM [GiftCardsPage]
+		),
+		MoreRecords = (
+			SELECT COUNT(*) FROM [GiftCardsPage]
+			WHERE [RowNo] > @PageRecordEnd
+		)
+	FROM
+		[GiftCardsPage] C
+	LEFT JOIN
+		{databaseOwner}{objectQualifier}RZC_StoreOrderDetails D
+	ON
+		D.[OrderDetailID] = C.[OrderDetailID]
+	WHERE
+		C.[RowNo] BETWEEN @PageRecordStart AND @PageRecordEnd
+	ORDER BY
+		C.[RowNo]
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_GetGiftCardByCode
+	@Code NVARCHAR(50) = NULL,
+	@CaseSensitive BIT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	DECLARE @Collation NVARCHAR(128) --Default Latin1_General_CI_AS CI: Case Insensitive, AS: Accent Sensitive
+	SELECT
+		TOP 1 @Collation = ISNULL(ISNULL(COLLATION_NAME, CONVERT(NVARCHAR, SERVERPROPERTY('Collation'))), 'Latin1_General_CI_AS')
+	FROM
+		INFORMATION_SCHEMA.COLUMNS
+	WHERE
+		TABLE_SCHEMA + '.' + TABLE_NAME = '{databaseOwner}{objectQualifier}RZC_GiftCards'
+		AND COLUMN_NAME = 'Code'
+
+	IF @CaseSensitive = 1
+		SET @Collation = REPLACE(@Collation, '_CI', '_CS') --Change Case to Sensitive
+	ELSE
+		SET @Collation = REPLACE(@Collation, '_CS', '_CI') --Change Case to Insensitive
+
+	DECLARE @SQL NVARCHAR(MAX) =
+	N'SELECT
+		TOP 1 C.*, D.[OrderID]
+	FROM
+		{databaseOwner}{objectQualifier}RZC_GiftCards C
+	LEFT JOIN
+		{databaseOwner}{objectQualifier}RZC_StoreOrderDetails D
+	ON
+		D.[OrderDetailID] = C.[OrderDetailID]
+	WHERE
+		C.Code = ''' + ISNULL(@Code, '') + N''' COLLATE ' + @Collation + '
+		AND C.[PortalID] = ' + CONVERT(VARCHAR, @PortalID)
+	EXEC(@SQL)
+END
+GO
+
+
+
+/************************************************************/
+/*****               End of Script                      *****/
+/************************************************************/

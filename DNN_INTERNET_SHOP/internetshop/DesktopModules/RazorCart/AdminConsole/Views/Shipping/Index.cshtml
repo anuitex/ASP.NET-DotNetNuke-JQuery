@@ -1,0 +1,565 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ShippingModel>
+@using System.Web.Mvc.Html;
+
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Shipping Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Save", "Shipping", new { StoreID = Model.StoreID })" autocomplete="off">
+            @Html.Partial("_ShippingMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            @if (Model.Submitted)
+                            {
+                                <div class="alert alert-success alert-dismissable">
+                                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                    @Model.SaveMessage
+                                </div>
+                            }
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Shipping Method</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Shipping Method</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "ShipCalculator", (string)Model.StoreConfig["SmithShipping"] == "ShipCalculator", new { @required = "required" }) Shipping Calculator (Carrier APIs)
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "ZoneByQuantity", (string)Model.StoreConfig["SmithShipping"] == "ZoneByQuantity", new { @required = "required" }) Zone Shipping By Quantity
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "ZoneByWeight", (string)Model.StoreConfig["SmithShipping"] == "ZoneByWeight", new { @required = "required" }) Zone Shipping By Weight
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "CustomShipMethods", (string)Model.StoreConfig["SmithShipping"] == "CustomShipMethods", new { @required = "required" }) Custom Ship Methods with Fixed Amounts
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "CustomShipMethodsByAmt", (string)Model.StoreConfig["SmithShipping"] == "CustomShipMethodsByAmt", new { @required = "required" }) Custom Ship Methods By Order Amount
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "CustomShipMethodsByQuantity", (string)Model.StoreConfig["SmithShipping"] == "CustomShipMethodsByQuantity", new { @required = "required" }) Custom Ship Methods By Quantity
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "CustomShipMethodsByWeight", (string)Model.StoreConfig["SmithShipping"] == "CustomShipMethodsByWeight", new { @required = "required" }) Custom Ship Methods By Weight
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "CustomShipMethodsByZip", (string)Model.StoreConfig["SmithShipping"] == "CustomShipMethodsByZip", new { @required = "required" }) Custom Ship Methods By Zip Code
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "ShippingByOrderAmount", (string)Model.StoreConfig["SmithShipping"] == "ShippingByOrderAmount", new { @required = "required" }) Shipping By Order Amount
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "ShippingByWeight", (string)Model.StoreConfig["SmithShipping"] == "ShippingByWeight", new { @required = "required" }) Shipping By Weight
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "ProductLevelShipping", (string)Model.StoreConfig["SmithShipping"] == "ProductLevelShipping", new { @required = "required" }) Product Level Shipping Costs
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShipping", "FreeShipping", (string)Model.StoreConfig["SmithShipping"] == "FreeShipping" || Model.StoreConfig["SmithShipping"] == null, new { @required = "required" }) Free Shipping
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="SmithShipping" data-cond-value="ShipCalculator" data-cond-destroy="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Shipping Carriers</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("Carrier", (((string)Model.StoreConfig["Carrier"]) ?? "").Contains("USPS"), new { @value = "USPS", @onchange = "checkBoxChange(this);" }) USPS
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("Carrier", (((string)Model.StoreConfig["Carrier"]) ?? "").Contains("UPS"), new { @value = "UPS", @onchange = "checkBoxChange(this);" }) UPS
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("Carrier", (((string)Model.StoreConfig["Carrier"]) ?? "").Contains("FedEx"), new { @value = "FedEx", @onchange = "checkBoxChange(this);" }) FedEx
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("Carrier", (((string)Model.StoreConfig["Carrier"]) ?? "").Contains("ParcelPerfect"), new { @value = "ParcelPerfect", @onchange = "checkBoxChange(this);" }) Parcel Perfect
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="USPS,UPS,FedEx,ParcelPerfect" data-cond-operator="[]" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Address Type</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("AddressClass", "Auto", (string)Model.StoreConfig["AddressClass"] == "Auto" || Model.StoreConfig["AddressClass"] == null, new { }) Auto
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("AddressClass", "Residential", (string)Model.StoreConfig["AddressClass"] == "Residential", new { }) Residential
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("AddressClass", "Commercial", (string)Model.StoreConfig["AddressClass"] == "Commercial", new { }) Commercial
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="USPS,UPS,FedEx,ParcelPerfect" data-cond-operator="[]" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Weight Unit of Measure</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("WeightUOE", Model.WeightUOEs, "-- Select --", new { @class = "form-control", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="USPS,UPS,FedEx,ParcelPerfect" data-cond-operator="[]" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Override Carrier Method Prices <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["OverrideCarrierMethods"]"></i></label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("OverrideCarrierMethods", Convert.ToBoolean(Model.StoreConfig["OverrideCarrierMethods"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="strike" data-show="conditional" data-cond-option="Carrier" data-cond-value="USPS" style="display: none;">
+                                        <span>
+                                            <strong>USPS Options</strong>
+                                        </span>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="USPS" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Carrier Ship Methods</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="row">
+                                                <div class="col-xs-5">
+                                                    @Html.DropDownList("USPSShipping", Model.USPSShipping, new { @class = "form-control", @multiple = "multiple", @data_source = "true" })
+                                                </div>
+                                                <div class="col-xs-2">
+                                                    <button type="button" class="btn btn-block" onclick="multiSelectAdd(this);"><i class="fa fa-angle-double-right"></i></button>
+                                                    <button type="button" class="btn btn-block" onclick="multiSelectDel(this);"><i class="fa fa-angle-double-left"></i></button>
+                                                </div>
+                                                <div class="col-xs-5">
+                                                    @Html.DropDownList("USPSShippingText", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_text = "USPSShipping" })
+                                                    @Html.DropDownList("USPSShippingCode", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_value = "USPSShipping", @style = "display: none;" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="strike" data-show="conditional" data-cond-option="Carrier" data-cond-value="UPS" style="display: none;">
+                                        <span>
+                                            <strong>UPS Options</strong>
+                                        </span>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="UPS" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Carrier Ship Methods</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="row">
+                                                <div class="col-xs-5">
+                                                    @Html.DropDownList("UPSShipping", Model.UPSShipping, new { @class = "form-control", @multiple = "multiple", @data_source = "true" })
+                                                </div>
+                                                <div class="col-xs-2">
+                                                    <button type="button" class="btn btn-block" onclick="multiSelectAdd(this);"><i class="fa fa-angle-double-right"></i></button>
+                                                    <button type="button" class="btn btn-block" onclick="multiSelectDel(this);"><i class="fa fa-angle-double-left"></i></button>
+                                                </div>
+                                                <div class="col-xs-5">
+                                                    @Html.DropDownList("UPSShippingText", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_text = "UPSShipping" })
+                                                    @Html.DropDownList("UPSShippingCode", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_value = "UPSShipping", @style = "display: none;" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="UPS" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Access License Key</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("CPCID", Model.StoreConfig["CPCID"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="UPS" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">User ID</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("UPSUserID", Model.StoreConfig["UPSUserID"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="UPS" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Password</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("UPSPassword", Model.StoreConfig["UPSPassword"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="UPS" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Package Type</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("UPSPackageType", Model.UPSPackageTypes, "-- Select --", new { @class = "form-control", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="UPS" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Max Package Weight (lbs)</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("MaxPackageWeight", Model.StoreConfig["MaxPackageWeight"], new { @class = "form-control", @type = "number", @step = "0.01" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="UPS" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Drop Ship from Manufacture</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("UseManuShipAddress", Convert.ToBoolean(Model.StoreConfig["UseManuShipAddress"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="UPS" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Enable Freight</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("UPSEnableFreight", Convert.ToBoolean(Model.StoreConfig["UPSEnableFreight"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="strike" data-show="conditional" data-cond-option="Carrier" data-cond-value="FedEx" style="display: none;">
+                                        <span>
+                                            <strong>FedEx Options</strong>
+                                        </span>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="FedEx" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Carrier Ship Methods</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="row">
+                                                <div class="col-xs-5">
+                                                    @Html.DropDownList("FedExShipping", Model.FedExShipping, new { @class = "form-control", @multiple = "multiple", @data_source = "true" })
+                                                </div>
+                                                <div class="col-xs-2">
+                                                    <button type="button" class="btn btn-block" onclick="multiSelectAdd(this);"><i class="fa fa-angle-double-right"></i></button>
+                                                    <button type="button" class="btn btn-block" onclick="multiSelectDel(this);"><i class="fa fa-angle-double-left"></i></button>
+                                                </div>
+                                                <div class="col-xs-5">
+                                                    @Html.DropDownList("FedExShippingText", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_text = "FedExShipping" })
+                                                    @Html.DropDownList("FedExShippingCode", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_value = "FedExShipping", @style = "display: none;" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="FedEx" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Key</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ShipKey", Model.StoreConfig["ShipKey"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="FedEx" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Password</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ShipPassword", Model.StoreConfig["ShipPassword"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="FedEx" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">FedEx Account #</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("FedExAccount", Model.StoreConfig["FedExAccount"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="FedEx" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">FedEx Meter #</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("FedExMeter", Model.StoreConfig["FedExMeter"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="FedEx" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Test Mode</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("ShipCalculatorTestMode", Convert.ToBoolean(Model.StoreConfig["ShipCalculatorTestMode"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="FedEx" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Enable Freight</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("FedExEnableFreight", Convert.ToBoolean(Model.StoreConfig["FedExEnableFreight"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="strike" data-show="conditional" data-cond-option="Carrier" data-cond-value="ParcelPerfect" style="display: none;">
+                                        <span>
+                                            <strong>Parcel Perfect Options</strong>
+                                        </span>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="ParcelPerfect" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Carrier Ship Methods</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="row">
+                                                <div class="col-xs-5">
+                                                    @Html.DropDownList("ParcelPerfectShipping", Model.ParcelPerfectShipping, new { @class = "form-control", @multiple = "multiple", @data_source = "true" })
+                                                </div>
+                                                <div class="col-xs-2">
+                                                    <button type="button" class="btn btn-block" onclick="multiSelectAdd(this);"><i class="fa fa-angle-double-right"></i></button>
+                                                    <button type="button" class="btn btn-block" onclick="multiSelectDel(this);"><i class="fa fa-angle-double-left"></i></button>
+                                                </div>
+                                                <div class="col-xs-5">
+                                                    @Html.DropDownList("ParcelPerfectShippingText", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_text = "ParcelPerfectShipping" })
+                                                    @Html.DropDownList("ParcelPerfectShippingCode", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_value = "ParcelPerfectShipping", @style = "display: none;" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="ParcelPerfect" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Email</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ParcelPerfectEmail", Model.StoreConfig["ParcelPerfectEmail"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Carrier" data-cond-value="ParcelPerfect" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Password</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ParcelPerfectPassword", Model.StoreConfig["ParcelPerfectPassword"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Handling Setup</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Handling Fee</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("HandlingSetup", "FlatHandlingFee", (string)Model.StoreConfig["HandlingSetup"] == "FlatHandlingFee" || Model.StoreConfig["HandlingSetup"] == null, new { }) Charge Flat Handling Fee
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("HandlingSetup", "PercentHandlingFee", (string)Model.StoreConfig["HandlingSetup"] == "PercentHandlingFee", new { }) Charge Percentage Handling Fee by Subtotal
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("HandlingSetup", "PercentHandlingFeeByShipping", (string)Model.StoreConfig["HandlingSetup"] == "PercentHandlingFeeByShipping", new { }) Charge Percentage Handling Fee by Shipping Total
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="HandlingSetup" data-cond-value="FlatHandlingFee,PercentHandlingFee,PercentHandlingFeeByShipping" data-cond-operator="[]" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Domestic Handling Charge</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="input-group">
+                                                @Html.TextBox("HandlingCharge", Model.StoreConfig["HandlingCharge"], new { @class = "form-control", @type = "number", @step = "0.01" })
+                                                <span class="input-group-addon" data-show="conditional" data-cond-option="HandlingSetup" data-cond-value="FlatHandlingFee">
+                                                    <i class="fa fa-usd" aria-hidden="true"></i>
+                                                </span>
+                                                <span class="input-group-addon" data-show="conditional" data-cond-option="HandlingSetup" data-cond-value="PercentHandlingFee,PercentHandlingFeeByShipping" data-cond-operator="[]">
+                                                    <i class="fa fa-percent" aria-hidden="true"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="HandlingSetup" data-cond-value="FlatHandlingFee,PercentHandlingFee,PercentHandlingFeeByShipping" data-cond-operator="[]" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">International Handling Charge</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="input-group">
+                                                @Html.TextBox("InternationalHandling", Model.StoreConfig["InternationalHandling"], new { @class = "form-control", @type = "number", @step = "0.01" })
+                                                <span class="input-group-addon" data-show="conditional" data-cond-option="HandlingSetup" data-cond-value="FlatHandlingFee">
+                                                    <i class="fa fa-usd" aria-hidden="true"></i>
+                                                </span>
+                                                <span class="input-group-addon" data-show="conditional" data-cond-option="HandlingSetup" data-cond-value="PercentHandlingFee,PercentHandlingFeeByShipping" data-cond-operator="[]">
+                                                    <i class="fa fa-percent" aria-hidden="true"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">When subtotal greater than</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("HandlingMinOrderAmount", Model.StoreConfig["HandlingMinOrderAmount"], new { @class = "form-control", @type = "number", @step = "0.01" })
+                                            Set a value to collect handling only when the order's subtotal is greater than a specific amount
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Combine Shipping & Handling</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("CombineShipAndHandle", Convert.ToBoolean(Model.StoreConfig["CombineShipAndHandle"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary" onclick="multiSelectAll(this);"><i class="fa fa-check-square-o"></i> Save</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        // Move Selected Shipping Codes/Texts
+        var uspsCodes = '@((string)Model.StoreConfig["USPSShippingCode"] ?? string.Empty)'.split(',');
+        $.each(uspsCodes, function (index, value) {
+            $('#USPSShipping').val(value).parents('.form-group').find('button[onclick^=multiSelectAdd]').trigger('onclick');
+        });
+        var upsCodes = '@((string)Model.StoreConfig["UPSShippingCode"] ?? string.Empty)'.split(',');
+        $.each(upsCodes, function (index, value) {
+            $('#UPSShipping').val(value).parents('.form-group').find('button[onclick^=multiSelectAdd]').trigger('onclick');
+        });
+        var fedexCodes = '@((string)Model.StoreConfig["FedExShippingCode"] ?? string.Empty)'.split(',');
+        $.each(fedexCodes, function (index, value) {
+            $('#FedExShipping').val(value).parents('.form-group').find('button[onclick^=multiSelectAdd]').trigger('onclick');
+        });
+        var parcelPerfectCodes = '@((string)Model.StoreConfig["ParcelPerfectShippingCode"] ?? string.Empty)'.split(',');
+        $.each(parcelPerfectCodes, function (index, value) {
+            $('#ParcelPerfectShipping').val(value).parents('.form-group').find('button[onclick^=multiSelectAdd]').trigger('onclick');
+        });
+        // Init Tooltips
+        $('[data-toggle="tooltip"]').tooltip({
+            placement: 'right',
+            container: 'body'
+        });
+        // Remove MVC checkbox-hidden inputs for multi-carrier
+        $('form').find('input[type="hidden"][name="Carrier"]').remove();
+    });
+</script>

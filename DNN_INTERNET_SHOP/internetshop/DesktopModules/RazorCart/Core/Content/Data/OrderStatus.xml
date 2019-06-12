@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<StatusList>
+  <Status>
+    <Value>BillMeLater</Value>
+    <Text>Bill Me Later</Text>
+    <Group></Group>
+    <Display></Display>
+  </Status>
+  <Status>
+    <Value>Open</Value>
+    <Text>Open</Text>
+    <Group></Group>
+    <Display></Display>
+    <Default>true</Default>
+  </Status>
+  <Status>
+    <Value>ReadyToShip</Value>
+    <Text>Ready To Ship</Text>
+    <Group></Group>
+    <Display></Display>
+  </Status>
+  <Status>
+    <Value>Shipped</Value>
+    <Text>Shipped</Text>
+    <Group></Group>
+    <Display></Display>
+  </Status>
+  <Status>
+    <Value>PickedUp</Value>
+    <Text>Picked Up</Text>
+    <Group></Group>
+    <Display></Display>
+  </Status>
+  <Status>
+    <Value>Cancelled</Value>
+    <Text>Cancelled</Text>
+    <Group></Group>
+    <Display></Display>
+  </Status>
+  <Status>
+    <Value>Incomplete</Value>
+    <Text>Incomplete</Text>
+    <Group></Group>
+    <Display></Display>
+  </Status>
+  <Status>
+    <Value>OnHold</Value>
+    <Text>On Hold</Text>
+    <Group></Group>
+    <Display></Display>
+  </Status>
+  <Status>
+    <Value>BackOrdered</Value>
+    <Text>Back Ordered</Text>
+    <Group></Group>
+    <Display></Display>
+  </Status>
+  <Status>
+    <Value>Returned</Value>
+    <Text>Returned</Text>
+    <Group></Group>
+    <Display></Display>
+  </Status>
+</StatusList>

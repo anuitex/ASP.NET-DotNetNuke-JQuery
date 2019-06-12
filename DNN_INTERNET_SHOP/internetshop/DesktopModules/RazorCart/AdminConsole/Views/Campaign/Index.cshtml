@@ -1,0 +1,70 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.CampaignModel>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Manage Email Campaigns</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Index", "Campaign", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a class="btn btn-primary pull-right" href="@Url.Action("Add", "Campaign", new { StoreID = Model.StoreID })">
+                        <i class="fa fa-plus"></i> Add Email
+                    </a>
+                    <h4>Email Campaigns</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Name</th>
+                                    <th>Email Subject</th>
+                                    <th>Language</th>
+                                    <th>Send Every</th>
+                                    <th>Active</th>
+                                    <th>Emails Sent</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var email in Model.EmailCampaigns)
+                                {
+                                    <tr>
+                                        <td>@email.Type</td>
+                                        <td>@email.Name</td>
+                                        <td>@email.Subject</td>
+                                        <td>@email.LanguageLocale</td>
+                                        <td>@string.Format("{0} {1}", email.Interval, email.Units)</td>
+                                        <td><i class="fa fa-@(email.Active ? "check-circle" : "circle-thin") fa-lg" aria-hidden="true"></i></td>
+                                        <td>@email.EmailsSent</td>
+                                        <td class="text-right">
+                                            <a href="@Url.Action("Edit", "Campaign", new { StoreID = Model.StoreID, CampaignID = email.EmailCampaignID })"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                            <a href="@Url.Action("Delete", "Campaign", new { StoreID = Model.StoreID, CampaignID = email.EmailCampaignID })" onclick="return confirm('Are you sure?')">
+                                                <i class="fa fa-trash-o fa-lg"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.EmailCampaigns.Count < 1)
+                                {
+                                    <tr><td colspan="8">No Email Campaigns added.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->

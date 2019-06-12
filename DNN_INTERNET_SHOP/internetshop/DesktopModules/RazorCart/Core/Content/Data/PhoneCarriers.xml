@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CarrierList>
+  <Carrier>
+    <Value>ATT</Value>
+    <Text>AT&amp;T</Text>
+    <Gateway>txt.att.net</Gateway>
+  </Carrier>
+  <Carrier>
+    <Value>Sprint</Value>
+    <Text>Sprint</Text>
+    <Gateway>messaging.sprintpcs.com</Gateway>
+  </Carrier>
+  <Carrier>
+    <Value>TMobile</Value>
+    <Text>T-Mobile</Text>
+    <Gateway>tmomail.net</Gateway>
+  </Carrier>
+  <Carrier>
+    <Value>Verizon</Value>
+    <Text>Verizon</Text>
+    <Gateway>vtext.com</Gateway>
+  </Carrier>
+</CarrierList>

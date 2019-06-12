@@ -1,0 +1,119 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Checkout.Models.CheckoutModel>
+@using DotNetNuke.Web.Mvc.Helpers;
+
+<div id="rzcDonationModal_@Dnn.ModuleContext.ModuleId" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="rzcDonationModalTitle_@Dnn.ModuleContext.ModuleId">
+    <div class="modal-dialog modal-sm" role="document">
+        <div ng-form="rzcDonationForm_@Dnn.ModuleContext.ModuleId" class="modal-content" style="position: relative;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="rzcDonationModalTitle_@Dnn.ModuleContext.ModuleId">@Dnn.LocalizeString("Donation")</h4>
+            </div>
+            <div class="modal-body">
+                <div ng-if="checkout.donationModalVisible" class="text-center">
+                    <h4>{{checkout.donationProduct.ModelName}}</h4>
+                    <h5>
+                        @Dnn.LocalizeString("SKU"): {{checkout.donationProduct.ModelNumber}}
+                    </h5>
+                    @if (Model.AllowPriceView)
+                    {
+                        <div>
+                            <h4 ng-class="{'rzc-donation-sale': checkout.donationIsSaleEnabled && checkout.donationProduct.IsUnderSale}">
+                                @Dnn.LocalizeString("Price"): {{(checkout.donationProduct.BundleUnitCost || checkout.donationProduct.UnitCost) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                            </h4>
+                            <h4 ng-if="checkout.donationIsSaleEnabled && checkout.donationProduct.IsUnderSale">
+                                @Dnn.LocalizeString("Now"): {{(checkout.donationProduct.BundleSalePrice || checkout.donationProduct.SalePrice) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                            </h4>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.DonationProduct.Summary))
+                    {
+                        <span itemprop="description" class="e-description description rzc-donation-product-desc">@Html.Raw(Model.DonationProduct.Summary)</span>
+                    }
+                    @if (Model.DonationProduct.HasVariants)
+                    {
+                        <div class="form">
+                            @Html.Partial("_DonationVariants")
+                        </div>
+                    }
+                    @if (!Model.DonationHasVariantQty)
+                    {
+                        <div class="form">
+                            <div class="form-group">
+                                <label class="control-label">@Dnn.LocalizeString("Quantity")</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" step="1" min="1" max="999999" ng-model="checkout.donationProductQuantity" ng-init="checkout.donationProductQuantity = 1" name="donationProductQuantity" required />
+                                    <span class="input-group-addon">{{checkout.donationProduct.PriceUnits}}<i class="fa fa-cart-plus" ng-if="!checkout.donationProduct.PriceUnits"></i></span>
+                                </div>
+                                <div ng-messages="rzcDonationForm_@(Dnn.ModuleContext.ModuleId).donationProductQuantity.$error" ng-if="checkout.donationSubmitted || rzcDonationForm_@(Dnn.ModuleContext.ModuleId).donationProductQuantity.$dirty">
+                                    <div class="form-control-required" ng-message="required">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldRequired")
+                                    </div>
+                                    <div class="form-control-required" ng-message="number">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldNumeric")
+                                    </div>
+                                    <div class="form-control-required" ng-message="min">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldMinValue")
+                                    </div>
+                                    <div class="form-control-required" ng-message="max">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldMaxValue")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (Model.DonationProduct.UserEnteredAmount)
+                    {
+                        <div class="form">
+                            <div class="form-group">
+                                <label class="control-label">@Dnn.LocalizeString("Price")</label>
+                                <div class="input-group">
+                                    @{
+                                        double stepValue = Math.Pow(10, Model.Culture.NumberFormat.CurrencyDecimalDigits * -1);
+                                        double minValue = Model.DonationProductII == null || Model.DonationProductII.MinPartialAmount == -1 ? stepValue : (double)Model.DonationProductII.MinPartialAmount;
+                                    }
+                                    <input type="number" class="form-control" step="@(stepValue)" min="@(minValue)" ng-model="checkout.donationProductPrice" name="donationProductPrice" ng-init="checkout.donationProductPrice = (checkout.isSaleEnabled && checkout.donationProduct.IsUnderSale ? (checkout.donationProduct.BundleSalePrice || checkout.donationProduct.SalePrice) : (checkout.donationProduct.BundleUnitCost || checkout.donationProduct.UnitCost)) || null" ng-change="checkout.userEnteredAmountChange('donationProductPrice')" ng-model-options="{updateOn: 'blur'}" required />
+                                    <span class="input-group-addon"><i class="fa fa-money"></i></span>
+                                </div>
+                                <div ng-messages="rzcDonationForm_@(Dnn.ModuleContext.ModuleId).donationProductPrice.$error" ng-if="checkout.donationSubmitted || rzcDonationForm_@(Dnn.ModuleContext.ModuleId).donationProductPrice.$dirty">
+                                    <div class="form-control-required" ng-message="required">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldRequired")
+                                    </div>
+                                    <div class="form-control-required" ng-message="number">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldNumeric")
+                                    </div>
+                                    <div class="form-control-required" ng-message="min">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldInteger")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">@Dnn.LocalizeString("Close")</button>
+                @if (Model.AllowAddToCart)
+                {
+                    <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("Donate")" ng-click="checkout.donationSubmitted = true; rzcDonationForm_@(Dnn.ModuleContext.ModuleId).$valid && checkout.addToCart()" ng-if="checkout.donationProduct.QuantityOnHand > 0 || !checkout.donationManageInventory || rzcForm_@(Dnn.ModuleContext.ModuleId).$invalid" focus-invalid />
+                }
+            </div>
+            <div class="rc-donation-backdrop" ng-if="checkout.donationRebinding">
+                <div class="rc-donation-backdrop-container">
+                    <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("Donation")" ng-click="checkout.donationModalVisible = true;" ng-disabled="(checkout.cartList.length < 1)" data-toggle="modal" data-target="#rzcDonationModal_@Dnn.ModuleContext.ModuleId" />
+<script type="text/javascript">
+    angular.element(document.getElementById('rzcDonationModal_@Dnn.ModuleContext.ModuleId')).on('hidden.bs.modal', function (e) {
+        let container@(Dnn.ModuleContext.ModuleId) = angular.element(document.getElementById('rzcContainer_@Dnn.ModuleContext.ModuleId'));
+        container@(Dnn.ModuleContext.ModuleId).ready(function () {
+            var scope = container@(Dnn.ModuleContext.ModuleId).scope();
+            var vm = container@(Dnn.ModuleContext.ModuleId).controller();
+            vm.donationModalVisible = false;
+            scope.$apply(function () { });
+        });
+    });
+</script>

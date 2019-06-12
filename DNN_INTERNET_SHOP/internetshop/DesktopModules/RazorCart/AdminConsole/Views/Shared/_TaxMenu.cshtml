@@ -1,0 +1,13 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.TaxModel>
+
+<ul class="nav nav-tabs" style="margin-bottom: 1em;">
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Index", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Index", "Tax", new { StoreID = Model.StoreID })">Setup</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Table", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Table", "Tax", new { StoreID = Model.StoreID })">Tax Table</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Region", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Region", "Tax", new { StoreID = Model.StoreID })">Tax Regions</a>
+    </li>
+</ul>

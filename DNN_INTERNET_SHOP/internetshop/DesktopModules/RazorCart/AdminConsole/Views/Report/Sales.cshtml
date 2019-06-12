@@ -1,0 +1,129 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ReportModel>
+@using System.Web.Mvc.Html;
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/rowGroup.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Bootstrap DateTimePicker CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/bootstrap-datetimepicker.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.rowGroup.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Moment JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/moment.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Bootstrap DateTimePicker JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/bootstrap-datetimepicker.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row printable">
+    <div class="col-lg-12">
+        <h1 class="page-header">Sales Summary</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row printable">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Sales", "Report", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a class="btn btn-warning pull-right" href="" onclick="javascript: if (window.opener) { window.print(); } else { openPrintPreview($('.printable')); }; return false;">
+                        <i class="fa fa-print"></i> Print
+                    </a>
+                    <h4>All Sales Summary</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <table class="table table-hover" id="tblSales" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Product SKU</th>
+                                <th>Product Name</th>
+                                <th style="text-align: center;">Total Products Ordered</th>
+                                <th style="text-align: center;">Product Category Revenue</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4">&nbsp;</th>
+                            </tr>
+                            <tr>
+                                <th colspan="2" class="text-center" data-bind="totalOrders"></th>
+                                <th colspan="2" class="text-center" data-bind="totalRevenue"></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            @Html.Partial("_TableDateFilter")
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tblSales').on('preXhr.dt', function (e, settings, data) {
+            data['date'] = { from: $('#dataTable_datefilter').find('input[type="text"]').eq(0).val(), to: $('#dataTable_datefilter').find('input[type="text"]').eq(1).val() };
+        }).on('init.dt', function (e, settings, data) {
+            $('#dataTable_datefilter').appendTo('#tblSales_wrapper .date-filter').show();
+        }).DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: '',
+            },
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            columns: [
+                { data: 'ProductSKU' },
+                { data: 'ProductName' },
+                { data: 'TotalOrders', className: 'text-left' },
+                { data: 'Revenue', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)'), className: 'text-left' }
+            ],
+            rowGroup: {
+                startRender: function (rows, group) {
+                    var categoryOrders = rows.data().pluck('TotalOrders').reduce(function (a, b) {
+                        return a + b * 1;
+                    }, 0);
+                    var categoryRevenue = rows.data().pluck('Revenue').reduce(function (a, b) {
+                        return a + b * 1;
+                    }, 0);
+                    return $('<tr/>')
+                        .append('<td colspan="2">' + ((group) ? group : 'Uncategorized') + '</td>')
+                        .append('<td class="text-center">' + categoryOrders.toFixed(0) + '</td>')
+                        .append('<td class="text-center">' + $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)').display(categoryRevenue) + '</td>');
+                },
+                dataSrc: 'CategoryName'
+            },
+            footerCallback: function (tfoot, data, start, end, display) {
+                var revenueSummary = this.api().table().ajax.json().revenueSummary;
+                $(tfoot).next().find('th[data-bind="totalOrders"]').html('Total Orders: ' + revenueSummary.CountTotal)
+                $(tfoot).next().find('th[data-bind="totalRevenue"]').html('Total Revenue: ' + $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)').display(revenueSummary.GrandTotal));
+            },
+            dom: '<"row"<"col-sm-4"l><"col-sm-4 date-filter"><"col-sm-4"f>>' + '<"row"<"col-sm-12"tr>>' + '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+            processing: false,
+            serverSide: true,
+            searching: false,
+            ordering: false,
+            ajax: {
+                url: '@Url.Action("ListSales", "Report", new { StoreID = Model.StoreID })',
+                type: 'POST'
+            }
+        });
+        var dPickers = new RZCDateTimePicker('[data-provider="datepicker"]', { format: '@Model.ShortDateFormat.ToUpper()' });
+        for (var i = 0; i < dPickers.length; i++) {
+            var dPicker = dPickers[i];
+            dPicker.on('dp.change', function (e) {
+                $('#tblSales').DataTable().draw();
+            });
+        }
+        $('#dataTable_datefilter').find(':input').each(function () {
+            $(this).on('change', function () {
+                $('#tblSales').DataTable().draw();
+            });
+        });
+    });
+</script>

@@ -1,0 +1,150 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Checkout.Models.CheckoutModel>
+
+@foreach (var group in Model.DonationVariantList)
+{
+    int i = 1;
+    string ngIf = string.Empty;
+    string[] ngIfs = new string[group.Conditionals.Count + 1];
+    ngIfs[0] = group.Hide ? "false" : "true";
+    foreach (var condition in group.Conditionals)
+    {
+        switch (condition.VariantDisplayType)
+        {
+            case "DropdownList":
+            case "Buttons":
+            case "RadioButtons":
+            case "Icon":
+                ngIfs[i] = "checkout.donationVariantsData.group_" + condition.VariantGroupID + " == " + condition.VariantID;
+                break;
+            case "CheckBox":
+                ngIfs[i] = "checkout.donationVariantsData.variantChk_" + condition.VariantID;
+                break;
+        }
+        i++;
+    }
+    ngIf = string.Join(" || ", ngIfs);
+    <!-- Donation Product Variants Form -->
+    <div class="form-group" ng-if="@ngIf">
+        <label class="control-label">
+            @(group.VariantGroup)
+            @if (!string.IsNullOrWhiteSpace(group.GroupDescription))
+            {
+                <i class="fa fa-info-circle" role="button" uib-popover="@(group.GroupDescription)" popover-trigger="'mouseenter'" popover-placement="right"></i>
+            }
+        </label>
+        <div class="control">
+            @switch (group.DisplayType)
+            {
+                case "DropdownList":
+                    <select class="form-control" ng-model="checkout.donationVariantsData.group_@(group.VariantGroupID)" ng-init="checkout.donationVariantsData.group_@(group.VariantGroupID) = null" destroy-y
+                            ng-change="checkout.price();" name="rzcVariantGroup_@(group.VariantGroupID)" @(group.GroupRequired ? "required" : "")>
+                        <option value="" disabled selected>@Dnn.LocalizeString("Select")</option>
+                        @foreach (var variant in group.Variants)
+                        {
+                            <option value="@(variant.VariantID)" data-images="@(variant.VariantImage)">@(variant.VariantName)</option>
+                        }
+                    </select>
+                    if (group.GroupRequired)
+                    {
+                        <div ng-messages="rzcDonationForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$error" ng-if="checkout.donationSubmitted || rzcDonationForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("SelectRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "Buttons":
+                    foreach (var variant in group.Variants)
+                    {
+                        <div class="radio radio-image">
+                            <label>
+                                <input type="radio" ng-model="checkout.donationVariantsData.group_@(group.VariantGroupID)" ng-init="checkout.donationVariantsData.group_@(group.VariantGroupID) = null" data-images="@(variant.VariantImage)" destroy-y
+                                       ng-change="checkout.price();" name="rzcVariantGroup_@(group.VariantGroupID)" ng-value="@(variant.VariantID)" @(group.GroupRequired ? "required" : "") />
+                                <strong class="img-thumbnail rzc-donation-button" ng-mouseenter="checkout.donationVariantButtonHover_@(variant.VariantID) = true" ng-mouseleave="checkout.donationVariantButtonHover_@(variant.VariantID) = false" ng-class="(checkout.donationVariantButtonHover_@(variant.VariantID) ? 'text-info rzc-shadow' : '') || (checkout.donationVariantsData.group_@(group.VariantGroupID) == @(variant.VariantID) ? 'text-primary' : '')">
+                                    @(variant.VariantName)
+                                    @if (!string.IsNullOrWhiteSpace(variant.VariantDesc))
+                                    {
+                                        <i class="fa fa-info-circle" role="button" uib-popover="@(variant.VariantDesc)" popover-trigger="'mouseenter'" popover-placement="right"></i>
+                                    }
+                                </strong>
+                            </label>
+                        </div>
+                    }
+                    if (group.GroupRequired)
+                    {
+                        <div ng-messages="rzcDonationForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$error" ng-if="checkout.donationSubmitted || rzcDonationForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("OptionRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "RadioButtons":
+                    foreach (var variant in group.Variants)
+                    {
+                        <div class="radio">
+                            <label>
+                                <input type="radio" ng-model="checkout.donationVariantsData.group_@(group.VariantGroupID)" ng-init="checkout.donationVariantsData.group_@(group.VariantGroupID) = null" data-images="@(variant.VariantImage)" destroy-y
+                                       ng-change="checkout.price();" name="rzcVariantGroup_@(group.VariantGroupID)" ng-value="@(variant.VariantID)" @(group.GroupRequired ? "required" : "") />
+                                @(variant.VariantName)
+                                @if (!string.IsNullOrWhiteSpace(variant.VariantDesc))
+                                {
+                                    <i class="fa fa-info-circle" role="button" uib-popover="@(variant.VariantDesc)" popover-trigger="'mouseenter'" popover-placement="right"></i>
+                                }
+                            </label>
+                        </div>
+                    }
+                    if (group.GroupRequired)
+                    {
+                        <div ng-messages="rzcDonationForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$error" ng-if="checkout.donationSubmitted || rzcDonationForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("OptionRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "Icon":
+                    foreach (var variant in group.Variants)
+                    {
+                        <div class="radio radio-image">
+                            <label>
+                                <input type="radio" ng-model="checkout.donationVariantsData.group_@(group.VariantGroupID)" ng-init="checkout.donationVariantsData.group_@(group.VariantGroupID) = null" data-images="@(variant.VariantImage)" destroy-y
+                                       ng-change="checkout.price();" name="rzcVariantGroup_@(group.VariantGroupID)" ng-value="@(variant.VariantID)" @(group.GroupRequired ? "required" : "") />
+                                <img class="img-thumbnail" ng-class="checkout.donationVariantsData.group_@(group.VariantGroupID) == @(variant.VariantID) ? 'btn-primary' : 'btn-default'" ng-src="@(variant.VariantIconImage)" />
+                            </label>
+                        </div>
+                    }
+                    if (group.GroupRequired)
+                    {
+                        <div ng-messages="rzcDonationForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$error" ng-if="checkout.donationSubmitted || rzcDonationForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("OptionRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "CheckBox":
+                    foreach (var variant in group.Variants)
+                    {
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="checkout.donationVariantsData.variantChk_@(variant.VariantID)" ng-init="checkout.donationVariantsData.variantChk_@(variant.VariantID) = false" data-images="@(variant.VariantImage)" destroy-y
+                                       ng-change="checkout.price();" name="variantChk_@(variant.VariantID)" @(variant.VariantRequired ? "required" : "") />
+                                @(variant.VariantName)
+                                @if (!string.IsNullOrWhiteSpace(variant.VariantDesc))
+                                {
+                                    <i class="fa fa-info-circle" role="button" uib-popover="@(variant.VariantDesc)" popover-trigger="'mouseenter'" popover-placement="right"></i>
+                                }
+                            </label>
+                        </div>
+                        <div ng-messages="rzcDonationForm_@(Dnn.ModuleContext.ModuleId).variantChk_@(variant.VariantID).$error" ng-if="checkout.donationSubmitted || rzcDonationForm_@(Dnn.ModuleContext.ModuleId).variantChk_@(variant.VariantID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("CheckboxRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+            }
+        </div>
+    </div>
+}

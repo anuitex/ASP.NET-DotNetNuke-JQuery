@@ -1,0 +1,133 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ShippingModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Shipping Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Custom", "Shipping", new { StoreID = Model.StoreID })" autocomplete="off">
+            @Html.Partial("_ShippingMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a class="btn btn-primary pull-right" href="@Url.Action("AddCustom", "Shipping", new { StoreID = Model.StoreID })">
+                                        <i class="fa fa-plus"></i> Add Ship Method
+                                    </a>
+                                    <h4>Custom Ship Methods</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="table-sortable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sort</th>
+                                                    <th>Ship Method Name</th>
+                                                    <th>Ship Amount</th>
+                                                    <th>Surcharge Percentage</th>
+                                                    <th>Surcharge Amount</th>
+                                                    <th>Security Role</th>
+                                                    <th>Share</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var method in Model.ShipMethods)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <span class="glyphicon glyphicon-sort"></span>
+                                                            <span class="text-muted badge">@method.SortOrder</span>
+                                                            <input type="hidden" name="tableSortId" value="@method.ShipMethodID" disabled />
+                                                            <input type="hidden" name="tableSortOrder" value="@method.SortOrder" disabled />
+                                                        </td>
+                                                        <td>@method.ShipMethodName</td>
+                                                        <td>@string.Format(Model.Culture, "{0:c}", method.ShipMethodAmount)</td>
+                                                        <td>@string.Format("{0}%", method.SurchargePercentage)</td>
+                                                        <td>@string.Format(Model.Culture, "{0:c}", method.SurchargeAmount)</td>
+                                                        <td>@method.RoleName</td>
+                                                        <td>@method.Share</td>
+                                                        <td class="text-right">
+                                                            <a href="@Url.Action("EditCustom", "Shipping", new { StoreID = Model.StoreID, ShipMethodID = method.ShipMethodID })"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                                            <a href="@Url.Action("DeleteCustom", "Shipping", new { StoreID = Model.StoreID, ShipMethodID = method.ShipMethodID })" onclick="return confirm('Are you sure?')">
+                                                                <i class="fa fa-trash-o fa-lg"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.ShipMethods.Count < 1)
+                                                {
+                                                    <tr><td colspan="8">No Ship Methods added.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    //Prevent table row from being collapsed when sorting
+    var fixHelperModified = function (e, tr) {
+        var $originals = tr.children();
+        var $helper = tr.clone();
+        $helper.children().each(function (index) {
+            $(this).width($originals.eq(index).width())
+        });
+        return $helper;
+    }
+    //Update Sort Order values
+    function renumber_table(tableID) {
+        var sortData = new FormData();
+        $(tableID + ' tbody tr').each(function () {
+            count = $(this).parent().children().index($(this)) + 1;
+            var hndID = $(this).find('[type=hidden][name=tableSortId]');
+            var hndSort = $(this).find('[type=hidden][name=tableSortOrder]');
+            var sortBadge = $(this).find('span.badge');
+            hndSort.val(count);
+            sortBadge.html(count);
+            sortData.append(hndID.val(), hndSort.val());
+        })
+        .promise().done(function () {
+            $.ajax({
+                url: '@Url.Action("SortCustom", "Shipping", new { StoreID = Model.StoreID })',
+                type: 'POST',
+                data: sortData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (data, result) {
+                    console.log(data);
+                },
+                error: function (error) {
+                    console.log(error.status + ' ' + error.statusText);
+                }
+            });
+        });
+    }
+    $(document).ready(function () {
+        //jQuery UI Sortable: (https://jqueryui.com/sortable/)
+        $('#table-sortable tbody').sortable({
+            handle: 'span.glyphicon-sort, span.badge',
+            helper: fixHelperModified,
+            stop: function (event, ui) { renumber_table('#table-sortable') }
+        });
+    });
+</script>

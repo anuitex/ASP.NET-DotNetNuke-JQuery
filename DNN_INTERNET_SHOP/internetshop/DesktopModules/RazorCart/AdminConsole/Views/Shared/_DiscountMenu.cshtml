@@ -1,0 +1,13 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.DiscountModel>
+
+<ul class="nav nav-tabs" style="margin-bottom: 1em;">
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("Index", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Index", "Discount", new { StoreID = Model.StoreID })">Setup</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Order", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Order", "Discount", new { StoreID = Model.StoreID })">Order Discounts</a>
+    </li>
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Class", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Class", "Discount", new { StoreID = Model.StoreID })">Price Class</a>
+    </li>
+</ul>

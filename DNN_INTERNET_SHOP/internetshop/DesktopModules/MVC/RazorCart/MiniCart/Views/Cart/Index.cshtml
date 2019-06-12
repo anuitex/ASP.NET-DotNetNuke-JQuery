@@ -1,0 +1,385 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.MiniCart.Models.CartModel>
+@using DotNetNuke.Web.Mvc.Helpers
+
+<div class="row">
+    <div class="col-md-12" ng-switch="minicart.viewState">
+        <div ng-switch-when="IconView">
+            <div style="position: relative; display: inline-block;">
+                <a class="btn btn-link" style="position: relative; padding: 0;" href="@Model.WishlistPage">
+                    <span ng-if="minicart.wishlist.length" class="icon-view-notification">
+                        {{minicart.wishlist.length}}
+                    </span>
+                    <span class="fa-stack">
+                        <i class="fa fa-circle fa-stack-2x" style="color: #8c8c8c"></i>
+                        <i class="fa fa-heart fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                <a class="btn btn-link" style="position: relative; padding: 0; margin-left: 2px;" ng-mouseover="minicart.showIconViewContent = true" ng-mouseleave="minicart.showIconViewContent = false" ng-click="$event.preventDefault(); minicart.showIconViewContent = true">
+                    <span ng-if="minicart.cartList.length" class="icon-view-notification">
+                        {{minicart.cartList.length}}
+                    </span>
+                    <span class="fa-stack">
+                        <i class="fa fa-circle fa-stack-2x" style="color: #8c8c8c"></i>
+                        <i class="fa fa-shopping-cart fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                <div class="icon-view-box" ng-mouseover="minicart.showIconViewContent = true" ng-mouseleave="minicart.showIconViewContent = false" ng-style="minicart.showIconViewContent && {'visibility':'visible', 'opacity':'1'}">
+                    <span class="icon-view-caret">
+                    </span>
+                    <h5 ng-if="minicart.cartList.length < 1">
+                        @Dnn.LocalizeString("NoCartItems")
+                    </h5>
+                    <h5 ng-if="minicart.cartList.length == 1">
+                        @Dnn.LocalizeString("SingleCartItem")
+                    </h5>
+                    <h5 ng-if="minicart.cartList.length > 1" ng-init="multiCartItemsStr = '@Dnn.LocalizeString("MultiCartItems")'">
+                        {{multiCartItemsStr.replace('[COUNT]', minicart.cartList.length)}}
+                    </h5>
+                    <table class="table table-condensed">
+                        <tbody>
+                            <tr ng-repeat="cartItem in minicart.cartList">
+                                <td style="vertical-align: middle; width: 30%; min-width: 80px;">
+                                    <img style="max-width: 100% !important;" ng-src="{{cartItem.ImageName}}" class="img-thumbnail cart-image" alt="{{cartItem.ProductName}}" err-src="@DotNetNuke.Common.Globals.DesktopModulePath" err-size="200" />
+                                </td>
+                                <td style="vertical-align: middle; width: 60%;">
+                                    <div>
+                                        <a ng-href="{{cartItem.ProductDetailUrl}}">
+                                            {{cartItem.ProductName}}
+                                            <small>@Dnn.LocalizeString("SKU"): {{cartItem.ProductSku}}</small>
+                                        </a>
+                                    </div>
+                                    <div ng-if="cartItem.CartVariants.length > 0">
+                                        <ul class="list-unstyled" style="margin-bottom: 0;">
+                                            <li ng-repeat="itemVariant in cartItem.CartVariants">
+                                                {{itemVariant.VariantHasText ? (itemVariant.VariantName + ': ' + itemVariant.VariantText) : (itemVariant.VariantGroup + ': ' + itemVariant.VariantName)}}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    @if (Model.AllowPriceView)
+                                    {
+                                        <div>@Dnn.LocalizeString("Total"): {{cartItem.UnitCost * cartItem.Quantity | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</div>
+                                    }
+                                    <div>
+                                        @Dnn.LocalizeString("Quantity"): {{cartItem.Quantity | number : 2}}
+                                    </div>
+                                </td>
+                                <td style="vertical-align: middle; width: 10%; min-width: 30px;">
+                                    <a href="#" ng-click="$event.preventDefault(); minicart.delete($index)">
+                                        <i class="fa fa-times"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr />
+                    <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("Checkout")" onclick="window.location.href='@Model.CheckoutPage';" ng-disabled="(minicart.cartList.length < 1)" />
+                </div>
+            </div>
+        </div>
+        <div ng-switch-when="SummaryView">
+            <ul class="list-unstyled">
+                <li>
+                    <a href="@Model.CheckoutPage">
+                        <h4><i class="fa fa-shopping-cart"></i> @Dnn.LocalizeString("Items") {{minicart.countCart().Number | number : 2}}</h4>
+                    </a>
+                </li>
+                @if (Model.AllowPriceView)
+                {
+                    <li>
+                        @Dnn.LocalizeString("TotalPrice") {{minicart.countCart().Total | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                    </li>
+                }
+            </ul>
+            <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("Checkout")" onclick="window.location.href='@Model.CheckoutPage';" ng-disabled="(minicart.cartList.length < 1)" />
+        </div>
+        <div ng-switch-when="DetailView">
+            <div class="rzc-basket">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th style="width: 1%;">@Dnn.LocalizeString("Item")</th>
+                            <th></th>
+                            <th>@Dnn.LocalizeString("Quantity")</th>
+                            <th class="text-right">@(Model.AllowPriceView ? Dnn.LocalizeString("Total") : string.Empty)</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="cartItem in minicart.cartList">
+                        <tr>
+                            <td rowspan="2"><img ng-src="{{cartItem.ImageName}}" class="img-thumbnail cart-image" alt="{{cartItem.ProductName}}" err-src="@DotNetNuke.Common.Globals.DesktopModulePath" err-size="200" /></td>
+                            <td>
+                                <a ng-href="{{cartItem.ProductDetailUrl}}">
+                                    {{cartItem.ProductName}}<br />
+                                    <small>@Dnn.LocalizeString("SKU"): {{cartItem.ProductSku}}</small>
+                                </a>
+                            </td>
+                            <td>
+                                {{cartItem.Quantity | number : 2}}
+                                @if (Model.AllowPriceView)
+                                {
+                                    <span>x {{cartItem.UnitCost | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</span>
+                                }
+                                <br />
+                                <span style="white-space: nowrap">
+                                    <button type="button" class="btn btn-default btn-xs" ng-click="minicart.increase($index)"><i class="fa fa-plus"></i></button>
+                                    <button type="button" class="btn btn-default btn-xs" ng-click="minicart.decrease($index)"><i class="fa fa-minus"></i></button>
+                                </span>
+                            </td>
+                            <td class="text-right">
+                                @if (Model.AllowPriceView)
+                                {
+                                    <span>{{cartItem.UnitCost * cartItem.Quantity | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</span><br />
+                                }
+                                <button type="button" class="btn btn-default btn-xs" ng-click="minicart.delete($index)"><i class="fa fa-trash-o"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" ng-if="cartItem.CartVariants.length > 0">
+                                <ul>
+                                    <li ng-repeat="itemVariant in cartItem.CartVariants">
+                                        {{itemVariant.VariantHasText ? (itemVariant.VariantName + ': ' + itemVariant.VariantText) : (itemVariant.VariantGroup + ': ' + itemVariant.VariantName)}}
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody ng-if="minicart.cartList.length < 1">
+                        <tr>
+                            <td colspan="4"><span>@Dnn.LocalizeString("NoCartItems")</span></td>
+                        </tr>
+                    </tbody>
+                    <tfoot ng-if="minicart.cartList.length > 0">
+                        @if (Model.AllowPriceView)
+                        {
+                            <tr>
+                                <td colspan="3" class="text-right"><strong>@Dnn.LocalizeString("Subtotal")</strong></td>
+                                <td colspan="1" class="text-right"><strong>{{minicart.cartTotals.SubTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</strong></td>
+                            </tr>
+                        }
+                    </tfoot>
+                </table>
+            </div>
+            <div class="row form-group">
+                <div class="col-xxs-6 text-left">
+                    <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("Checkout")" onclick="window.location.href='@Model.CheckoutPage';" ng-disabled="(minicart.cartList.length < 1)" />
+                </div>
+                <div class="col-xxs-6 text-right">
+                    <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("ClearCart")" ng-click="minicart.clear()" ng-disabled="(minicart.cartList.length < 1)" />
+                </div>
+            </div>
+        </div>
+        <div ng-switch-when="TabView">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a data-toggle="tab" href="#miniCart">@Dnn.LocalizeString("ShoppingCart") ({{minicart.countCart().Number}})</a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#wishList">@Dnn.LocalizeString("WishList") ({{minicart.countWishlist().Number}})</a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#orderHistory">@Dnn.LocalizeString("OrderHistory") ({{minicart.orders.length}})</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="miniCart" class="tab-pane fade in active">
+                    <div class="rzc-basket">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>@Dnn.LocalizeString("Image")</th>
+                                    <th>@Dnn.LocalizeString("Item")</th>
+                                    <th>@Dnn.LocalizeString("Quantity")</th>
+                                    <th class="text-right">@(Model.AllowPriceView ? Dnn.LocalizeString("Total") : string.Empty)</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="cartItem in minicart.cartList">
+                                <tr>
+                                    <td rowspan="2"><img ng-src="{{cartItem.ImageName}}" class="img-thumbnail cart-image" alt="{{cartItem.ProductName}}" err-src="@DotNetNuke.Common.Globals.DesktopModulePath" err-size="200" /></td>
+                                    <td>
+                                        <a ng-href="{{cartItem.ProductDetailUrl}}">
+                                            {{cartItem.ProductName}}<br />
+                                            <small>@Dnn.LocalizeString("SKU"): {{cartItem.ProductSku}}</small>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {{cartItem.Quantity | number : 2}}
+                                        @if (Model.AllowPriceView)
+                                        {
+                                            <span>x {{cartItem.UnitCost | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</span>
+                                        }
+                                        <br />
+                                        <span style="white-space: nowrap">
+                                            <button type="button" class="btn btn-default btn-xs" ng-click="minicart.increase($index)"><i class="fa fa-plus"></i></button>
+                                            <button type="button" class="btn btn-default btn-xs" ng-click="minicart.decrease($index)"><i class="fa fa-minus"></i></button>
+                                        </span>
+                                    </td>
+                                    <td class="text-right">
+                                        @if (Model.AllowPriceView)
+                                        {
+                                            <span>{{cartItem.UnitCost * cartItem.Quantity | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</span><br />
+                                        }
+                                        <button type="button" class="btn btn-default btn-xs" ng-click="minicart.delete($index)"><i class="fa fa-trash-o"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" ng-if="cartItem.CartVariants.length > 0">
+                                        <ul>
+                                            <li ng-repeat="itemVariant in cartItem.CartVariants">
+                                                {{itemVariant.VariantHasText ? (itemVariant.VariantName + ': ' + itemVariant.VariantText) : (itemVariant.VariantGroup + ': ' + itemVariant.VariantName)}}
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tbody ng-if="minicart.cartList.length < 1">
+                                <tr>
+                                    <td colspan="4"><span>@Dnn.LocalizeString("NoCartItems")</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-xs-4 text-left">
+                            <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("Checkout")" onclick="window.location.href='@Model.CheckoutPage';" ng-disabled="(minicart.cartList.length < 1)" />
+                        </div>
+                        <div class="col-xs-8 text-right">
+                            <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("ClearCart")" ng-click="minicart.clear()" ng-disabled="(minicart.cartList.length < 1)" />
+                        </div>
+                    </div>
+                </div>
+                <div id="wishList" class="tab-pane fade">
+                    <div class="rzc-basket">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>@Dnn.LocalizeString("Description")</th>
+                                        <th>@Dnn.LocalizeString("Created")</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="savedCart in minicart.wishlist">
+                                    <tr>
+                                        <td ng-click="minicart.showSaved($index)" role="button">{{savedCart.Description}}</td>
+                                        <td ng-click="minicart.showSaved($index)" role="button">{{savedCart.CreateDate | date : '@Model.Culture.DateTimeFormat.ShortDatePattern @Model.Culture.DateTimeFormat.ShortTimePattern.Replace("tt", "a")'}}</td>
+                                        <td><i class="fa fa-trash-o fa-lg" role="button" ng-click="minicart.unsave($index)"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" ng-if="savedCart.Visible">
+                                            <div class="rzc-basket">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>@Dnn.LocalizeString("SKU")</th>
+                                                            <th>@Dnn.LocalizeString("ProductName")</th>
+                                                            <th class="text-right">@Dnn.LocalizeString("UnitCost")</th>
+                                                            <th class="text-right">@Dnn.LocalizeString("Quantity")</th>
+                                                            <th class="text-right">@Dnn.LocalizeString("LineTotal")</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody ng-repeat="cartItem in savedCart.CartItems">
+                                                        <tr>
+                                                            <td>{{cartItem.ProductSku}}</td>
+                                                            <td><a ng-href="{{cartItem.ProductDetailUrl}}">{{cartItem.ProductName}}</a></td>
+                                                            <td class="text-right">{{cartItem.UnitCost | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                                                            <td class="text-right">{{cartItem.Quantity | number : 2}}</td>
+                                                            <td class="text-right">{{cartItem.UnitCost * cartItem.Quantity | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5" ng-if="cartItem.CartVariants.length > 0">
+                                                                <ul>
+                                                                    <li ng-repeat="itemVariant in cartItem.CartVariants">
+                                                                        {{itemVariant.VariantHasText ? (itemVariant.VariantName + ': ' + itemVariant.VariantText) : (itemVariant.VariantGroup + ': ' + itemVariant.VariantName)}}
+                                                                    </li>
+                                                                </ul>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tbody ng-if="savedCart.CartItems.length < 1">
+                                                        <tr>
+                                                            <td colspan="5"><span>@Dnn.LocalizeString("NoSavedCartItems")</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody ng-if="minicart.wishlist.length < 1">
+                                    <tr>
+                                        <td colspan="4"><span>@Dnn.LocalizeString("NoWishlist")</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="orderHistory" class="tab-pane fade">
+                    <div class="rzc-basket">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>@Dnn.LocalizeString("Status")</th>
+                                        <th>@Dnn.LocalizeString("OrderNo")</th>
+                                        <th>@Dnn.LocalizeString("OrderDate")</th>
+                                        <th ng-if="false">@Dnn.LocalizeString("ShipTo")</th>
+                                        <th class="text-right">@Dnn.LocalizeString("OrderTotal")</th>
+                                        <th class="text-right">@Dnn.LocalizeString("PayTotal")</th>
+                                        <th class="text-right">@Dnn.LocalizeString("Balance")</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="order in minicart.orders">
+                                    <tr>
+                                        <td>
+                                            <div ng-switch="order.Status">
+                                                <span ng-switch-when="BillMeLater">
+                                                    @Dnn.LocalizeString("StatusBillMeLater")
+                                                </span>
+                                                <span ng-switch-when="Open">
+                                                    @Dnn.LocalizeString("StatusOpen")
+                                                </span>
+                                                <span ng-switch-when="ReadyToShip">
+                                                    @Dnn.LocalizeString("StatusReadyToShip")
+                                                </span>
+                                                <span ng-switch-when="Shipped">
+                                                    @Dnn.LocalizeString("StatusShipped")
+                                                </span>
+                                                <span ng-switch-when="PickedUp">
+                                                    @Dnn.LocalizeString("StatusPickedUp")
+                                                </span>
+                                                <span ng-switch-when="Cancelled">
+                                                    @Dnn.LocalizeString("StatusCancelled")
+                                                </span>
+                                                <span ng-switch-when="Incomplete">
+                                                    @Dnn.LocalizeString("StatusIncomplete")
+                                                </span>
+                                                <span ng-switch-when="OnHold">
+                                                    @Dnn.LocalizeString("StatusOnHold")
+                                                </span>
+                                                <span ng-switch-when="BackOrdered">
+                                                    @Dnn.LocalizeString("StatusBackOrdered")
+                                                </span>
+                                                <span ng-switch-when="Returned">
+                                                    @Dnn.LocalizeString("StatusReturned")
+                                                </span>
+                                                <span ng-switch-default>
+                                                    {{order.Status}}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>{{order.OrderID}}</td>
+                                        <td>{{order.OrderDate | date : '@Model.Culture.DateTimeFormat.ShortDatePattern'}}</td>
+                                        <td ng-if="false">{{order.ShipFirstName}} {{order.ShipLastName}}, {{order.ShipAddress1}} {{order.ShipAddress2}}, {{order.ShipCity}}, {{order.ShipState}} {{order.ShipZipcode}}</td>
+                                        <td class="text-right">{{order.GrandTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                                        <td class="text-right">{{order.PayTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                                        <td class="text-right">{{order.GrandTotal - order.PayTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

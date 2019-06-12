@@ -1,0 +1,77 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })" autocomplete="off">
+            @Html.Partial("_ProductMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a class="btn btn-primary pull-right" href="@Url.Action("AddInventory", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">
+                                        <i class="fa fa-plus"></i> Add Variant Inventory
+                                    </a>
+                                    <h4>Variant Inventory</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Combination</th>
+                                                    <th>SKU</th>
+                                                    <th>Qty On Hand</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var inventory in Model.ProductInventories)
+                                                {
+                                                    <tr>
+                                                        <td>@inventory.VariantName</td>
+                                                        <td>@inventory.Sku</td>
+                                                        <td>@inventory.QtyOnHand</td>
+                                                        <td class="text-right">
+                                                            <a href="@Url.Action("EditInventory", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, InventoryID = inventory.VariantInventoryID })"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                                            <a href="@Url.Action("DeleteInventory", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, InventoryID = inventory.VariantInventoryID })" onclick="return confirm('Are you sure?')">
+                                                                <i class="fa fa-trash-o fa-lg"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.ProductInventories.Count < 1)
+                                                {
+                                                    <tr><td colspan="4">No Variant Inventories added.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <a class="btn btn-default" href="@Url.Action("Variants", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->

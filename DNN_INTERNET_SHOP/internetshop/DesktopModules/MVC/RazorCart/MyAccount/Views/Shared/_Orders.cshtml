@@ -1,0 +1,533 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.MyAccount.Models.AccountModel>
+@using DotNetNuke.Web.Mvc.Helpers;
+
+<div class="rzc-basket" ng-if="!account.detailMode">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>@Dnn.LocalizeString("OrderNo")</th>
+                    <th>@Dnn.LocalizeString("Date")</th>
+                    <th>@Dnn.LocalizeString("Shipping")</th>
+                    <th>@Dnn.LocalizeString("Status")</th>
+                    <th class="text-right">@Dnn.LocalizeString("Total")</th>
+                    <th class="text-right">@Dnn.LocalizeString("Paid")</th>
+                    <th class="text-right">@Dnn.LocalizeString("Balance")</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody ng-if="account.orders.length > 0">
+                <tr ng-repeat="order in account.orders">
+                    <td>{{order.OrderID}}</td>
+                    <td>{{order.OrderDate | date : '@Model.Culture.DateTimeFormat.ShortDatePattern'}}</td>
+                    <td>{{order.ShipMethod}}</td>
+                    <td>{{order.Status}}</td>
+                    <td class="text-right">{{order.GrandTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                    <td class="text-right">{{order.PayTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                    <td class="text-right">{{order.GrandTotal - order.PayTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                    <td class="text-right">
+                        <i class="fa fa-folder-open fa-lg" role="button" ng-click="account.viewOrder($index)"></i>
+                        <i class="fa fa-print fa-lg" role="button" ng-click="account.print($index)" onclick="if (window.opener) window.print()"></i>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody ng-if="account.orders.length < 1">
+                <tr>
+                    <td colspan="6">@Dnn.LocalizeString("NoOrders")</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row form-horizontal" ng-if="account.detailMode">
+    <div class="col-lg-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="panel-title text-uppercase">@Dnn.LocalizeString("GeneralDetails")</span>
+            </div>
+            <div class="panel-body details">
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("OrderNo")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control">{{account.order.OrderID}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("OrderDate")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.order.OrderDate | date : '@(Model.Culture.DateTimeFormat.ShortDatePattern + " " + Model.Culture.DateTimeFormat.ShortTimePattern.Replace("tt", "a"))'}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("Status")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.order.Status}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("ShipDate")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.order.ShipDate > account.sqlMinDate ? account.order.ShipDate : ''}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("TrackingNo")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.order.TrackingNumber}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="panel-title text-uppercase">@Dnn.LocalizeString("ShippingDetails")</span>
+            </div>
+            <div class="panel-body details">
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("Name")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.order.ShipFirstName + ' ' + account.order.ShipLastName}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("Address")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.order.ShipAddress1 + ' ' + account.order.ShipAddress2}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label"></label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.order.ShipCity + ',' + account.order.ShipState + ' ' + account.order.ShipZipcode + ', ' + account.order.ShipCountry}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("ShipMethod")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.order.ShipMethod}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("ShipNotes")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.order.SpecialInstructions}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="panel-title text-uppercase">@Dnn.LocalizeString("BillingDetails")</span>
+            </div>
+            <div class="panel-body details">
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("BillingName")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.payments[0].BillingName}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("Address")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.payments[0].BillingAddress}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label"></label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.payments[0].BillingCity + ',' + account.payments[0].BillingState + ' ' + account.payments[0].BillingZip + ', ' + account.payments[0].BillingCountry}}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("PaymentMethod")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.payments[0].PayType}}</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">@Dnn.LocalizeString("TransID")</label>
+                    <div class="col-xs-8">
+                        <label class="form-control label-ellipsis">{{account.payments[0].TransID}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="account.detailMode">
+    <div class="panel-heading">
+        <span class="panel-title text-uppercase">@Dnn.LocalizeString("Items")</span>
+    </div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <th>@Dnn.LocalizeString("SKU")</th>
+                        <th>@Dnn.LocalizeString("ProductName")</th>
+                        <th class="text-right">@Dnn.LocalizeString("UnitCost")</th>
+                        <th class="text-right">@Dnn.LocalizeString("Quantity")</th>
+                        <th class="text-right">@Dnn.LocalizeString("LineTotal")</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="item in account.order.OrderDetails">
+                    <tr>
+                        <td>{{item.ProductSKU}}</td>
+                        <td>
+                            {{item.ProductName}}
+                            <ul ng-if="item.DetailVariants.length > 0">
+                                <li ng-repeat="variant in item.DetailVariants">
+                                    {{variant.VariantHasText ? (variant.VariantName + ': ' + variant.VariantText) : (variant.VariantGroup + ': ' + variant.VariantName)}}
+                                </li>
+                            </ul>
+                            <ul ng-if="item.DetailBooking.IsBooking">
+                                <li ng-if="item.DetailBooking.BookingStart">
+                                    @Dnn.LocalizeString("StartDate"): {{item.DetailBooking.BookingStart | date: [item.DetailBooking.ShowTime ? '@(Model.Culture.DateTimeFormat.ShortDatePattern + " " + Model.Culture.DateTimeFormat.ShortTimePattern.Replace("tt", "a"))' : '@Model.Culture.DateTimeFormat.ShortDatePattern'] }}
+                                </li>
+                                <li ng-if="item.DetailBooking.BookingEnd">
+                                    @Dnn.LocalizeString("EndDate"): {{item.DetailBooking.BookingEnd | date: [item.DetailBooking.ShowTime ? '@(Model.Culture.DateTimeFormat.ShortDatePattern + " " + Model.Culture.DateTimeFormat.ShortTimePattern.Replace("tt", "a"))' : '@Model.Culture.DateTimeFormat.ShortDatePattern'] }}
+                                </li>
+                            </ul>
+                            <ul ng-if="item.DetailRecurring.IsRecurring">
+                                <li>
+                                    <span ng-switch="item.DetailRecurring.SubscriptionInterval">
+                                        {{item.DetailRecurring.RecurringOccurances == 9999 ? '@Dnn.LocalizeString("Ongoing")' : (item.DetailRecurring.RecurringOccurances + ' @Dnn.LocalizeString("Times")')}}
+                                        <span ng-switch-when="Weekly">
+                                            @Dnn.LocalizeString("WeeklyRecurring")
+                                        </span>
+                                        <span ng-switch-when="2Weeks">
+                                            @Dnn.LocalizeString("2WeeksRecurring")
+                                        </span>
+                                        <span ng-switch-when="Monthly">
+                                            @Dnn.LocalizeString("MonthlyRecurring")
+                                        </span>
+                                        <span ng-switch-when="2Months">
+                                            @Dnn.LocalizeString("2MonthsRecurring")
+                                        </span>
+                                        <span ng-switch-when="Quarterly">
+                                            @Dnn.LocalizeString("QuarterlyRecurring")
+                                        </span>
+                                        <span ng-switch-when="Semiannual">
+                                            @Dnn.LocalizeString("SemiannualRecurring")
+                                        </span>
+                                        <span ng-switch-when="Yearly">
+                                            @Dnn.LocalizeString("YearlyRecurring")
+                                        </span>
+                                        {{item.DetailRecurring.StartDate | date: ['@Model.Culture.DateTimeFormat.ShortDatePattern']}}
+                                    </span>
+                                </li>
+                            </ul>
+                        </td>
+                        <td class="text-right">{{item.UnitCost | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                        <td class="text-right">{{item.Quantity | number : 2}}</td>
+                        <td class="text-right">{{item.UnitCost * item.Quantity | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="account.detailMode">
+    <div class="panel-heading">
+        <span class="panel-title text-uppercase">@Dnn.LocalizeString("Payments")</span>
+    </div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <th>@Dnn.LocalizeString("PaymentMethod")</th>
+                        <th>@Dnn.LocalizeString("TransType")</th>
+                        <th>@Dnn.LocalizeString("Date")</th>
+                        <th>@Dnn.LocalizeString("Paid")</th>
+                        <th>@Dnn.LocalizeString("Status")</th>
+                        <th>@Dnn.LocalizeString("Name")</th>
+                        <th>@Dnn.LocalizeString("AccountNo")</th>
+                        <th class="text-right">@Dnn.LocalizeString("Amount")</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="payment in account.payments">
+                    <tr>
+                        <td>{{payment.PayType}}</td>
+                        <td>{{payment.TransType}}</td>
+                        <td>{{payment.PayDate | date : '@Model.Culture.DateTimeFormat.ShortDatePattern'}}</td>
+                        <td>{{payment.Success}}</td>
+                        <td>{{payment.Status}}</td>
+                        <td>{{payment.BillingName}}</td>
+                        <td>{{payment.MaskAcctNo}}</td>
+                        <td class="text-right">{{payment.Amount | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row" ng-if="account.detailMode">
+    <div class="col-xs-4 text-left">
+        <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("Back")" ng-click="account.detailMode = false" />
+    </div>
+    <div class="col-xs-8 text-right">
+        <input type="button" class="btn btn-success" value="@Dnn.LocalizeString("Pay")" ng-if="account.order.PayTotal < account.order.GrandTotal" data-toggle="modal" ng-click="account.submitted = false" data-target="#rzcPaymentModal_@Dnn.ModuleContext.ModuleId" data-backdrop="static" data-keyboard="true" />
+        <input type="button" class="btn btn-danger" value="@Dnn.LocalizeString("CancelSubscription")" ng-if="account.subscription" ng-disabled="!account.subscription.Active" ng-click="account.unsubscribe()" />
+        <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("Print")" ng-click="account.print()" onclick="if (window.opener) window.print()" />
+    </div>
+    <div ng-if="account.order.PayTotal < account.order.GrandTotal">
+        <div class="modal fade" id="rzcPaymentModal_@Dnn.ModuleContext.ModuleId" role="dialog" tabindex="-1" aria-labelledby="rzcPaymentModalTitle_@Dnn.ModuleContext.ModuleId" aria-hidden="true">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="rzcPaymentModalTitle_@Dnn.ModuleContext.ModuleId">@Dnn.LocalizeString("PayOrder")</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            @if (Model.GatewayMode == RazorCart.Service.Gateway.GatewayProcessMode.Direct)
+                            {
+                                <div class="col-xs-12" ng-init="account.orderPayment = {}; account.defaultPayment()" ng-show="account.billingPayments.length > 1">
+                                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPayment.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billPayment.$invalid }">
+                                        <span class="input-group-addon"><i class="fa fa-money"></i></span>
+                                        <div class="form-control" style="height: auto;">
+                                            <div class="radio" ng-repeat="payment in account.billingPayments">
+                                                <label>
+                                                    <input type="radio" name="billPayment" ng-model="account.orderPayment.Payment" value="{{payment.PayMethodID}}" ng-change="account.defaultPaymentChange(account.orderPayment); account.orderPayment.Wallet = null;" required /> {{payment.Name}}
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                                <div class="alert alert-info" ng-show="account.orderPayment.Payment == payment.PayMethodID && false">{{payment.Step2Label1}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billPayment.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPayment.$dirty">
+                                        <div class="form-control-required" ng-message="required">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("PaymentMethodRequired")
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="col-xs-12">
+                                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billFullName.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billFullName.$invalid }">
+                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                    <input type="text" name="billFullName" class="form-control" placeholder="@Dnn.LocalizeString("BillingName")" ng-model="account.orderPayment.FullName" required>
+                                </div>
+                                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billFullName.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billFullName.$dirty">
+                                    <div class="form-control-required" ng-message="required">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingNameRequired")
+                                    </div>
+                                </div>
+                            </div>
+                            @if (Model.GatewayMode == RazorCart.Service.Gateway.GatewayProcessMode.Direct)
+                            {
+                                if (Model.ShowWallet)
+                                {
+                                    <div class="col-xs-12" ng-if="account.selectedPayment.ProcessMode == 'Direct' && (account.selectedPayment.DisplayType == 'CreditCard' || account.selectedPayment.DisplayType == 'ECheck')">
+                                        <div class="form-group input-group">
+                                            <span class="input-group-addon"><i class="fa fa-suitcase"></i></span>
+                                            <select name="billWallet" class="form-control" ng-model="account.orderPayment.Wallet" ng-change="account.billWalletChange()">
+                                                <option value="" selected>-- @Dnn.LocalizeString("WalletItem") --</option>
+                                                <option ng-repeat="item in account.walletItems" ng-disabled="account.selectedPayment.PayType != item.PayType" value="{{item.ID}}">{{item.WalletName + ' ' + item.MaskAcctNo}}</option>
+                                            </select>
+                                            <span class="input-group-btn">
+                                                <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("ManageWallet")" ng-click="account.manageWallet('rzcPaymentModal_@Dnn.ModuleContext.ModuleId')" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                                <div class="col-xs-12" ng-if="account.selectedPayment.ProcessMode == 'Direct' && account.selectedPayment.DisplayType == 'CreditCard' && !account.orderPayment.Wallet">
+                                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCardNumber.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billCardNumber.$invalid }">
+                                        <span class="input-group-addon"><i class="fa fa-credit-card"></i></span>
+                                        <input type="tel" name="billCardNumber" class="form-control" placeholder="@Dnn.LocalizeString("CreditCardNumber")" ng-model="account.orderPayment.CardNumber" autocomplete="off" pattern="^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\d{3})\d{11})$" required>
+                                    </div>
+                                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billCardNumber.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCardNumber.$dirty">
+                                        <div class="form-control-required" ng-message="required">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("CardNumberRequired")
+                                        </div>
+                                        <div class="form-control-required" ng-message="pattern">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("CardNumberInvalid")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4" ng-if="account.selectedPayment.ProcessMode == 'Direct' && account.selectedPayment.DisplayType == 'CreditCard' && !account.orderPayment.Wallet">
+                                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCVV.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billCVV.$invalid }">
+                                        <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                        <input type="tel" name="billCVV" class="form-control" placeholder="@Dnn.LocalizeString("SecurityCode")" ng-model="account.orderPayment.CVV" autocomplete="off" pattern="^([0-9]{3,4})$" required>
+                                    </div>
+                                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billCVV.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCVV.$dirty">
+                                        <div class="form-control-required" ng-message="required">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("SecurityCodeRequired")
+                                        </div>
+                                        <div class="form-control-required" ng-message="pattern">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("SecurityCodeInvalid")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-8" ng-if="account.selectedPayment.ProcessMode == 'Direct' && account.selectedPayment.DisplayType == 'CreditCard' && !account.orderPayment.Wallet">
+                                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billExpMonth.$dirty && rzcForm_@(Dnn.ModuleContext.ModuleId).billExpYear.$dirty) && (rzcForm_@(Dnn.ModuleContext.ModuleId).billExpMonth.$invalid || rzcForm_@(Dnn.ModuleContext.ModuleId).billExpYear.$invalid) }">
+                                        <select name="billExpMonth" class="form-control" ng-model="account.orderPayment.ExpMonth" ng-change="" required>
+                                            <option value="" disabled selected>-- @Dnn.LocalizeString("ExpirationMonth") --</option>
+                                            <option ng-repeat="month in account.expMonths" value="{{month.Value}}">{{month.Text}}</option>
+                                        </select>
+                                        <span class="input-group-addon input-sm"><i class="fa fa-minus"></i></span>
+                                        <select name="billExpYear" class="form-control" ng-model="account.orderPayment.ExpYear" ng-change="" required>
+                                            <option value="" disabled selected>-- @Dnn.LocalizeString("ExpirationYear") --</option>
+                                            <option ng-repeat="year in account.expYears" value="{{year.Value}}">{{year.Text}}</option>
+                                        </select>
+                                    </div>
+                                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billExpMonth.$error || rzcForm_@(Dnn.ModuleContext.ModuleId).billExpYear.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billExpMonth.$dirty && rzcForm_@(Dnn.ModuleContext.ModuleId).billExpYear.$dirty">
+                                        <div class="form-control-required" ng-show="rzcForm_@(Dnn.ModuleContext.ModuleId).billExpMonth.$error.required || rzcForm_@(Dnn.ModuleContext.ModuleId).billExpYear.$error.required">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ExpirationDateRequired")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12" ng-if="account.selectedPayment.ProcessMode == 'Direct' && account.selectedPayment.DisplayType == 'ECheck' && !account.orderPayment.Wallet">
+                                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billBankName.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billBankName.$invalid }">
+                                        <span class="input-group-addon"><i class="fa fa-university"></i></span>
+                                        <input type="text" name="billBankName" class="form-control" placeholder="@Dnn.LocalizeString("BankName")" ng-model="account.orderPayment.BankName" required>
+                                    </div>
+                                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billBankName.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billBankName.$dirty">
+                                        <div class="form-control-required" ng-message="required">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BankNameRequired")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12" ng-if="account.selectedPayment.ProcessMode == 'Direct' && account.selectedPayment.DisplayType == 'ECheck' && !account.orderPayment.Wallet">
+                                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billAccountNumber.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billAccountNumber.$invalid }">
+                                        <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                                        <input type="tel" name="billAccountNumber" class="form-control" placeholder="@Dnn.LocalizeString("AccountNumber")" ng-model="account.orderPayment.AccountNumber" autocomplete="off" pattern="^([0-9]{4,17})$" required>
+                                    </div>
+                                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billAccountNumber.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billAccountNumber.$dirty">
+                                        <div class="form-control-required" ng-message="required">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("AccountNumberRequired")
+                                        </div>
+                                        <div class="form-control-required" ng-message="pattern">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("AccountNumberInvalid")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12" ng-if="account.selectedPayment.ProcessMode == 'Direct' && account.selectedPayment.DisplayType == 'ECheck' && !account.orderPayment.Wallet">
+                                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billRoutingNumber.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billRoutingNumber.$invalid }">
+                                        <span class="input-group-addon"><i class="fa fa-list-alt"></i></span>
+                                        <input type="tel" name="billRoutingNumber" class="form-control" placeholder="@Dnn.LocalizeString("RoutingNumber")" ng-model="account.orderPayment.RoutingNumber" autocomplete="off" pattern="^([0-9]{9})$" required>
+                                    </div>
+                                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billRoutingNumber.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billRoutingNumber.$dirty">
+                                        <div class="form-control-required" ng-message="required">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("RoutingNumberRequired")
+                                        </div>
+                                        <div class="form-control-required" ng-message="pattern">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("RoutingNumberInvalid")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12" ng-if="account.selectedPayment.ProcessMode == 'Direct' && account.selectedPayment.DisplayType == 'PurchaseOrder'">
+                                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPONumber.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billPONumber.$invalid }">
+                                        <span class="input-group-addon"><i class="fa fa-list-alt"></i></span>
+                                        <input type="text" name="billPONumber" class="form-control" placeholder="@Dnn.LocalizeString("PONumber")" ng-model="account.orderPayment.PONumber" required>
+                                    </div>
+                                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billPONumber.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPONumber.$dirty">
+                                        <div class="form-control-required" ng-message="required">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("PONumberRequired")
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="col-xs-12" ng-if="!account.orderPayment.Wallet">
+                                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$invalid }">
+                                    <span class="input-group-addon"><i class="fa fa-home"></i></span>
+                                    <input type="text" name="billAddress1" class="form-control" placeholder="@Dnn.LocalizeString("Address1")" ng-model="account.orderPayment.Address1" required>
+                                    <input type="text" name="billAddress2" class="form-control" placeholder="@Dnn.LocalizeString("Address2")" ng-model="account.orderPayment.Address2">
+                                </div>
+                                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$dirty">
+                                    <div class="form-control-required" ng-message="required">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingAddress1Required")
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-6" ng-if="!account.orderPayment.Wallet">
+                                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$invalid }">
+                                    <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                                    <input type="text" name="billCity" class="form-control" placeholder="@Dnn.LocalizeString("City")" ng-model="account.orderPayment.City" required>
+                                </div>
+                                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$dirty">
+                                    <div class="form-control-required" ng-message="required">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingCityRequired")
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-6" ng-if="!account.orderPayment.Wallet">
+                                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$invalid }">
+                                    <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                                    <input type="text" name="billPostalCode" class="form-control" placeholder="@Dnn.LocalizeString("PostalCode")" ng-model="account.orderPayment.PostalCode" required>
+                                </div>
+                                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$dirty">
+                                    <div class="form-control-required" ng-message="required">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingPostalCodeRequired")
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-6" ng-if="!account.orderPayment.Wallet">
+                                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$invalid }">
+                                    <span class="input-group-addon"><i class="fa fa-globe"></i></span>
+                                    <select name="billCountry" class="form-control" ng-model="account.orderPayment.CountryID" ng-change="account.billCountryChange()" required>
+                                        <option value="" disabled selected>-- @Dnn.LocalizeString("Country") --</option>
+                                        <option ng-repeat="country in account.countries" value="{{country.EntryID}}">{{country.Text}}</option>
+                                    </select>
+                                </div>
+                                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$dirty">
+                                    <div class="form-control-required" ng-message="required">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingCountryRequired")
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-6" ng-if="!account.orderPayment.Wallet">
+                                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$invalid }">
+                                    <span class="input-group-addon"><i class="fa fa-map"></i></span>
+                                    <select name="billRegion" class="form-control" ng-model="account.orderPayment.RegionID" required>
+                                        <option value="" disabled selected>-- @Dnn.LocalizeString("Region") --</option>
+                                        <option ng-repeat="region in account.billingRegions" value="{{region.EntryID}}">{{region.Text}}</option>
+                                    </select>
+                                </div>
+                                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$dirty">
+                                    <div class="form-control-required" ng-message="required">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingRegionRequired")
+                                    </div>
+                                </div>
+                            </div>
+                            @if (Model.ShowAcceptTerms)
+                            {
+                                <div class="col-xs-12">
+                                    <div class="form-group input-group">
+                                        <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
+                                        <div class="form-control" style="height: auto;">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" name="acceptTerms" ng-model="account.orderPayment.AcceptTerms" required /> @Dnn.LocalizeString("AcceptTerms")
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).acceptTerms.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).acceptTerms.$dirty">
+                                        <div class="form-control-required" ng-message="required">
+                                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("AcceptTermsRequired")
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" ng-click="account.submitted = true; rzcForm_@(Dnn.ModuleContext.ModuleId).$valid && account.payOrder('rzcPaymentModal_@Dnn.ModuleContext.ModuleId')">@Dnn.LocalizeString("PayNow")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

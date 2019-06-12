@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EmailTemplateTypes>
+  <EmailTemplateType Value="" Text="-- Select --">
+    <EmailTemplateNames>
+      <EmailTemplateName Value="" Text="-- Select --" />
+    </EmailTemplateNames>
+  </EmailTemplateType>
+  <EmailTemplateType Value="Store" Text="Store Email Template">
+    <EmailTemplateNames>
+      <EmailTemplateName Value="" Text="-- Select --" />
+      <EmailTemplateName Value="User Email Template" Text="User Email Template" />
+      <EmailTemplateName Value="Admin Email Template" Text="Admin Email Template" />
+    </EmailTemplateNames>
+  </EmailTemplateType>
+  <EmailTemplateType Value="Manufacturer" Text="Manufacturer Email Template">
+    <EmailTemplateNames>
+      <EmailTemplateName Value="" Text="-- Select --" />
+      <EmailTemplateName Value="Manufacturer Email Template" Text="Manufacturer Email Template" />
+    </EmailTemplateNames>
+  </EmailTemplateType>
+  <EmailTemplateType Value="Product" Text="Product Level Email Template">
+    <EmailTemplateNames>
+      <EmailTemplateName Value="" Text="-- Select --" />
+      <EmailTemplateName Value="User Email Template" Text="User Email Template" />
+    </EmailTemplateNames>
+  </EmailTemplateType>
+  <EmailTemplateType Value="Ship" Text="Ship Email Templates">
+    <EmailTemplateNames>
+      <EmailTemplateName Value="" Text="-- Select --" />
+      <EmailTemplateName Value="User Email Template" Text="User Email Template" />
+    </EmailTemplateNames>
+  </EmailTemplateType>
+  <EmailTemplateType Value="Recurring" Text="Recurring Email Template">
+    <EmailTemplateNames>
+      <EmailTemplateName Value="" Text="-- Select --" />
+      <EmailTemplateName Value="Successful Payment - User Email Template" Text="Successful Payment - User Email Template" />
+      <EmailTemplateName Value="Successful Payment - Admin Email Template" Text="Successful Payment - Admin Email Template" />
+      <EmailTemplateName Value="Failed Payment - User Email Template" Text="Failed Payment - User Email Template" />
+      <EmailTemplateName Value="Failed Payment - Admin Email Template" Text="Failed Payment - Admin Email Template" />
+    </EmailTemplateNames>
+  </EmailTemplateType>
+  <EmailTemplateType Value="Review" Text="Product Review Email Template">
+    <EmailTemplateNames>
+      <EmailTemplateName Value="" Text="-- Select --" />
+      <EmailTemplateName Value="User Email Template" Text="User Email Template" />
+      <EmailTemplateName Value="Admin Email Template" Text="Admin Email Template" />
+    </EmailTemplateNames>
+  </EmailTemplateType>
+  <EmailTemplateType Value="Reminder" Text="Booking Reminder SMS Template">
+    <EmailTemplateNames>
+      <EmailTemplateName Value="" Text="-- Select --" />
+      <EmailTemplateName Value="User Email Template" Text="User Email Template" />
+    </EmailTemplateNames>
+  </EmailTemplateType>
+</EmailTemplateTypes>

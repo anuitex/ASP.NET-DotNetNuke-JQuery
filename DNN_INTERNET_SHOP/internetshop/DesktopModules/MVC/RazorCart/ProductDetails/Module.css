@@ -1,0 +1,323 @@
+﻿razorbody {
+    margin: 0px;
+    padding: 0px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row;
+    flex-flow: row;
+}
+razorbody > centerbox {
+    margin: 10px;
+    padding: 15px;
+    /*border: 1px solid;*/
+    border-radius: 7pt;
+    -webkit-flex: 3 1 60%;
+    flex: 3 1 60%;
+    max-width: 50%;
+    -webkit-order: 2;
+    order: 2;
+}
+razorbody > leftbox {
+    margin: 10px 10px 10px 0px;
+    padding: 15px 0px;
+    /*border: 1px solid;*/
+    border-radius: 7pt;
+    -webkit-flex: 1 6 20%;
+    flex: 1 6 20%;
+    max-width: 50%;
+    -webkit-order: 1;
+    order: 1;
+}
+razorbody > rightbox {
+    margin: 10px 0px 10px 10px;
+    padding: 15px 0px;
+    /*border: 1px solid;*/
+    border-radius: 7pt;
+    -webkit-flex: 1 6 20%;
+    flex: 1 6 20%;
+    -webkit-order: 3;
+    order: 3;
+    max-width: 50%;
+}
+razorheader, razorfooter {
+    display: block;
+    margin: 10px 0px;
+    padding: 15px 0px;
+    /*border: 1px solid;*/
+    border-radius: 7pt;
+}
+@media all and (max-width: 640px) {
+    razorbody, #page {
+        -webkit-flex-flow: column;
+        flex-flow: column;
+    }
+    razorbody > centerbox, razorbody > leftbox, razorbody > rightbox {
+        -webkit-order: 0;
+        order: 0;
+        max-width: initial;
+    }
+    razorbody > centerbox, razorbody > leftbox, razorbody > rightbox, razorheader, razorfooter {
+        min-height: initial;
+        max-height: initial;
+    }
+    razorbody > leftbox, razorbody > rightbox {
+        margin: 10px 0px;
+        padding: 15px 0px;
+    }
+}
+.rzc_product_desc {
+    border: 1px solid;
+    border-radius: 10px;
+    padding: 10px 10px;
+    margin: 10px 0px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+    display: block;
+}
+.rzc_variant_grid {
+    border-collapse: collapse;
+}
+.rzc_variant_grid td, rzc_variant_grid th {
+    border: 1px solid;
+}
+.radio-image {
+    display: inline-block !important;
+}
+.radio-image label {
+    padding: 0 !important;
+}
+.radio-image input[type="radio"] {
+    margin: 0;
+    padding: 0;
+    display: none;
+}
+.rzc-sale {
+    font-style: italic;
+    text-decoration: line-through;
+}
+.rzc-button {
+    padding: 6px 10px !important;
+    border: 4px solid !important;
+}
+.rzc-shadow {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+/************************************************************************************************/
+.rc-backdrop {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    top: 0;
+    z-index: 1040;
+}
+.rc-backdrop-container {
+    position: relative;
+    top: 50%;
+    text-align: center;
+}
+/*******************************************************************************************************************************/
+ul.rating {
+    margin: 0px;
+}
+ul.rating li {
+    display: inline;
+    border: 0px;
+    background: none;
+    padding: 5px 5px;
+    color: #286090;
+}
+ul.rating li i {
+    cursor: pointer;
+}
+/*******************************************************************************************************************************/
+/* jssor slider arrow navigator skin 05 css */
+/*
+.jssora05l              (normal)
+.jssora05r              (normal)
+.jssora05l:hover        (normal mouseover)
+.jssora05r:hover        (normal mouseover)
+.jssora05ldn            (mousedown)
+.jssora05rdn            (mousedown)
+*/
+.jssora05l, .jssora05r, .jssora05ldn, .jssora05rdn {
+    position: absolute;
+    cursor: pointer;
+    display: block;
+    background: url(./Images/arrows.png) no-repeat;
+    overflow: hidden;
+}
+.jssora05l {
+    background-position: -5px -9px;
+}
+.jssora05r {
+    background-position: -70px -9px;
+}
+.jssora05l:hover {
+    background-position: -125px -9px;
+}
+.jssora05r:hover {
+    background-position: -190px -9px;
+}
+.jssora05ldn {
+    background-position: -250px -9px;
+}
+.jssora05rdn {
+    background-position: -310px -9px;
+}
+/* jssor slider thumbnail navigator skin 01 css */
+/*
+.jssort01 .p           (normal)
+.jssort01 .p:hover     (normal mouseover)
+.jssort01 .pav           (active)
+.jssort01 .pav:hover     (active mouseover)
+.jssort01 .pdn           (mousedown)
+*/
+.jssort01 .w {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+}
+.jssort01 .c {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    /*border: #000 2px solid;*/
+}
+.jssort01 .p:hover .c, .jssort01 .pav:hover .c, .jssort01 .pav .c {
+    background: url(./Images/selected.png) center center;
+    border-width: 0px;
+    top: 2px;
+    left: 2px;
+    width: 100%;
+    height: 100%;
+}
+.jssort01 .p:hover .c, .jssort01 .pav:hover .c {
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    /*border: #fff 1px solid;*/
+}
+/*******************************************************************************************************************************/
+.picker__input {
+    background-color: unset !important;
+    cursor: pointer !important;
+}
+.picker__day--outfocus {
+    color: #939393 !important;
+}
+.picker__day--disabled,
+.picker__day--disabled:hover,
+.picker--focused .picker__day--disabled {
+    background-image: -webkit-linear-gradient(top, #d9534f 0%, #c12e2a 100%) !important;
+    background-image: -o-linear-gradient(top, #d9534f 0%, #c12e2a 100%) !important;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#d9534f), to(#c12e2a)) !important;
+    background-image: linear-gradient(to bottom, #d9534f 0%, #c12e2a 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd9534f', endColorstr='#ffc12e2a', GradientType=0) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false) !important;
+    background-repeat: repeat-x !important;
+}
+/*******************************************************************************************************************************/
+/* Zoom plugin */
+.zoom {
+    display: inline-block;
+    position: relative;
+}
+/* magnifying glass icon */
+div[u="slides"] ~ div[data-container="zoom"]:after {
+    content: '';
+    display: block;
+    width: 45px;
+    height: 45px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: url('Images/zoom.png') no-repeat;
+    background-size: cover;
+}
+.zoom img {
+    display: block;
+}
+.zoom img::selection {
+    background-color: transparent;
+}
+/* Share Bar */
+.rzc-social-bar {
+    margin-top: 15px;
+}
+.rzc-social-bar a {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    background-color: #999999 !important;
+    border-radius: 18px;
+    font-size: 20px;
+    width: 34px;
+    height: 34px;
+    line-height: 34px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.rzc-social-bar i {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: white;
+    width: 34px;
+    height: 34px;
+    line-height: 34px;
+    z-index: 10;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+.rzc-social-bar span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+.rzc-social-bar .rzc-facebook span {
+    background-color: #3d5b99;
+}
+.rzc-social-bar .rzc-twitter span {
+    background-color: #1da1f2;
+}
+.rzc-social-bar .rzc-google-plus span {
+    background-color: #db4437;
+}
+.rzc-social-bar .rzc-linkedin span {
+    background-color: #0077b5;
+}
+.rzc-social-bar .rzc-pinterest span {
+    background-color: #bd081c;
+}
+.rzc-social-bar .rzc-email span {
+    background-color: #f89a1e;
+}
+.rzc-social-bar a:hover span {
+    width: 34px;
+    height: 34px;
+    border-radius: 18px;
+    margin: -17px;
+}
+/*******************************************************************************************************************************/
+.rzc-bootstrap .tab-content {
+    border: none;
+    padding: 0;
+}

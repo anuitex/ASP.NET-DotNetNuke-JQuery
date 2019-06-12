@@ -1,0 +1,870 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccountName.Text" xml:space="preserve">
+    <value>Account Name</value>
+  </data>
+  <data name="AccountNumber.Text" xml:space="preserve">
+    <value>Account Number</value>
+  </data>
+  <data name="Address1.Text" xml:space="preserve">
+    <value>Street</value>
+  </data>
+  <data name="Address2.Text" xml:space="preserve">
+    <value>Unit</value>
+  </data>
+  <data name="Back.Text" xml:space="preserve">
+    <value>Go Back</value>
+  </data>
+  <data name="BillTo.Text" xml:space="preserve">
+    <value>Bill To</value>
+  </data>
+  <data name="CalculateShipping.Text" xml:space="preserve">
+    <value>Calculate Shipping</value>
+  </data>
+  <data name="City.Text" xml:space="preserve">
+    <value>City</value>
+  </data>
+  <data name="ClearCart.Text" xml:space="preserve">
+    <value>Empty Cart</value>
+  </data>
+  <data name="Country.Text" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="Email.Text" xml:space="preserve">
+    <value>Email Address</value>
+  </data>
+  <data name="EmailBalance.Text" xml:space="preserve">
+    <value>Balance:</value>
+  </data>
+  <data name="EmailDepositAmount.Text" xml:space="preserve">
+    <value>Deposit amount charged to your credit card:</value>
+  </data>
+  <data name="EmailDiscount.Text" xml:space="preserve">
+    <value>Discount :</value>
+  </data>
+  <data name="Download.Text" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="EmailEUVAT.Text" xml:space="preserve">
+    <value>VAT ({0}) :</value>
+  </data>
+  <data name="EmailEUVATID.Text" xml:space="preserve">
+    <value>VAT ID:</value>
+  </data>
+  <data name="EmailGST.Text" xml:space="preserve">
+    <value>GST Included</value>
+  </data>
+  <data name="EmailGSTTotal.Text" xml:space="preserve">
+    <value>Total (incl. GST)</value>
+  </data>
+  <data name="EmailHandlingCharge.Text" xml:space="preserve">
+    <value>Handling Charge :</value>
+  </data>
+  <data name="EmailHST.Text" xml:space="preserve">
+    <value>HST</value>
+  </data>
+  <data name="EmailLineTotal.Header" xml:space="preserve">
+    <value>Line Total</value>
+  </data>
+  <data name="EmailProductName.Text" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
+  <data name="EmailProductVATRate.Text" xml:space="preserve">
+    <value>VAT</value>
+  </data>
+  <data name="EmailPST.Text" xml:space="preserve">
+    <value>PST</value>
+  </data>
+  <data name="EmailQuantity.Header" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="EmailRequestQuote.Text" xml:space="preserve">
+    <value>Request a Quote</value>
+  </data>
+  <data name="EmailSalesTax.Text" xml:space="preserve">
+    <value>Sales Tax</value>
+  </data>
+  <data name="EmailShipMethod.Text" xml:space="preserve">
+    <value>Ship Method:</value>
+  </data>
+  <data name="EmailShippingFee.Text" xml:space="preserve">
+    <value>Shipping Fee :</value>
+  </data>
+  <data name="EmailShippingHandling.Text" xml:space="preserve">
+    <value>Shipping &amp; Handling :</value>
+  </data>
+  <data name="EmailSKU.Text" xml:space="preserve">
+    <value>SKU</value>
+  </data>
+  <data name="EmailSubTotal.Text" xml:space="preserve">
+    <value>SubTotal:</value>
+  </data>
+  <data name="EmailSurcharge.Text" xml:space="preserve">
+    <value>Surcharge :</value>
+  </data>
+  <data name="EmailTotal.Text" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="EmailVAT.Text" xml:space="preserve">
+    <value>VAT Included</value>
+  </data>
+  <data name="EmailVATTotal.Text" xml:space="preserve">
+    <value>Total (incl. VAT)</value>
+  </data>
+  <data name="ExpirationDate.Text" xml:space="preserve">
+    <value>Expiration Date</value>
+  </data>
+  <data name="FirstName.Text" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="FullAddress.Text" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="FullName.Text" xml:space="preserve">
+    <value>Account Name</value>
+  </data>
+  <data name="HidePriceMessage.Text" xml:space="preserve">
+    <value>Request a Quote</value>
+  </data>
+  <data name="Image.Text" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="LastName.Text" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
+  <data name="LineTotal.Text" xml:space="preserve">
+    <value>Line Total</value>
+  </data>
+  <data name="OrderFailed.Text" xml:space="preserve">
+    <value>We're sorry, there was a problem processing your order. Please check your info and try again.</value>
+  </data>
+  <data name="OrderNote.Text" xml:space="preserve">
+    <value>Message:</value>
+  </data>
+  <data name="PaymentMethod.Text" xml:space="preserve">
+    <value>Payment Method</value>
+  </data>
+  <data name="Phone.Text" xml:space="preserve">
+    <value>Phone Number</value>
+  </data>
+  <data name="PlaceOrder.Text" xml:space="preserve">
+    <value>Place Order</value>
+  </data>
+  <data name="PostalCode.Text" xml:space="preserve">
+    <value>Postal Code</value>
+  </data>
+  <data name="PrintOrder.Text" xml:space="preserve">
+    <value>Print Order</value>
+  </data>
+  <data name="ProductName.Text" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
+  <data name="Quantity.Text" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="Region.Text" xml:space="preserve">
+    <value>Region</value>
+  </data>
+  <data name="ContinueShopping.Text" xml:space="preserve">
+    <value>Continue Shopping</value>
+  </data>
+  <data name="ReviewOrder.Text" xml:space="preserve">
+    <value>Checkout</value>
+  </data>
+  <data name="SecurityCode.Text" xml:space="preserve">
+    <value>CVV</value>
+  </data>
+  <data name="ShippingMethod.Text" xml:space="preserve">
+    <value>Shipping Method</value>
+  </data>
+  <data name="ShipTo.Text" xml:space="preserve">
+    <value>Ship To</value>
+  </data>
+  <data name="SKU.Text" xml:space="preserve">
+    <value>SKU</value>
+  </data>
+  <data name="SuccessfulConfirmation.Text" xml:space="preserve">
+    <value>Confirmation Code:</value>
+  </data>
+  <data name="SuccessfulTransID.Text" xml:space="preserve">
+    <value>Transaction ID:</value>
+  </data>
+  <data name="UnitCost.Text" xml:space="preserve">
+    <value>Unit Cost</value>
+  </data>
+  <data name="UpdateCart.Text" xml:space="preserve">
+    <value>Update Quantity</value>
+  </data>
+  <data name="ExpirationMonth.Text" xml:space="preserve">
+    <value>Exp. Month</value>
+  </data>
+  <data name="ExpirationYear.Text" xml:space="preserve">
+    <value>Exp. Year</value>
+  </data>
+  <data name="Coupon.Text" xml:space="preserve">
+    <value>Coupon or Gift Card</value>
+  </data>
+  <data name="ApplyCoupon.Text" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="CouponDiscount.Text" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="GrandTotal.Text" xml:space="preserve">
+    <value>Grand Total</value>
+  </data>
+  <data name="HandlingCharge.Text" xml:space="preserve">
+    <value>Handling Charge</value>
+  </data>
+  <data name="MemberDiscount.Text" xml:space="preserve">
+    <value>Member Discount</value>
+  </data>
+  <data name="SalesTax.Text" xml:space="preserve">
+    <value>Sales Tax</value>
+  </data>
+  <data name="ShippingFees.Text" xml:space="preserve">
+    <value>Shipping Fees</value>
+  </data>
+  <data name="ShippingHandlingCharge.Text" xml:space="preserve">
+    <value>Shipping &amp; Handling Charges</value>
+  </data>
+  <data name="Subtotal.Text" xml:space="preserve">
+    <value>Subtotal</value>
+  </data>
+  <data name="Surcharge.Text" xml:space="preserve">
+    <value>Surcharge</value>
+  </data>
+  <data name="SaveCart.Text" xml:space="preserve">
+    <value>Save Cart</value>
+  </data>
+  <data name="ViewSavedCart.Text" xml:space="preserve">
+    <value>View Saved Cart</value>
+  </data>
+  <data name="Delete.Text" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="MoveToCart.Text" xml:space="preserve">
+    <value>Move to Cart</value>
+  </data>
+  <data name="Share.Text" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="Print.Text" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="Created.Text" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="Description.Text" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="SpecialInstructions.Text" xml:space="preserve">
+    <value>Special Instructions</value>
+  </data>
+  <data name="ThankYou.Text" xml:space="preserve">
+    <value>Thank you for your order.</value>
+  </data>
+  <data name="YourOrder.Text" xml:space="preserve">
+    <value>Your order number is:</value>
+  </data>
+  <data name="MinOrderAmountMsg.Text" xml:space="preserve">
+    <value>Minimum Order Amount of [MinOrderAmt]</value>
+  </data>
+  <data name="LimitProductsInCartMsg.Text" xml:space="preserve">
+    <value>Maximum Products per Order is [LimitProductsInCart]</value>
+  </data>
+  <data name="BankName.Text" xml:space="preserve">
+    <value>Bank Name</value>
+  </data>
+  <data name="RoutingNumber.Text" xml:space="preserve">
+    <value>Routing Number</value>
+  </data>
+  <data name="Company.Text" xml:space="preserve">
+    <value>Company Name</value>
+  </data>
+  <data name="RequestQuote.Text" xml:space="preserve">
+    <value>Request a Quote</value>
+  </data>
+  <data name="Manufacturer.Text" xml:space="preserve">
+    <value>Manufacturer</value>
+  </data>
+  <data name="WalletItem.Text" xml:space="preserve">
+    <value>Wallet Item</value>
+  </data>
+  <data name="AddWalletItem.Text" xml:space="preserve">
+    <value>Add Wallet Item</value>
+  </data>
+  <data name="Cancel.Text" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ManageWallet.Text" xml:space="preserve">
+    <value>Manage Wallet</value>
+  </data>
+  <data name="Save.Text" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ItemName.Text" xml:space="preserve">
+    <value>Item Name</value>
+  </data>
+  <data name="WalletName.Text" xml:space="preserve">
+    <value>Wallet Name</value>
+  </data>
+  <data name="GuestCheckout_Unauthorized.Text" xml:space="preserve">
+    <value>Guest Checkout has been disabled by the site owner.</value>
+  </data>
+  <data name="LoginFailed_Error.Text" xml:space="preserve">
+    <value>Login Failed. Please remember that passwords are case sensitive.</value>
+  </data>
+  <data name="RegistrationFailed_Error.Text" xml:space="preserve">
+    <value>Registration Failed. [UserCreateStatus].</value>
+  </data>
+  <data name="RegistrationFailed_NoEmail.Text" xml:space="preserve">
+    <value>Registration Failed. Email was not provided.</value>
+  </data>
+  <data name="RegistrationFailed_NoPassword.Text" xml:space="preserve">
+    <value>Registration Failed. Password was not provided or does not match.</value>
+  </data>
+  <data name="RegistrationFailed_NoUser.Text" xml:space="preserve">
+    <value>Registration Failed. Username was not provided.</value>
+  </data>
+  <data name="PONumber.Text" xml:space="preserve">
+    <value>P.O. Number</value>
+  </data>
+  <data name="CustomerOptIn.Text" xml:space="preserve">
+    <value>Opt-In to receive our newsletter</value>
+  </data>
+  <data name="FreeShipMethod.Text" xml:space="preserve">
+    <value>Free Shipping</value>
+  </data>
+  <data name="ProductLevelShipMethod.Text" xml:space="preserve">
+    <value>Flat Shipping Rate</value>
+  </data>
+  <data name="CustomField1.Text" xml:space="preserve">
+    <value>Custom Field 1</value>
+  </data>
+  <data name="CustomField1Required.Text" xml:space="preserve">
+    <value>Please fill out Custom Field 1...</value>
+  </data>
+  <data name="CustomField2.Text" xml:space="preserve">
+    <value>Custom Field 2</value>
+  </data>
+  <data name="CustomField2Required.Text" xml:space="preserve">
+    <value>Please fill out Custom Field 2...</value>
+  </data>
+  <data name="BillingDetails.Text" xml:space="preserve">
+    <value>Billing Details</value>
+  </data>
+  <data name="ShippingDetails.Text" xml:space="preserve">
+    <value>Shipping Details</value>
+  </data>
+  <data name="UnshippableAddress.Text" xml:space="preserve">
+    <value>We're sorry, currently we cannot ship to this address!</value>
+  </data>
+  <data name="2MonthsRecurring.Text" xml:space="preserve">
+    <value>Every 2 Months Recurring Charge to start at:</value>
+  </data>
+  <data name="2WeeksRecurring.Text" xml:space="preserve">
+    <value>Every 2 Weeks Recurring Charge to start at:</value>
+  </data>
+  <data name="AccountNumberInvalid.Text" xml:space="preserve">
+    <value>Please enter a valid Account Number...</value>
+  </data>
+  <data name="AccountNumberRequired.Text" xml:space="preserve">
+    <value>Please fill out Account Number...</value>
+  </data>
+  <data name="BankNameRequired.Text" xml:space="preserve">
+    <value>Please fill out Bank Name...</value>
+  </data>
+  <data name="BillingName.Text" xml:space="preserve">
+    <value>Billing Name</value>
+  </data>
+  <data name="BillingNameRequired.Text" xml:space="preserve">
+    <value>Please fill out Bill-To Name...</value>
+  </data>
+  <data name="CardNumber.Text" xml:space="preserve">
+    <value>Card Number</value>
+  </data>
+  <data name="CardNumberInvalid.Text" xml:space="preserve">
+    <value>Please enter a valid Card Number...</value>
+  </data>
+  <data name="CardNumberRequired.Text" xml:space="preserve">
+    <value>Please fill out Card Number...</value>
+  </data>
+  <data name="CreditCardNumber.Text" xml:space="preserve">
+    <value>Credit Card</value>
+  </data>
+  <data name="ExpirationMonthRequired.Text" xml:space="preserve">
+    <value>Please select Card Expiration Month...</value>
+  </data>
+  <data name="ExpirationYearRequired.Text" xml:space="preserve">
+    <value>Please select Card Expiration Year...</value>
+  </data>
+  <data name="MonthlyRecurring.Text" xml:space="preserve">
+    <value>Monthly Recurring Charge to start at:</value>
+  </data>
+  <data name="NoCartItems.Text" xml:space="preserve">
+    <value>You have no items in your shopping cart.</value>
+  </data>
+  <data name="NoWallet.Text" xml:space="preserve">
+    <value>You have no items in your wallet.</value>
+  </data>
+  <data name="Ongoing.Text" xml:space="preserve">
+    <value>Ongoing</value>
+  </data>
+  <data name="QuarterlyRecurring.Text" xml:space="preserve">
+    <value>Quarterly (Every 3 Months) Recurring Charge to start at:</value>
+  </data>
+  <data name="RegularCost.Text" xml:space="preserve">
+    <value>Regular Cost:</value>
+  </data>
+  <data name="RoutingNumberInvalid.Text" xml:space="preserve">
+    <value>Please enter a valid Routing Number...</value>
+  </data>
+  <data name="RoutingNumberRequired.Text" xml:space="preserve">
+    <value>Please fill out Routing Number...</value>
+  </data>
+  <data name="SecurityCodeInvalid.Text" xml:space="preserve">
+    <value>Please enter a valid Card CVV...</value>
+  </data>
+  <data name="SecurityCodeRequired.Text" xml:space="preserve">
+    <value>Please fill out Card CVV...</value>
+  </data>
+  <data name="SemiannualRecurring.Text" xml:space="preserve">
+    <value>Semi-Annually Recurring Charge to start at:</value>
+  </data>
+  <data name="Times.Text" xml:space="preserve">
+    <value>Time(s)</value>
+  </data>
+  <data name="WalletNameRequired.Text" xml:space="preserve">
+    <value>Please fill out Wallet Name...</value>
+  </data>
+  <data name="WeeklyRecurring.Text" xml:space="preserve">
+    <value>Weely Recurring Charge to start at:</value>
+  </data>
+  <data name="YearlyRecurring.Text" xml:space="preserve">
+    <value>Yearly Recurring Charge to start at:</value>
+  </data>
+  <data name="BillingAddress.Text" xml:space="preserve">
+    <value>Billing Address</value>
+  </data>
+  <data name="BillingAddress1Required.Text" xml:space="preserve">
+    <value>Please fill out Bill-To Address...</value>
+  </data>
+  <data name="BillingCity.Text" xml:space="preserve">
+    <value>Billing City</value>
+  </data>
+  <data name="BillingCityRequired.Text" xml:space="preserve">
+    <value>Please fill out Bill-To City...</value>
+  </data>
+  <data name="BillingCountry.Text" xml:space="preserve">
+    <value>Billing Country</value>
+  </data>
+  <data name="BillingCountryRequired.Text" xml:space="preserve">
+    <value>Please select Bill-To Country...</value>
+  </data>
+  <data name="BillingPostalCode.Text" xml:space="preserve">
+    <value>Billing Postal Code</value>
+  </data>
+  <data name="BillingPostalCodeRequired.Text" xml:space="preserve">
+    <value>Please fill out Bill-To Postal Code...</value>
+  </data>
+  <data name="BillingRegion.Text" xml:space="preserve">
+    <value>Billing Region</value>
+  </data>
+  <data name="BillingRegionRequired.Text" xml:space="preserve">
+    <value>Please select Bill-To Region...</value>
+  </data>
+  <data name="CheckoutAsGuest.Text" xml:space="preserve">
+    <value>Checkout as guest</value>
+  </data>
+  <data name="ConfirmPassword.Text" xml:space="preserve">
+    <value>Confirm Password</value>
+  </data>
+  <data name="ConfirmPasswordNotMatch.Text" xml:space="preserve">
+    <value>Password does not match...</value>
+  </data>
+  <data name="ConfirmPasswordRequired.Text" xml:space="preserve">
+    <value>Please fill out Confirm Password...</value>
+  </data>
+  <data name="CreateAccount.Text" xml:space="preserve">
+    <value>Create Account</value>
+  </data>
+  <data name="EmailInvalid.Text" xml:space="preserve">
+    <value>Please enter a valid Email...</value>
+  </data>
+  <data name="EmailRequired.Text" xml:space="preserve">
+    <value>Please fill out Email...</value>
+  </data>
+  <data name="ExpirationDateRequired.Text" xml:space="preserve">
+    <value>Please select Card Expiration Date...</value>
+  </data>
+  <data name="NoSavedCartItems.Text" xml:space="preserve">
+    <value>You have no items in your saved shopping cart.</value>
+  </data>
+  <data name="NoWishlist.Text" xml:space="preserve">
+    <value>You have no items in your wishlist.</value>
+  </data>
+  <data name="Password.Text" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PasswordRequired.Text" xml:space="preserve">
+    <value>Please fill out Password...</value>
+  </data>
+  <data name="PaymentMethodRequired.Text" xml:space="preserve">
+    <value>Please select Payment Method...</value>
+  </data>
+  <data name="PONumberRequired.Text" xml:space="preserve">
+    <value>Please fill out P.O. Number...</value>
+  </data>
+  <data name="ShippingAddress1Required.Text" xml:space="preserve">
+    <value>Please fill out Ship-To Address...</value>
+  </data>
+  <data name="ShippingCityRequired.Text" xml:space="preserve">
+    <value>Please fill out Ship-To City...</value>
+  </data>
+  <data name="ShippingCountryRequired.Text" xml:space="preserve">
+    <value>Please select Ship-To Country...</value>
+  </data>
+  <data name="ShippingEmailInvalid.Text" xml:space="preserve">
+    <value>Please enter a valid Ship-To Email...</value>
+  </data>
+  <data name="ShippingEmailRequired.Text" xml:space="preserve">
+    <value>Please fill out Ship-To Email...</value>
+  </data>
+  <data name="ShippingFirstNameRequired.Text" xml:space="preserve">
+    <value>Please fill out Ship-To First Name...</value>
+  </data>
+  <data name="ShippingLastNameRequired.Text" xml:space="preserve">
+    <value>Please fill out Ship-To Last Name...</value>
+  </data>
+  <data name="ShippingMethodRequired.Text" xml:space="preserve">
+    <value>Please select Ship-To Method...</value>
+  </data>
+  <data name="ShippingPhoneRequired.Text" xml:space="preserve">
+    <value>Please fill out Ship-To Phone...</value>
+  </data>
+  <data name="ShippingPostalCodeRequired.Text" xml:space="preserve">
+    <value>Please fill out Ship-To Postal Code...</value>
+  </data>
+  <data name="ShippingReqionRequired.Text" xml:space="preserve">
+    <value>Please select Ship-To Region...</value>
+  </data>
+  <data name="SignIn.Text" xml:space="preserve">
+    <value>Sign In</value>
+  </data>
+  <data name="StateRegion.Text" xml:space="preserve">
+    <value>State/Region</value>
+  </data>
+  <data name="Username.Text" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="UsernameRequired.Text" xml:space="preserve">
+    <value>Please fill out Username...</value>
+  </data>
+  <data name="CopyShippingDetails.Text" xml:space="preserve">
+    <value>Copy Shipping Details</value>
+  </data>
+  <data name="ReminderOptIn.Text" xml:space="preserve">
+    <value>Opt-In to receive text message reminders</value>
+  </data>
+  <data name="ShippingPhoneCarrierRequired.Text" xml:space="preserve">
+    <value>Please fill out Ship-To Phone Carrier...</value>
+  </data>
+  <data name="OrderTransDeclined.Text" xml:space="preserve">
+    <value>Your order transaction has been declined.</value>
+  </data>
+  <data name="PaymentApproved.Text" xml:space="preserve">
+    <value>Your payment has been approved.</value>
+  </data>
+  <data name="PaymentDeclined.Text" xml:space="preserve">
+    <value>Your payment has been declined.</value>
+  </data>
+  <data name="SubscriptionApproved.Text" xml:space="preserve">
+    <value>Your subscription has been approved.</value>
+  </data>
+  <data name="SubscriptionDeclined.Text" xml:space="preserve">
+    <value>Your subscription has been declined.</value>
+  </data>
+  <data name="AlreadyHaveAccount.Text" xml:space="preserve">
+    <value>Already have an account?</value>
+  </data>
+  <data name="TaxEUVAT.Text" xml:space="preserve">
+    <value>EU VAT</value>
+  </data>
+  <data name="TaxGST/PST.Text" xml:space="preserve">
+    <value>GST/PST</value>
+  </data>
+  <data name="TaxHST.Text" xml:space="preserve">
+    <value>HST</value>
+  </data>
+  <data name="TaxIncluded.Text" xml:space="preserve">
+    <value>Tax Included</value>
+  </data>
+  <data name="TaxVATGSTIncluded.Text" xml:space="preserve">
+    <value>{0} Included</value>
+  </data>
+  <data name="TaxVATIncluded.Text" xml:space="preserve">
+    <value>VAT Included</value>
+  </data>
+  <data name="CalcShippingError.Text" xml:space="preserve">
+    <value>Unable to calculate shipping rate(s) | ERR:</value>
+  </data>
+  <data name="CartCleared.Text" xml:space="preserve">
+    <value>The cart was cleared successfully.</value>
+  </data>
+  <data name="CartClearError.Text" xml:space="preserve">
+    <value>Unable to clear cart | ERR:</value>
+  </data>
+  <data name="CartUpdated.Text" xml:space="preserve">
+    <value>The cart was updated successfully.</value>
+  </data>
+  <data name="CartUpdateError.Text" xml:space="preserve">
+    <value>Unable to update cart | ERR:</value>
+  </data>
+  <data name="CouponApplied.Text" xml:space="preserve">
+    <value>Coupon [COUPON] was applied.</value>
+  </data>
+  <data name="CouponApplyError.Text" xml:space="preserve">
+    <value>Unable to apply coupon | ERR:</value>
+  </data>
+  <data name="PrintOrderError.Text" xml:space="preserve">
+    <value>Unable to print order | ERR:</value>
+  </data>
+  <data name="ProductDeleted.Text" xml:space="preserve">
+    <value>Successfully deleted [PRODUCT] from the cart.</value>
+  </data>
+  <data name="ProductDeleteError.Text" xml:space="preserve">
+    <value>Unable to delete product | ERR:</value>
+  </data>
+  <data name="UnauthorizedFileDownload.Text" xml:space="preserve">
+    <value>Unauthorized request to download [PRODUCT]</value>
+  </data>
+  <data name="WalletCreated.Text" xml:space="preserve">
+    <value>Your wallet item was successfully created.</value>
+  </data>
+  <data name="WalletCreateError.Text" xml:space="preserve">
+    <value>Unable to create wallet item | ERR:</value>
+  </data>
+  <data name="WalletDeleted.Text" xml:space="preserve">
+    <value>Your wallet item was successfully deleted.</value>
+  </data>
+  <data name="WalletDeleteError.Text" xml:space="preserve">
+    <value>Unable to delete wallet item | ERR:</value>
+  </data>
+  <data name="WishlistDeleted.Text" xml:space="preserve">
+    <value>Your wishlist saved cart was successfully deleted.</value>
+  </data>
+  <data name="WishlistDeleteError.Text" xml:space="preserve">
+    <value>Unable to delete saved cart | ERR:</value>
+  </data>
+  <data name="WishlistRestored.Text" xml:space="preserve">
+    <value>Your wishlist was successfully restored into your cart.</value>
+  </data>
+  <data name="WishlistRestoreError.Text" xml:space="preserve">
+    <value>Unable to restore saved cart | ERR:</value>
+  </data>
+  <data name="WishlistSaved.Text" xml:space="preserve">
+    <value>Your shopping cart was successfully saved into your wishlist.</value>
+  </data>
+  <data name="WishlistSaveError.Text" xml:space="preserve">
+    <value>Unable to save shopping cart | ERR:</value>
+  </data>
+  <data name="WishlistUpdated.Text" xml:space="preserve">
+    <value>Your wishlist saved cart was successfully updated.</value>
+  </data>
+  <data name="WishlistUpdateError.Text" xml:space="preserve">
+    <value>Unable to update saved cart | ERR:</value>
+  </data>
+  <data name="PayWithStripe.Text" xml:space="preserve">
+    <value>Pay with Stripe</value>
+  </data>
+  <data name="AcceptTerms.Text" xml:space="preserve">
+    <value>I agree to the terms and conditions</value>
+  </data>
+  <data name="AcceptTermsRequired.Text" xml:space="preserve">
+    <value>Please check this box if you want to proceed...</value>
+  </data>
+  <data name="ConsumedCoupon.Text" xml:space="preserve">
+    <value>This coupon code has reached its maximum limit!</value>
+  </data>
+  <data name="ExpiredCoupon.Text" xml:space="preserve">
+    <value>This coupon code has expired!</value>
+  </data>
+  <data name="InvalidCoupon.Text" xml:space="preserve">
+    <value>Invalid coupon code! Please make sure to use a valid one!</value>
+  </data>
+  <data name="MinPurchaseCoupon.Text" xml:space="preserve">
+    <value>This coupon code has a minimum order amount of [MinOrderAmount]</value>
+  </data>
+  <data name="Donation.Text" xml:space="preserve">
+    <value>Donation</value>
+  </data>
+  <data name="Donate.Text" xml:space="preserve">
+    <value>Donate</value>
+  </data>
+  <data name="Close.Text" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="AddedToCart.Text" xml:space="preserve">
+    <value>Successfully added [PRODUCT] to cart.</value>
+  </data>
+  <data name="AddToCartError.Text" xml:space="preserve">
+    <value>Unable to add to cart | ERR:</value>
+  </data>
+  <data name="CheckboxRequired.Text" xml:space="preserve">
+    <value>Please check this box...</value>
+  </data>
+  <data name="FieldInteger.Text" xml:space="preserve">
+    <value>Please enter an integer number...</value>
+  </data>
+  <data name="FieldMaxValue.Text" xml:space="preserve">
+    <value>Please enter at max 999999...</value>
+  </data>
+  <data name="FieldMinValue.Text" xml:space="preserve">
+    <value>Please enter at least 1...</value>
+  </data>
+  <data name="FieldNumeric.Text" xml:space="preserve">
+    <value>Please enter a number...</value>
+  </data>
+  <data name="FieldRequired.Text" xml:space="preserve">
+    <value>Please fill out this field...</value>
+  </data>
+  <data name="Now.Text" xml:space="preserve">
+    <value>Now</value>
+  </data>
+  <data name="OptionRequired.Text" xml:space="preserve">
+    <value>Please select one of these options...</value>
+  </data>
+  <data name="Price.Text" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="PriceError.Text" xml:space="preserve">
+    <value>Unable to get price | ERR:</value>
+  </data>
+  <data name="Select.Text" xml:space="preserve">
+    <value>-- Select --</value>
+  </data>
+  <data name="SelectRequired.Text" xml:space="preserve">
+    <value>Please select an item in the list...</value>
+  </data>
+  <data name="CouponCleared.Text" xml:space="preserve">
+    <value>Coupon [COUPON] was cleared.</value>
+  </data>
+</root>

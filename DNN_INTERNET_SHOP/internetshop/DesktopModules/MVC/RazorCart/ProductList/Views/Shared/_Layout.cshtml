@@ -1,0 +1,28 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<dynamic>
+@using DotNetNuke.Web.Client.ClientResourceManagement;
+@using Newtonsoft.Json;
+
+@{
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/rzc-bootstrap.css", 100, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/rzc-bootstrap-theme.css", 101, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/font-awesome.css", 102, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/angular-toastr.css", 103, "DnnPageHeaderProvider");
+
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/angular.min.js", 100, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/angular-messages.min.js", 101, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/angular-toastr.tpls.js", 102, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/razorcart.core.js", 103, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/ProductList/Scripts/razorcart.list.js", 104, "DnnPageHeaderProvider");
+
+    string startupScript = "angular.bootstrap(angular.element(document.getElementById('rzcContainer_" + Dnn.ModuleContext.ModuleId + "')), ['RazorCart']);";
+    Dnn.DnnPage.ClientScript.RegisterStartupScript(Dnn.DnnPage.GetType(), string.Concat("rzc-init-", Dnn.ModuleContext.ModuleId), startupScript, true);
+}
+
+<div id="rzcContainer_@Dnn.ModuleContext.ModuleId" class="rzc-bootstrap rzc-product-list" ng-controller="listCtrl as list" ng-init="list.init(@JsonConvert.SerializeObject(Model))" ng-cloak>
+    @RenderBody()
+    <div class="rc-backdrop" ng-if="list.rebinding || list.adding">
+        <div class="rc-backdrop-container">
+            <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<dynamic>
+@using DotNetNuke.Web.Client.ClientResourceManagement;
+
+@{
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/rzc-bootstrap.css", 100, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/rzc-bootstrap-theme.css", 101, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/font-awesome.css", 102, "DnnPageHeaderProvider");
+
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/Search/Content/Scripts/razorCart.searchCommon.js", 100, "DnnPageHeaderProvider");
+}
+
+<div id="rzcContainer_@Dnn.ModuleContext.ModuleId" class="rzc-bootstrap rzc-search">
+    @RenderBody()
+</div>

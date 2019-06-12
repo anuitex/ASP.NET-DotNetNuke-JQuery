@@ -1,0 +1,216 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.MyAccount.Models.AccountModel>
+@using DotNetNuke.Web.Mvc.Helpers;
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="panel-title text-uppercase">@Dnn.LocalizeString("AddressTitle")</span>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("Company")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="text" name="shipCompany" class="form-control" placeholder="@Dnn.LocalizeString("Company")" ng-model="account.shipping.CompanyName">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipFirstName.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipFirstName.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("FirstName")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="text" name="shipFirstName" class="form-control" placeholder="@Dnn.LocalizeString("FirstName")" ng-model="account.shipping.FirstName" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipFirstName.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipFirstName.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FirstNameRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipLastName.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipLastName.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("LastName")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="text" name="shipLastName" class="form-control" placeholder="@Dnn.LocalizeString("LastName")" ng-model="account.shipping.LastName" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipLastName.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipLastName.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("LastNameRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipAddress1.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipAddress1.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("Address")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="text" name="shipAddress1" class="form-control" placeholder="@Dnn.LocalizeString("Address1")" ng-model="account.shipping.Address1" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipAddress1.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipAddress1.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("Address1Required")
+                                </div>
+                            </div>
+                            <input type="text" name="shipAddress2" class="form-control" placeholder="@Dnn.LocalizeString("Address2")" ng-model="account.shipping.Address2">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipCity.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipCity.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("City")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="text" name="shipCity" class="form-control" placeholder="@Dnn.LocalizeString("City")" ng-model="account.shipping.City" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipCity.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipCity.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("CityRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPostalCode.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipPostalCode.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("PostalCode")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="text" name="shipPostalCode" class="form-control" placeholder="@Dnn.LocalizeString("PostalCode")" ng-model="account.shipping.PostalCode" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipPostalCode.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPostalCode.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("PostalCodeRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipCountry.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipCountry.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("Country")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <select name="shipCountry" class="form-control" ng-model="account.shipping.CountryID" ng-change="account.shipCountryChange()" required>
+                                <option value="" disabled selected>-- @Dnn.LocalizeString("Country") --</option>
+                                <option ng-repeat="country in account.countries" value="{{country.EntryID}}">{{country.Text}}</option>
+                            </select>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipCountry.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipCountry.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("CountryRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipRegion.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipRegion.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("Region")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <select name="shipRegion" class="form-control" ng-model="account.shipping.RegionID" required>
+                                <option value="" disabled selected>-- @Dnn.LocalizeString("StateRegion") --</option>
+                                <option ng-repeat="region in account.shippingRegions" value="{{region.EntryID}}">{{region.Text}}</option>
+                            </select>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipRegion.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipRegion.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("RegionRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("BillingAddress")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="text" name="billAddress1" class="form-control" placeholder="@Dnn.LocalizeString("Address1")" ng-model="account.billing.Address1" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingAddress1Required")
+                                </div>
+                            </div>
+                            <input type="text" name="billAddress2" class="form-control" placeholder="@Dnn.LocalizeString("Address2")" ng-model="account.billing.Address2">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("BillingCity")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="text" name="billCity" class="form-control" placeholder="@Dnn.LocalizeString("City")" ng-model="account.billing.City" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingCityRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("BillingPostalCode")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="text" name="billPostalCode" class="form-control" placeholder="@Dnn.LocalizeString("PostalCode")" ng-model="account.billing.PostalCode" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingPostalCodeRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("BillingCountry")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <select name="billCountry" class="form-control" ng-model="account.billing.CountryID" ng-change="account.billCountryChange()" required>
+                                <option value="" disabled selected>-- @Dnn.LocalizeString("Country") --</option>
+                                <option ng-repeat="country in account.countries" value="{{country.EntryID}}">{{country.Text}}</option>
+                            </select>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingCountryRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("BillingRegion")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <select name="billRegion" class="form-control" ng-model="account.billing.RegionID" required>
+                                <option value="" disabled selected>-- @Dnn.LocalizeString("StateRegion") --</option>
+                                <option ng-repeat="region in account.billingRegions" value="{{region.EntryID}}">{{region.Text}}</option>
+                            </select>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingRegionRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhone.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhone.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("Phone")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="tel" name="shipPhone" class="form-control" placeholder="@Dnn.LocalizeString("PhoneNumber")" ng-model="account.shipping.Phone"> @* Add "required" attribute to mandate Ship-To Phone *@
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhone.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhone.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("PhoneRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipEmail.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipEmail.$invalid }">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("Email")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <input type="email" name="shipEmail" class="form-control" placeholder="@Dnn.LocalizeString("EmailAddress")" ng-model="account.shipping.Email" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipEmail.$error" ng-if="account.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipEmail.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("EmailRequired")
+                                </div>
+                                <div class="form-control-required" ng-message="email">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("EmailInvalid")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">@Dnn.LocalizeString("CustomerOptIn")</label>
+                        <div class="col-md-7 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="customerOptIn" ng-model="account.shipping.CustomerOptIn" />
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="form-group">
+        <div class="col-xs-12 text-center">
+            <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("Save")" ng-click="account.submitted = true; rzcForm_@(Dnn.ModuleContext.ModuleId).$valid && account.saveAddress()" ng-disabled="account.submitting" />
+        </div>
+    </div>
+</div>

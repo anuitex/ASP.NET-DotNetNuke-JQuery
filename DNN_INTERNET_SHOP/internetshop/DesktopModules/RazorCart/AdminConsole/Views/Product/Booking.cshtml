@@ -1,0 +1,432 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<!-- Bootstrap DateTimePicker CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/bootstrap-datetimepicker.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Moment JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/moment.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Bootstrap DateTimePicker JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/bootstrap-datetimepicker.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })" autocomplete="off">
+            @Html.Partial("_ProductMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            @if (Model.Submitted)
+                            {
+                                <div class="alert alert-success alert-dismissable">
+                                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                    @Model.SaveMessage
+                                </div>
+                            }
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Booking Options</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Enable Booking</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("Booking", Model.Product.Booking, new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="Booking" data-cond-value="true" data-cond-destroy="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Number of Dates</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("BookingFields", Model.BookingFieldsCount, "-- Select --", new { @class = "form-control", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="BookingFields" data-cond-value="One,Two" data-cond-operator="[]" data-cond-destroy="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Booking Duration</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("BookingDuration", Model.BookingDurations, "-- Select --", new { @class = "form-control", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="BookingFields" data-cond-value="One,Two" data-cond-operator="[]" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">First Available Date <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["FirstBookingDate"]"></i></label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("FirstBookingDate", Model.ProductII.FirstBookingDate, new { @class = "form-control", @required = "required", @placeholder = "First available date (day)", @type = "number", @step = "1" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="BookingFields" data-cond-value="Two" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Minimum Date Duration <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["MinBookingDuration"]"></i></label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="input-group">
+                                                @Html.TextBox("MinBookingDuration", Model.ProductII.MinBookingDuration, new { @class = "form-control", @required = "required", @placeholder = "Minimum booking date duration", @type = "number", @step = "1", @min = "-1" })
+                                                <span class="input-group-addon">Days</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="BookingFields" data-cond-value="Two" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Maximum Date Duration <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["MaxBookingDuration"]"></i></label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="input-group">
+                                                @Html.TextBox("MaxBookingDuration", Model.ProductII.MaxBookingDuration, new { @class = "form-control", @required = "required", @placeholder = "Maximum booking date duration", @type = "number", @step = "1", @min = "-1" })
+                                                <span class="input-group-addon">Days</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div data-show="conditional" data-cond-option="BookingFields" data-cond-value="Two" style="display: none;">
+                                        <div data-show="conditional" data-cond-option="MinBookingDuration" data-cond-value="0" style="display: none;">
+                                            <div data-show="conditional" data-cond-option="MaxBookingDuration" data-cond-value="0" style="display: none;">
+                                                <div class="form-group" data-show="conditional" data-cond-option="BookingDuration" data-cond-value="QuarterHourly,HalfHourly,Hourly" data-cond-operator="[]" style="display: none;">
+                                                    <label class="col-md-3 col-sm-4 control-label">Minimum Time Duration <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["MinBookingTimeDuration"]"></i></label>
+                                                    <div class="col-md-6 col-sm-8">
+                                                        <div class="input-group">
+                                                            @Html.TextBox("MinBookingTimeDuration", Model.ProductII.MinBookingTimeDuration, new { @class = "form-control", @required = "required", @placeholder = "Minimum booking time duration", @type = "number", @step = "1", @min = "0" })
+                                                            <span class="input-group-addon">Time</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" data-show="conditional" data-cond-option="BookingDuration" data-cond-value="QuarterHourly,HalfHourly,Hourly" data-cond-operator="[]" style="display: none;">
+                                                    <label class="col-md-3 col-sm-4 control-label">Maximum Time Duration <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["MaxBookingTimeDuration"]"></i></label>
+                                                    <div class="col-md-6 col-sm-8">
+                                                        <div class="input-group">
+                                                            @Html.TextBox("MaxBookingTimeDuration", Model.ProductII.MaxBookingTimeDuration, new { @class = "form-control", @required = "required", @placeholder = "Maximum booking time duration", @type = "number", @step = "1", @min = "-1" })
+                                                            <span class="input-group-addon">Time</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if (Model.Product.Booking)
+                                    {
+                                        <div class="form-group" data-show="conditional" data-cond-option="BookingFields" data-cond-value="One,Two" data-cond-operator="[]" style="display: none;">
+                                            <label class="col-md-3 col-sm-4 control-label">Disabled Dates</label>
+                                            <div class="col-md-6 col-sm-8">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-body">
+                                                        <div class="table">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <td>Type</td>
+                                                                        <td>Disable</td>
+                                                                        <td>Every Year</td>
+                                                                        <td>Calendar</td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach (var date in Model.BookingDisabledDates)
+                                                                    {
+                                                                        <tr>
+                                                                            <td>
+                                                                                @date.Type
+                                                                            </td>
+                                                                            <td>
+                                                                                @switch (date.Type)
+                                                                                {
+                                                                                    case "Day":
+                                                                                        @(((RazorCart.Service.Data.ModelDataContext.DisabledDay)date.DisableDay).ToString())
+                                                                                        break;
+                                                                                    case "Date":
+                                                                                        @(date.DisableDate.ToString(Model.ShortDateFormat))
+                                                                                        break;
+                                                                                    case "DateRange":
+                                                                                        @(date.DisableDateRangeFrom.ToString(Model.ShortDateFormat) + " - " + date.DisableDateRangeTo.ToString(Model.ShortDateFormat))
+                                                                                        break;
+                                                                                }
+                                                                            </td>
+                                                                            <td>
+                                                                                @Html.Raw(string.Format("<i class=\"fa fa-{0} fa-lg\" aria-hidden=\"true\"></i>", date.EveryYear ? "check-circle" : "circle-thin"))
+                                                                            </td>
+                                                                            <td>
+                                                                                @(date.Calendar)
+                                                                            </td>
+                                                                            <td>
+                                                                                <a href="@Url.Action("DeleteDisableDate", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, DisableDateID = date.ID })" onclick="return confirm('Are you sure?')">
+                                                                                    <i class="fa fa-trash-o fa-lg"></i>
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    }
+                                                                    <tr>
+                                                                        <td>
+                                                                            @Html.DropDownList("DateType", Model.DisabledDateTypes, new { @class = "form-control", @required = "required" })
+                                                                        </td>
+                                                                        <td>
+                                                                            <div data-show="conditional" data-cond-option="DateType" data-cond-value="Day" style="display: none;">
+                                                                                @Html.DropDownList("DisableDay", Model.DisabledDateDays, new { @class = "form-control", @required = "required" })
+                                                                            </div>
+                                                                            <div data-show="conditional" data-cond-option="DateType" data-cond-value="Date" style="display: none;">
+                                                                                <div class="input-group date" data-provide="datetimepicker" data-provide-format="@Model.ShortDateFormat.ToUpper()">
+                                                                                    @Html.TextBox("DisableDate", null, new { @class = "form-control", @placeholder = "Disable Date" })
+                                                                                    <span class="input-group-addon">
+                                                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div data-show="conditional" data-cond-option="DateType" data-cond-value="DateRange" style="display: none;">
+                                                                                <div class="input-group date" data-provide="datetimepicker" data-provide-format="@Model.ShortDateFormat.ToUpper()" data-provider-range="DisableDateRange">
+                                                                                    @Html.TextBox("DisableDateRangeFrom", null, new { @class = "form-control", @placeholder = "From Date" })
+                                                                                    <span class="input-group-addon">
+                                                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div class="input-group date" data-provide="datetimepicker" data-provide-format="@Model.ShortDateFormat.ToUpper()" data-provider-range="DisableDateRange">
+                                                                                    @Html.TextBox("DisableDateRangeTo", null, new { @class = "form-control", @placeholder = "To Date" })
+                                                                                    <span class="input-group-addon">
+                                                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="checkbox" data-show="conditional" data-cond-option="DateType" data-cond-value="Date,DateRange" data-cond-operator="[]" style="display: none;">
+                                                                                <label>
+                                                                                    @Html.CheckBox("EveryYear", false, new { @onchange = "checkBoxChange(this);" })
+                                                                                    <span class="rc-control">
+                                                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                                                    </span>
+                                                                                </label>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            @Html.DropDownList("DateCalendar", Model.DisabledDateTimeCalendar, new { @class = "form-control", @required = "required" })
+                                                                        </td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td colspan="5">
+                                                                            <button type="submit" class="btn btn-default" name="AddDisabledDate" formnovalidate>Add Disabled Date</button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- /.panel-body -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" data-show="conditional" data-cond-option="BookingDuration" data-cond-value="QuarterHourly,HalfHourly,Hourly" data-cond-operator="[]" style="display: none;">
+                                            <label class="col-md-3 col-sm-4 control-label">Disabled Times</label>
+                                            <div class="col-md-6 col-sm-8">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-body">
+                                                        <div class="table">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <td>Type</td>
+                                                                        <td>Disable</td>
+                                                                        <td>Repeat</td>
+                                                                        <td>Calendar</td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach (var time in Model.BookingDisabledTimes)
+                                                                    {
+                                                                        <tr>
+                                                                            <td>
+                                                                                @time.Type
+                                                                            </td>
+                                                                            <td>
+                                                                                @switch (time.Type)
+                                                                                {
+                                                                                    case "Time":
+                                                                                        @(DateTime.Today.Add(time.DisableTime).ToString(Model.ShortTimeFormat))
+                                                                                        break;
+                                                                                    case "TimeRange":
+                                                                                        @(DateTime.Today.Add(time.DisableTimeRangeFrom).ToString(Model.ShortTimeFormat) + " - " + DateTime.Today.Add(time.DisableTimeRangeTo).ToString(Model.ShortTimeFormat))
+                                                                                        break;
+                                                                                }
+                                                                            </td>
+                                                                            <td>
+                                                                                @(((RazorCart.Service.Data.ModelDataContext.DisabledDay)time.Repeat).ToString())
+                                                                            </td>
+                                                                            <td>
+                                                                                @(time.Calendar)
+                                                                            </td>
+                                                                            <td>
+                                                                                <a href="@Url.Action("DeleteDisableTime", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, DisableTimeID = time.ID })" onclick="return confirm('Are you sure?')">
+                                                                                    <i class="fa fa-trash-o fa-lg"></i>
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    }
+                                                                    <tr>
+                                                                        <td>
+                                                                            @Html.DropDownList("TimeType", Model.DisabledTimeTypes, new { @class = "form-control", @required = "required" })
+                                                                        </td>
+                                                                        <td>
+                                                                            <div data-show="conditional" data-cond-option="TimeType" data-cond-value="Time" style="display: none;">
+                                                                                <div class="input-group date" data-provide="datetimepicker" data-provide-format="@Model.ShortTimeFormat.Replace("tt", "A")">
+                                                                                    @Html.TextBox("DisableTime", null, new { @class = "form-control", @placeholder = "Disable Time" })
+                                                                                    <span class="input-group-addon">
+                                                                                        <span class="glyphicon glyphicon-time"></span>
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div data-show="conditional" data-cond-option="TimeType" data-cond-value="TimeRange" style="display: none;">
+                                                                                <div class="input-group date" data-provide="datetimepicker" data-provide-format="@Model.ShortTimeFormat.Replace("tt", "A")" data-provider-range="DisableTimeRange">
+                                                                                    @Html.TextBox("DisableTimeRangeFrom", null, new { @class = "form-control", @placeholder = "From Time" })
+                                                                                    <span class="input-group-addon">
+                                                                                        <span class="glyphicon glyphicon-time"></span>
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div class="input-group date" data-provide="datetimepicker" data-provide-format="@Model.ShortTimeFormat.Replace("tt", "A")" data-provider-range="DisableTimeRange">
+                                                                                    @Html.TextBox("DisableTimeRangeTo", null, new { @class = "form-control", @placeholder = "To Time" })
+                                                                                    <span class="input-group-addon">
+                                                                                        <span class="glyphicon glyphicon-time"></span>
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            @Html.DropDownList("Repeat", Model.DisabledTimeDays, new { @class = "form-control", @required = "required" })
+                                                                        </td>
+                                                                        <td>
+                                                                            @Html.DropDownList("TimeCalendar", Model.DisabledDateTimeCalendar, new { @class = "form-control", @required = "required" })
+                                                                        </td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td colspan="5">
+                                                                            <button type="submit" class="btn btn-default" name="AddDisabledTime" formnovalidate>Add Disabled Time</button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- /.panel-body -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("Index", "Product", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<style type="text/css">
+    select option:disabled {
+        color: #D3D3D3;
+    }
+</style>
+<script type="text/javascript">
+    function AddDisabledDate(sender) {
+        var type = $(sender).parents('table').find('select#DisabledDateType').get(0);
+        var day = $(sender).parents('table').find('select#DisabledDateDay').get(0);
+        var everyYear = $(sender).parents('table').find('input#DisabledDateEveryYear').get(0);
+        var calendar = $(sender).parents('table').find('select#DisabledDateCalendar').get(0);
+    }
+    function getTimePickerStepping() {
+        var stepping;
+        switch ($('#BookingDuration').val()) {
+            case 'QuarterHourly':
+                stepping = 15;
+                break;
+            case 'HalfHourly':
+                stepping = 30;
+                break;
+            case 'Hourly':
+                stepping = 60;
+                break;
+        }
+        return stepping;
+    };
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        // Init Tooltips
+        $('[data-toggle="tooltip"]').tooltip({
+            placement: 'right',
+            container: 'body'
+        });
+        // Init Date Picker
+        $('[data-provide="datetimepicker"]').each(function () {
+            $(this).datetimepicker({
+                format: $(this).data('provide-format'),
+                showTodayButton: true,
+                showClear: true,
+                showClose: true,
+                useCurrent: true,
+                stepping: getTimePickerStepping()
+            }).on('dp.show', function () {
+                var date = $(this).data('DateTimePicker').date();
+                $(this).data('DateTimePicker').date(null);
+                $(this).data('DateTimePicker').stepping(getTimePickerStepping());
+                $(this).data('DateTimePicker').date(new Date(date.year(), date.month(), date.date(), date.hour(), date.minute(), 0, 0));
+            }).find('input[type="text"]').click(function () {
+                $(this).closest('[data-provide="datetimepicker"]').data("DateTimePicker").toggle();
+            });
+        });
+        // Booking Durations Logic
+        $('#BookingFields').on('change', function () {
+            switch ($(this).val()) {
+                case 'One':
+                    $('#BookingDuration option[value="QuarterHourly"]').prop('disabled', false);
+                    $('#BookingDuration option[value="HalfHourly"]').prop('disabled', false);
+                    $('#BookingDuration option[value="Hourly"]').prop('disabled', false);
+                    $('#BookingDuration option[value="Daily"]').prop('disabled', false);
+                    $('#BookingDuration option[value="Weekly"]').prop('disabled', true);
+                    $('#BookingDuration option[value="Monthly"]').prop('disabled', true);
+                    $('#BookingDuration option[value="Yearly"]').prop('disabled', true);
+                    break;
+                case 'Two':
+                    $('#BookingDuration option[value="QuarterHourly"]').prop('disabled', false);
+                    $('#BookingDuration option[value="HalfHourly"]').prop('disabled', false);
+                    $('#BookingDuration option[value="Hourly"]').prop('disabled', false);
+                    $('#BookingDuration option[value="Daily"]').prop('disabled', false);
+                    $('#BookingDuration option[value="Weekly"]').prop('disabled', false);
+                    $('#BookingDuration option[value="Monthly"]').prop('disabled', false);
+                    $('#BookingDuration option[value="Yearly"]').prop('disabled', false);
+                    break;
+            }
+            if (!$('#BookingDuration').val())
+                $('#BookingDuration').val('').change();
+        });
+        $('#BookingFields').change();
+        // Set Date/Time Ranges
+        $('[data-provider-range="DisableDateRange"]').eq(0).on("dp.change", function (e) {
+            $('[data-provider-range="DisableDateRange"]').eq(1).data("DateTimePicker").minDate(e.date);
+        });
+        $('[data-provider-range="DisableDateRange"]').eq(1).on("dp.change", function (e) {
+            $('[data-provider-range="DisableDateRange"]').eq(0).data("DateTimePicker").maxDate(e.date);
+        });
+        $('[data-provider-range="DisableTimeRange"]').eq(0).on("dp.change", function (e) {
+            $('[data-provider-range="DisableTimeRange"]').eq(1).data("DateTimePicker").minDate(e.date);
+        });
+        $('[data-provider-range="DisableTimeRange"]').eq(1).on("dp.change", function (e) {
+            $('[data-provider-range="DisableTimeRange"]').eq(0).data("DateTimePicker").maxDate(e.date);
+        });
+    });
+</script>

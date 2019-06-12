@@ -1,0 +1,330 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Checkout.Models.CheckoutModel>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="panel-title text-uppercase">@Dnn.LocalizeString("ShippingDetails")</span>
+    </div>
+    <div class="panel-body">
+        <div class="row" ng-switch-when="ShoppingCart">
+            @if (Model.ShowCompany)
+            {
+                <div class="col-xs-12">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                        <input type="text" name="shipCompany" class="form-control" placeholder="@Dnn.LocalizeString("Company")" ng-model="checkout.shipping.CompanyName">
+                    </div>
+                </div>
+            }
+            <div class="col-xs-6">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipFirstName.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipFirstName.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                    <input type="text" name="shipFirstName" class="form-control" placeholder="@Dnn.LocalizeString("FirstName")" ng-model="checkout.shipping.FirstName" required>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="(checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipFirstName.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipFirstName.$invalid"></span>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipFirstName.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipFirstName.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingFirstNameRequired")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipLastName.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipLastName.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-users"></i></span>
+                    <input type="text" name="shipLastName" class="form-control" placeholder="@Dnn.LocalizeString("LastName")" ng-model="checkout.shipping.LastName" required>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="(checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipLastName.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipLastName.$invalid"></span>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipLastName.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipLastName.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingLastNameRequired")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipAddress1.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipAddress1.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-home"></i></span>
+                    <input type="text" name="shipAddress1" class="form-control" placeholder="@Dnn.LocalizeString("Address1")" ng-model="checkout.shipping.Address1" ng-blur="blur && checkout.shipAddressChange(); blur = false;" ng-change="blur = true;" required>
+                    <input type="text" name="shipAddress2" class="form-control" placeholder="@Dnn.LocalizeString("Address2")" ng-model="checkout.shipping.Address2">
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="(checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipAddress1.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipAddress1.$invalid"></span>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipAddress1.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipAddress1.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingAddress1Required")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipCity.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipCity.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-bank"></i></span>
+                    <input type="text" name="shipCity" class="form-control" placeholder="@Dnn.LocalizeString("City")" ng-model="checkout.shipping.City" ng-blur="blur && checkout.shipAddressChange(); blur = false;" ng-change="blur = true;" required>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="(checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipCity.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipCity.$invalid"></span>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipCity.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipCity.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingCityRequired")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPostalCode.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipPostalCode.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                    <input type="text" name="shipPostalCode" class="form-control" placeholder="@Dnn.LocalizeString("PostalCode")" ng-model="checkout.shipping.PostalCode" ng-blur="blur && checkout.shipAddressChange(); blur = false;" ng-change="blur = true;" required>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="(checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPostalCode.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipPostalCode.$invalid"></span>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipPostalCode.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPostalCode.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingPostalCodeRequired")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipCountry.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipCountry.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-globe"></i></span>
+                    <select name="shipCountry" class="form-control" ng-model="checkout.shipping.CountryID" ng-change="checkout.shipCountryChange()" required>
+                        <option value="" disabled selected>-- @Dnn.LocalizeString("Country") --</option>
+                        <option ng-repeat="country in checkout.countries" value="{{country.EntryID}}">{{country.Text}}</option>
+                    </select>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipCountry.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipCountry.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingCountryRequired")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipRegion.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipRegion.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-map"></i></span>
+                    <select name="shipRegion" class="form-control" ng-model="checkout.shipping.RegionID" ng-change="checkout.shipAddressChange()" required>
+                        <option value="" disabled selected>-- @Dnn.LocalizeString("Region") --</option>
+                        <option ng-repeat="region in checkout.shippingRegions" value="{{region.EntryID}}">{{region.Text}}</option>
+                    </select>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipRegion.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipRegion.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingReqionRequired")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhone.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhone.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-phone"></i></span>
+                    <input type="tel" name="shipPhone" class="form-control" placeholder="@Dnn.LocalizeString("Phone")" ng-model="checkout.shipping.Phone">
+                    @if (Model.EnableBookingReminder)
+                    {
+                        <div class="input-group-btn" ng-if="(checkout.shipping.ReminderOptIn || @Json.Encode(!Model.ShowReminderOptIn)) && checkout.cartHasBooking()">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <span>{{checkout.shipping.PhoneCarrier || '-- Carrier --'}}</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li ng-repeat="carrier in checkout.phoneCarriers">
+                                    <a href="" ng-click="checkout.shipping.PhoneCarrier = carrier.Value">{{carrier.Text}}</a>
+                                </li>
+                            </ul>
+                            <input type="hidden" name="shipPhoneCarrier" ng-model="checkout.shipping.PhoneCarrier" required />
+                        </div>
+                    }
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="(checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhone.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhone.$invalid"></span>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhone.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhone.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingPhoneRequired")
+                    </div>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhoneCarrier.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipPhoneCarrier.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingPhoneCarrierRequired")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipEmail.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipEmail.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                    <input type="email" name="shipEmail" class="form-control" placeholder="@Dnn.LocalizeString("Email")" ng-model="checkout.shipping.Email" ng-change="checkout.shipEmailChange()" required>
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="(checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipEmail.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipEmail.$invalid"></span>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipEmail.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipEmail.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingEmailRequired")
+                    </div>
+                    <div class="form-control-required" ng-message="email">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingEmailInvalid")
+                    </div>
+                </div>
+            </div>
+            @if (Model.UseShipMethodList)
+            {
+                <div class="col-xs-12" ng-init="checkout.defaultShipping()">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipMethod.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).shipMethod.$invalid || rzcForm_@(Dnn.ModuleContext.ModuleId).shipMethodUndefined.$invalid }">
+                        <span class="input-group-addon"><i class="fa fa-truck fa-flip-horizontal"></i></span>
+                        <div class="form-control" style="height: auto;" ng-show="checkout.shippingMethods.length > 0">
+                            <div class="radio" ng-repeat="method in checkout.shippingMethods">
+                                <label>
+                                    <input type="radio" name="shipMethod" ng-model="checkout.shipping.Method" value="{{method.Code}}" ng-change="checkout.shipMethodChange();" required />
+                                    {{method.Text}} – {{method.Price | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <label class="form-control" ng-if="checkout.shippingMethods.length < 1" style="height: auto;">
+                            @Dnn.LocalizeString("UnshippableAddress")
+                            <input type="hidden" name="shipMethodUndefined" ng-model="checkout.shipping.shipMethodUndefined" required>
+                        </label>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).shipMethod.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).shipMethod.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ShippingMethodRequired")
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (Model.ShowReminderOptIn)
+            {
+                <div class="col-xs-12" ng-if="checkout.cartHasBooking()">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-comment"></i></span>
+                        <div class="form-control" style="height: auto;">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="reminderOptIn" ng-model="checkout.shipping.ReminderOptIn" /> @Dnn.LocalizeString("ReminderOptIn")
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (Model.ShowCustomerOptIn)
+            {
+                <div class="col-xs-12">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-newspaper-o"></i></span>
+                        <div class="form-control" style="height: auto;">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="customerOptIn" ng-model="checkout.shipping.CustomerOptIn" /> @Dnn.LocalizeString("CustomerOptIn")
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (Model.ShowCustomField1)
+            {
+                <div class="col-xs-12">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).customField1.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).customField1.$invalid }">
+                        <span class="input-group-addon"><i class="fa fa-info"></i></span>
+                        <input type="text" name="customField1" class="form-control" maxlength="50" placeholder="@Dnn.LocalizeString("CustomField1")" ng-model="checkout.inputs.CustomField1" @(Model.CustomField1Required ? "required" : "")>
+                        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="(checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).customField1.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).customField1.$invalid"></span>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).customField1.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).customField1.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("CustomField1Required")
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (Model.ShowCustomField2)
+            {
+                <div class="col-xs-12">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).customField2.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).customField2.$invalid }">
+                        <span class="input-group-addon"><i class="fa fa-info"></i></span>
+                        <input type="text" name="customField2" class="form-control" maxlength="50" placeholder="@Dnn.LocalizeString("CustomField2")" ng-model="checkout.inputs.CustomField2" @(Model.CustomField2Required ? "required" : "")>
+                        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="(checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).customField2.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).customField2.$invalid"></span>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).customField2.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).customField2.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("CustomField2Required")
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (Model.ShowSpecialInstructions == 1)
+            {
+                <div class="col-xs-12">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-info-circle"></i></span>
+                        <textarea name="specialInstructions" class="form-control" placeholder="@Dnn.LocalizeString("SpecialInstructions")" ng-model="checkout.shipping.SpecialInstructions" rows="2"></textarea>
+                    </div>
+                </div>
+            }
+            @if (Model.ProfileProperty != null)
+            {
+                <div class="col-xs-12">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-user-circle"></i></span>
+                        <label class="form-control">@Model.ProfileProperty.PropertyName: @Model.ProfileProperty.PropertyValue</label>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row" ng-if="checkout.viewState != 'ShoppingCart'">
+            <div class="col-xs-12">
+                <dl>
+                    <dt>@Dnn.LocalizeString("ShipTo"):</dt>
+                    <dd>
+                        @if (Model.ShowCompany)
+                        {
+                            <div>{{checkout.shipping.CompanyName}}</div>
+                        }
+                        <div>{{checkout.shipping.FirstName}} {{checkout.shipping.LastName}}</div>
+                        <div>@Dnn.LocalizeString("ShippingMethod"): {{checkout.shipping.MethodType}}</div>
+                        @if (Model.ShowCustomerOptIn)
+                        {
+                            <div ng-if="checkout.shipping.CustomerOptIn">@Dnn.LocalizeString("CustomerOptIn"): Yes</div>
+                        }
+                    </dd>
+                    <dt>@Dnn.LocalizeString("FullAddress"):</dt>
+                    <dd>
+                        <div>{{checkout.shipping.Address1}}<span ng-if="checkout.shipping.Address2.length > 0">, {{checkout.shipping.Address2}}</span></div>
+                        <div>
+                            {{checkout.shipping.City}}, {{(checkout.shippingRegions | filter: {EntryID : checkout.shipping.RegionID} : true)[0].Text}} {{checkout.shipping.PostalCode}}
+                        </div>
+                        <div>
+                            {{(checkout.countries | filter: {EntryID : checkout.shipping.CountryID} : true)[0].Text}}
+                        </div>
+                        <div>Phone: {{checkout.shipping.Phone}}</div>
+                        <div>Email: {{checkout.shipping.Email}}</div>
+                    </dd>
+                    @if (Model.ShowCustomField1)
+                    {
+                        <dt>@Dnn.LocalizeString("CustomField1"):</dt>
+                        <dd>
+                            <div>{{checkout.inputs.CustomField1}}</div>
+                        </dd>
+                    }
+                    @if (Model.ShowCustomField2)
+                    {
+                        <dt>@Dnn.LocalizeString("CustomField2"):</dt>
+                        <dd>
+                            <div>{{checkout.inputs.CustomField2}}</div>
+                        </dd>
+                    }
+                    @if (Model.ShowSpecialInstructions == 1)
+                    {
+                        <dt ng-if="checkout.shipping.SpecialInstructions.length > 0">@Dnn.LocalizeString("SpecialInstructions"):</dt>
+                        <dd>
+                            <div ng-if="checkout.shipping.SpecialInstructions.length > 0">{{checkout.shipping.SpecialInstructions}}</div>
+                        </dd>
+                    }
+                </dl>
+            </div>
+            @if (Model.ShowSpecialInstructions == 2)
+            {
+                <div class="col-xs-12">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-info-circle"></i></span>
+                        <textarea name="specialInstructions" class="form-control" placeholder="@Dnn.LocalizeString("SpecialInstructions")" ng-model="checkout.shipping.SpecialInstructions" ng-if="checkout.viewState != 'OrderStatus'" rows="2"></textarea>
+                        <label class="form-control" ng-if="checkout.viewState == 'OrderStatus'">{{checkout.shipping.SpecialInstructions}}</label>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

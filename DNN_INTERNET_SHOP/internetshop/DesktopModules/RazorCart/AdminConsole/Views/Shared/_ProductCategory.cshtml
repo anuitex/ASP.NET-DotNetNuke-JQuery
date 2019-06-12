@@ -1,0 +1,19 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.SelectListItemEx>
+@using System.Web.Mvc.Html;
+
+<a href="#cat_@Model.Value" class="list-group-item" data-value="@Model.Value" data-checked="@Model.Selected.ToString().ToLower()" data-offset="@Model.Level" data-toggle="collapse">
+    @if (Model.Children.Count() > 0)
+    {
+        <span class="collapse-icon glyphicon glyphicon-plus"></span>
+    }
+    @Model.Text
+</a>
+@if (Model.Children.Count() > 0)
+{
+    <div class="list-group checked-list-box collapse" id="cat_@Model.Value">
+        @foreach (var category in Model.Children)
+        {
+            @Html.Partial("_ProductCategory", category);
+        }
+    </div>
+}

@@ -1,0 +1,95 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.ProductCompare.Models.CompareModel>
+@using DotNetNuke.Web.Mvc.Helpers;
+
+<div class="row">
+    <div class="col-md-12" ng-if="compare.products.length">
+        <nav class="navbar navbar-default rzc-navbar-compare">
+            <div class="container-fluid">
+                <ul class="nav navbar-nav">
+                    <li ng-repeat="product in compare.products" ng-class="{ 'active' : compare.selected === product.ProductID }">
+                        <a href="" ng-click="compare.selected = product.ProductID">
+                            <strong>{{product.ModelName}}</strong>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="table-responsive">
+            <table class="table table-striped rzc-table-compare">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th ng-repeat="product in compare.products" ng-class="{ 'active' : compare.selected === product.ProductID }">
+                            {{product.ModelName}}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th></th>
+                        <td ng-repeat="product in compare.products" ng-class="{ 'active' : compare.selected === product.ProductID }">
+                            <img ng-src="{{product.ThumbImage}}" err-src="@DotNetNuke.Common.Globals.DesktopModulePath" err-size="200" title="{{product.ImageTitle}}" alt="{{product.ImageAlt}}" class="img-responsive" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Sku</th>
+                        <td ng-repeat="product in compare.products" ng-class="{ 'active' : compare.selected === product.ProductID }">
+                            {{product.ModelNumber}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Price</th>
+                        <td ng-repeat="product in compare.products" ng-class="{ 'active' : compare.selected === product.ProductID }">
+                            <span ng-class="{'strike-through': compare.isSaleEnabled && product.IsUnderSale}">
+                                {{(product.BundleUnitCost || product.UnitCost) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                            </span>
+                            <span ng-if="compare.isSaleEnabled && product.IsUnderSale">
+                                {{(product.BundleSalePrice || product.SalePrice) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Summary</th>
+                        <td ng-repeat="product in compare.products" ng-class="{ 'active' : compare.selected === product.ProductID }">
+                            {{product.Summary}}
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th ng-repeat="product in compare.products" ng-class="{ 'active' : compare.selected === product.ProductID }">
+                            <div class="btn-group btn-group-justified" style="table-layout: auto; max-width: 298px;">
+                                <div class="btn-group">
+                                    <a ng-href="{{product.ProductDetailUrl}}" class="btn btn-primary">
+                                        @Dnn.LocalizeString("ViewDetails")
+                                    </a>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-danger" ng-click="compare.removeFromComparison($index)">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="col-sm-12" ng-if="!compare.products.length">
+        <div class="alert alert-danger">
+            <strong>@Dnn.LocalizeString("NoComparisonProducts")</strong>
+        </div>
+    </div>
+</div>
+<div class="row panel-group">
+    <div class="col-lg-12 panel-group">
+        <div class="col-xxs-6 text-left">
+            <input type="button" value="@Dnn.LocalizeString("ContinueShopping")" class="btn btn-default" onclick="window.location.href='@Model.ProductListPage';" />
+        </div>
+        <div class="col-xxs-6 text-right">
+            <input type="button" value="@Dnn.LocalizeString("ViewCart")" class="btn btn-default" onclick="window.location.href='@Model.CheckoutPage';" />
+        </div>
+    </div>
+</div>

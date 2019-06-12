@@ -1,0 +1,143 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.GiftCardModel>
+@using System.Web.Mvc.Html;
+
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Gift Card Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Save", "GiftCard", new { StoreID = Model.StoreID })" autocomplete="off">
+            @Html.Partial("_GiftCardMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            @if (Model.Submitted)
+                            {
+                                <div class="alert alert-success alert-dismissable">
+                                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                    @Model.SaveMessage
+                                </div>
+                            }
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Gift Card Options</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Enable Gift Cards</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("EnableGiftCards", Convert.ToBoolean(Model.StoreConfig["EnableGiftCards"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="EnableGiftCards" data-cond-value="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Reserved Character <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["GiftCardsReservedChar"]"></i></label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("GiftCardsReservedChar", Model.StoreConfig["GiftCardsReservedChar"] ?? "#", new { @class = "form-control", @placeholder = "Reserved Character", @maxlength = "1", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="EnableGiftCards" data-cond-value="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Format Pattern <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["GiftCardsFormatPattern"]"></i></label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("GiftCardsFormatPattern", Model.StoreConfig["GiftCardsFormatPattern"] ?? "####-####-####-####", new { @class = "form-control", @placeholder = "Format Pattern", @maxlength = "50", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="EnableGiftCards" data-cond-value="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Characters List <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["GiftCardsCharsList"]"></i></label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextArea("GiftCardsCharsList", (Model.StoreConfig["GiftCardsCharsList"] ?? "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ").ToString(), new { @class = "form-control", @placeholder = "Characters List", @onkeypress = "if ((event.keyCode || event.which) == 13) event.preventDefault();", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="EnableGiftCards" data-cond-value="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Sample Code</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="input-group">
+                                                <div id="GiftCardsSampleCode" class="form-control"></div>
+                                                <div id="RefreshGiftCardsSampleCode" class="input-group-addon btn btn-primary">
+                                                    Refresh <i class="fa fa-refresh"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" no-data-show="conditional" data-cond-option="EnableGiftCards" data-cond-value="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Case Sensitive <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["GiftCardsCaseSensitive"]"></i></label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("GiftCardsCaseSensitive", Convert.ToBoolean(Model.StoreConfig["GiftCardsCaseSensitive"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" no-data-show="conditional" data-cond-option="EnableGiftCards" data-cond-value="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Ignored Characters <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["GiftCardsIgnoredChars"]"></i></label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("GiftCardsIgnoredChars", Model.StoreConfig["GiftCardsIgnoredChars"] ?? " -", new { @class = "form-control", @placeholder = "Ignored Characters" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    function GenerateCode(ReservedChar = '#', FormatPattern = '####-####-####-####', CharsList = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+        var codeParts = [];
+        FormatPattern.split('[' + ReservedChar + ']').forEach(function (patternPart) {
+            for (var i = 0; i < patternPart.length; i++) {
+                if (ReservedChar == patternPart[i])
+                    patternPart = patternPart.substr(0, i) + CharsList[Math.floor(Math.random() * CharsList.length)] + patternPart.substr(i + 1);
+            }
+            codeParts.push(patternPart);
+        });
+        return codeParts.join(ReservedChar);
+    }
+    $(document).ready(function () {
+        // Init Tooltips
+        $('[data-toggle="tooltip"]').tooltip({
+            placement: 'right',
+            container: 'body'
+        });
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        // Init Code Sample
+        var refreshSampleCode = function () {
+            $('#GiftCardsSampleCode').text(GenerateCode($('#GiftCardsReservedChar').val(), $('#GiftCardsFormatPattern').val(), $('#GiftCardsCharsList').val()));
+        };
+        $('#RefreshGiftCardsSampleCode').click(function () {
+            refreshSampleCode();
+        });
+        refreshSampleCode();
+    });
+</script>

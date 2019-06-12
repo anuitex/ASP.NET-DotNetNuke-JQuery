@@ -1,0 +1,65 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.DiscountModel>
+@using System.Web.Mvc.Html;
+@using System.Globalization;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Discount Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @Html.Partial("_DiscountMenu")
+        <div class="tab-content">
+            <div class="tab-pane active">
+                <div class="container-fluid">
+                    <div class="row">
+                        @if (Model.Submitted)
+                        {
+                            <div class="alert alert-success alert-dismissable">
+                                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                @Model.SaveMessage
+                            </div>
+                        }
+                        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Discount", new { StoreID = Model.StoreID, OrderDiscountID = Model.OrderDiscount.OrderDiscountID })" autocomplete="off">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Security Role</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("RoleID", Model.PortalRoles, new { @class = "form-control", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Discount Percent</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("DiscountPercent", Model.OrderDiscount.DiscountPercent.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Discount Percent", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Discount Amount</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("DiscountAmount", Model.OrderDiscount.DiscountAmount.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Discount Amount", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("Order", "Discount", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- /.form -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.row -->

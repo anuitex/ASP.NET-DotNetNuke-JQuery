@@ -1,0 +1,152 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.DiscountModel>
+@using System.Web.Mvc.Html;
+
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Discount Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Save", "Discount", new { StoreID = Model.StoreID })" autocomplete="off">
+            @Html.Partial("_DiscountMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            @if (Model.Submitted)
+                            {
+                                <div class="alert alert-success alert-dismissable">
+                                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                    @Model.SaveMessage
+                                </div>
+                            }
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Discount Options</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Enable Sale Prices</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("EnableSalePrices", Convert.ToBoolean(Model.StoreConfig["EnableSalePrices"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Discount Type</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithDiscounts", "NoDiscounts", (string)Model.StoreConfig["SmithDiscounts"] == "NoDiscounts" || Model.StoreConfig["SmithDiscounts"] == null, new { @required = "required" }) No Discounts
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithDiscounts", "ProductDiscounts", (string)Model.StoreConfig["SmithDiscounts"] == "ProductDiscounts", new { @required = "required" }) Product Quantity Discounts
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithDiscounts", "ProductDiscountPercent", (string)Model.StoreConfig["SmithDiscounts"] == "ProductDiscountPercent", new { @required = "required" }) Product Discounts By Role
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithDiscounts", "ProductDiscountByUser", (string)Model.StoreConfig["SmithDiscounts"] == "ProductDiscountByUser", new { @required = "required" }) Product Discounts By User
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithDiscounts", "CategoryDiscounts", (string)Model.StoreConfig["SmithDiscounts"] == "CategoryDiscounts", new { @required = "required" }) Category Level Discounts
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithDiscounts", "PriceClassDiscounts", (string)Model.StoreConfig["SmithDiscounts"] == "PriceClassDiscounts", new { @required = "required" }) Price Class Discounts
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithDiscounts", "OrderDiscountsByRole", (string)Model.StoreConfig["SmithDiscounts"] == "OrderDiscountsByRole", new { @required = "required" }) Order Level Discounts By Role
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="alert alert-info" data-show="conditional" data-cond-option="SmithDiscounts" data-cond-value="NoDiscounts" data-cond-operator="![]" style="display: none; margin-top: 10px;">
+                                                <span data-show="conditional" data-cond-option="SmithDiscounts" data-cond-value="ProductDiscounts">
+                                                    This will use the product level <a href="@Url.Action("Discounts", "Product", new { StoreID = Model.StoreID, ProductID = 1 })">Discounts By Quantity</a>
+                                                </span>
+                                                <span data-show="conditional" data-cond-option="SmithDiscounts" data-cond-value="ProductDiscountPercent" data-cond-operator="[]">
+                                                    This will use the product level <a href="@Url.Action("Discounts", "Product", new { StoreID = Model.StoreID, ProductID = 1 })">Discounts By Role</a> based on Security Role only
+                                                </span>
+                                                <span data-show="conditional" data-cond-option="SmithDiscounts" data-cond-value="ProductDiscountByUser" data-cond-operator="[]">
+                                                    This will use the product level <a href="@Url.Action("Discounts", "Product", new { StoreID = Model.StoreID, ProductID = 1 })">Discounts By Role</a> based on Security Role & Username
+                                                </span>
+                                                <span data-show="conditional" data-cond-option="SmithDiscounts" data-cond-value="CategoryDiscounts" data-cond-operator="[]">
+                                                    This will use the <a href="@Url.Action("Category", "Product", new { StoreID = Model.StoreID })">Category</a> level discount
+                                                </span>
+                                                <span data-show="conditional" data-cond-option="SmithDiscounts" data-cond-value="PriceClassDiscounts" data-cond-operator="[]">
+                                                    This will apply the <a href="@Url.Action("Class", "Discount", new { StoreID = Model.StoreID })">Price Class</a> discount on the product level
+                                                </span>
+                                                <span data-show="conditional" data-cond-option="SmithDiscounts" data-cond-value="OrderDiscountsByRole" data-cond-operator="[]">
+                                                    This will apply at the order level as configured at <a href="@Url.Action("Order", "Discount", new { StoreID = Model.StoreID })">Order Discount</a> based on Security Role
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+    });
+</script>

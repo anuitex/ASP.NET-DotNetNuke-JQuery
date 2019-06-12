@@ -1,0 +1,97 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ShippingModel>
+@using System.Web.Mvc.Html;
+@using System.Globalization;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Shipping Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @Html.Partial("_ShippingMenu")
+        <div class="tab-content">
+            <div class="tab-pane active">
+                <div class="container-fluid">
+                    <div class="row">
+                        @if (Model.Submitted)
+                        {
+                            <div class="alert alert-success alert-dismissable">
+                                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                @Model.SaveMessage
+                            </div>
+                        }
+                        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Shipping", new { StoreID = Model.StoreID, ShipMethodID = Model.ShipMethod.ShipMethodID })" autocomplete="off">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Method Name</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @if (Convert.ToBoolean(Model.StoreConfig["OverrideCarrierMethods"]))
+                                            {
+                                                @Html.DropDownList("ShipMethodName", Model.OverrideCarrierMethodList, "-- Select --", new { @class = "form-control", @required = "required" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBox("ShipMethodName", Model.ShipMethod.ShipMethodName, new { @class = "form-control", @placeholder = "Method Name", @required = "required" })
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Charge Amount</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ShipMethodAmount", Model.ShipMethod.ShipMethodAmount.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Charge Amount", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Surcharge Percentage</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("SurchargePercentage", Model.ShipMethod.SurchargePercentage.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Surcharge Percentage", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Surcharge Amount</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("SurchargeAmount", Model.ShipMethod.SurchargeAmount.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Surcharge Amount", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Security Role</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("RoleID", Model.PortalRoles, new { @class = "form-control", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Share</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("Share", Model.ShipMethod.Share, new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("Custom", "Shipping", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- /.form -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.row -->

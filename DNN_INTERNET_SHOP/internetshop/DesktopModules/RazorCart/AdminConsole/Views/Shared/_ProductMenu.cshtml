@@ -1,0 +1,46 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+
+<ul class="nav nav-tabs" style="margin-bottom: 1em;">
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("Edit", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Edit", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Product</a>
+    </li>
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("Categories", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Categories", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Categories</a>
+    </li>
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("Images", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Images", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Images</a>
+    </li>
+    <li @Html.Raw((Model.Culture.CompareInfo.IndexOf(ViewContext.RouteData.Values["action"].ToString(), "Variant", System.Globalization.CompareOptions.OrdinalIgnoreCase) >= 0) || (Model.Culture.CompareInfo.IndexOf(ViewContext.RouteData.Values["action"].ToString(), "Inventory", System.Globalization.CompareOptions.OrdinalIgnoreCase) >= 0) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Variants", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Variants</a>
+    </li>
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("Booking", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Booking", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Booking</a>
+    </li>
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("SEO", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("SEO", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">SEO</a>
+    </li>
+    <li @Html.Raw((Model.Culture.CompareInfo.IndexOf(ViewContext.RouteData.Values["action"].ToString(), "Discount", System.Globalization.CompareOptions.OrdinalIgnoreCase) >= 0) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Discounts", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Discounts</a>
+    </li>
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("Related", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Related", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Related Products</a>
+    </li>
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("Bundle", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Bundle", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Bundle Products</a>
+    </li>
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("Roles", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Roles", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Roles</a>
+    </li>
+    <li @Html.Raw((Model.Culture.CompareInfo.IndexOf(ViewContext.RouteData.Values["action"].ToString(), "Keyword", System.Globalization.CompareOptions.OrdinalIgnoreCase) >= 0) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Keywords", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Search Keywords</a>
+    </li>
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("Localization", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Localization", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Localization</a>
+    </li>
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("Email", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Email", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Email</a>
+    </li>
+    <li @Html.Raw((Model.Culture.CompareInfo.IndexOf(ViewContext.RouteData.Values["action"].ToString(), "Fields", System.Globalization.CompareOptions.OrdinalIgnoreCase) >= 0) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Fields", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Custom Fields</a>
+    </li>
+</ul>

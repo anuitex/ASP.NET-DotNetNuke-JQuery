@@ -1,0 +1,83 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ReportModel>
+@using System.Web.Mvc.Html;
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="page-header h1">
+            Safety Stock
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-table fa-fw"></i>
+                    Safety Stock Products
+                </h3>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <table class="table table-hover" id="tblSafetyStock" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Product</th>
+                            <th>Cost</th>
+                            <th>Qty On Hand</th>
+                            <th>Safety Stock Qty</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tblSafetyStock').DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: ''
+            },
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            columns: [
+                { data: 'ModelNumber' },
+                { data: 'ModelName' },
+                { data: 'UnitCost', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)'), className: 'text-right' },
+                { data: 'QuantityOnHand', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits)), className: 'text-right' },
+                { data: 'SafetyStockQty', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits)), className: 'text-right' },
+                {
+                    data: 'ProductID', render: function (data, type, full, meta) {
+                        var editUrl = '@Url.Action("Edit", "Product", new { StoreID = Model.StoreID })' + '?ProductID=' + data;
+                        return '<a href="' + editUrl + '"><i class="fa fa-pencil-square-o fa-lg"></i></a>';
+                    }, className: 'text-right'
+                }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: false,
+            ordering: false,
+            ajax: {
+                url: '@Url.Action("ListSafetyStock", "Report", new { StoreID = Model.StoreID })',
+                type: 'POST'
+            }
+        });
+    });
+</script>

@@ -1,0 +1,48 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Checkout.Models.CheckoutModel>
+
+<div class="form-group" ng-switch-when="ShoppingCart">
+    <div class="col-xxs-6 text-left">
+        <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("ContinueShopping")" onclick="window.location.href='@Model.ProductListPage';" />
+    </div>
+    <div class="col-xxs-6 text-right">
+        <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("ReviewOrder")" ng-disabled="(checkout.cartList.length < 1)" ng-click="checkout.submitted = true; rzcForm_@(Dnn.ModuleContext.ModuleId).$valid && checkout.review()" focus-invalid />
+    </div>
+</div>
+<div class="form-group" ng-switch-when="ReviewOrder">
+    <div class="col-xxs-6 text-left">
+        <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("Back")" ng-click="checkout.back()" ng-disabled="checkout.submitting" />
+    </div>
+    <div class="col-xxs-6 text-right">
+        @if (!Model.IsPriceHidden)
+        {
+            <input type="button" class="btn btn-primary" ng-if="!checkout.checkoutButton.EnableOnBottom" value="@Dnn.LocalizeString("PlaceOrder")" ng-click="checkout.submit()" ng-disabled="checkout.submitting" />
+            foreach (var payment in Model.BillingPayments)
+            {
+                if (payment.CheckoutButton != null && payment.CheckoutButton.EnableOnBottom)
+                {
+                    <div ng-if="checkout.checkoutButton.EnableOnBottom">
+                        @Html.Raw(payment.CheckoutButton.BottomOutterHtml)
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("RequestQuote")" ng-click="checkout.submit()" ng-disabled="checkout.submitting" />
+        }
+    </div>
+</div>
+<div class="form-group" ng-switch-when="OrderStatus" ng-switch="">
+    <div class="col-xxs-6 text-left" ng-if="checkout.orderStatus.Success">
+        <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("PrintOrder")" ng-click="checkout.print()" onclick="if (window.opener) window.print()" />
+    </div>
+    <div class="col-xxs-6 text-right" ng-if="checkout.orderStatus.Success">
+        <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("ContinueShopping")" onclick="window.location.href='@Model.ProductListPage';" />
+    </div>
+    <div class="col-xxs-6 text-left" ng-if="!checkout.orderStatus.Success">
+        <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("Back")" ng-click="checkout.back()" />
+    </div>
+    <div class="col-xxs-6 text-right" ng-if="!checkout.orderStatus.Success">
+        <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("ContinueShopping")" onclick="window.location.href='@Model.ProductListPage';" />
+    </div>
+</div>

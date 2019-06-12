@@ -1,0 +1,111 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.CustomerModel>
+@using System.Web.Mvc.Html
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Manage Customers</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Index", "Customer", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="btn-group pull-right">
+                        <a class="btn btn-primary" href="@Url.Action("Add", "Customer", new { StoreID = Model.StoreID })">
+                            <i class="fa fa-plus"></i> Add Customer
+                        </a>
+                        <button type="submit" class="btn btn-warning" onclick="this.form.action='@Url.Action("Export", "Customer", new { StoreID = Model.StoreID })'">
+                            @Html.Hidden("ExportType", "Customers")
+                            @Html.Hidden("SearchDt", string.Empty)
+                            @Html.Hidden("ColumnDt", string.Empty)
+                            @Html.Hidden("DirectionDt", string.Empty)
+                            <i class="fa fa-upload"></i> Export
+                        </button>
+                    </div>
+                    <h4>Customers</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <table class="table table-hover" id="tblCustomers" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Address</th>
+                                <th>City</th>
+                                <th>Region/State</th>
+                                <th>Country</th>
+                                <th>Postal Code</th>
+                                <th>Username</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tblCustomers').DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: '',
+            },
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            columns: [
+                { data: 'FirstName' },
+                { data: 'LastName' },
+                { data: 'Address1' },
+                { data: 'City' },
+                { data: 'State' },
+                { data: 'Country' },
+                { data: 'Zip' },
+                { data: 'DNNLogin' },
+                {
+                    data: 'CustomerID', render: function (data, type, full, meta) {
+                        var editUrl = '@Url.Action("Edit", "Customer", new { StoreID = Model.StoreID })' + '?CustomerID=' + data;
+                        var ordersUrl = '@Url.Action("Index", "Order", new { StoreID = Model.StoreID })' + '?CustomerID=' + data;
+                        var deleteUrl = '@Url.Action("Delete", "Customer", new { StoreID = Model.StoreID })' + '?CustomerID=' + data;
+                        return '<a title="Edit Customer" href="' + editUrl + '"><i class="fa fa-pencil-square-o fa-lg"></i></a>' + '\n'
+                            + '<a title="Customer Orders" href="' + ordersUrl + '"><i class="fa fa-list-alt fa-lg"></i></a>' + '\n'
+                            + '<a title="Delete Customer" href="' + deleteUrl + '" onclick="return confirm(\'Are you sure?\')"><i class="fa fa-trash-o fa-lg"></i></a>';
+                    }, className: 'text-right', orderable: false
+                }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            order: [[0, 'asc']],
+            ajax: {
+                url: '@Url.Action("List", "Customer", new { StoreID = Model.StoreID })',
+                type: 'POST'
+            }
+        }).on('init.dt', function () {
+            $('#SearchDt').val($('.dataTables_filter input').val());
+            $('#ColumnDt').val('FirstName');
+            $('#DirectionDt').val('ASC');
+        }).on('preXhr.dt', function (e, settings, data) {
+            $('#SearchDt').val(data.search.value);
+            $('#ColumnDt').val(data.columns[data.order[0].column].data);
+            $('#DirectionDt').val(data.order[0].dir.toUpperCase());
+        });
+    });
+</script>

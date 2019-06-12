@@ -1,0 +1,268 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })" autocomplete="off">
+            @Html.Partial("_ProductMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a class="btn btn-primary pull-right" href="@Url.Action("AddVariantGroup", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">
+                                        <i class="fa fa-plus"></i> Add Variant Group
+                                    </a>
+                                    <h4>Variant Groups</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="table-sortable">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Sort</th>
+                                                    <th>Group Name</th>
+                                                    <th>Description</th>
+                                                    <th>Help URL</th>
+                                                    <th>Hidden</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var group in Model.VariantGroups)
+                                                {
+                                                    <tr class="row-clickable" data-show="@group.VariantGroup">
+                                                        <td>@group.VariantGroupID</td>
+                                                        <td>
+                                                            <span class="glyphicon glyphicon-sort"></span>
+                                                            <span class="text-muted badge">@group.SortOrder</span>
+                                                            <input type="hidden" name="tableSortId" value="@group.VariantGroupID" disabled />
+                                                            <input type="hidden" name="tableSortOrder" value="@group.SortOrder" disabled />
+                                                        </td>
+                                                        <td>@group.VariantGroup</td>
+                                                        <td>@group.GroupDescription</td>
+                                                        <td>@group.VariantHelpURL</td>
+                                                        <td>@group.Hide</td>
+                                                        <td class="text-right">
+                                                            <a href="@Url.Action("EditVariantGroup", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, VariantGroupID = group.VariantGroupID })"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                                            <a href="@Url.Action("DeleteVariantGroup", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, VariantGroupID = group.VariantGroupID })" onclick="return confirm('Are you sure?')">
+                                                                <i class="fa fa-trash-o fa-lg"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.VariantGroups.Count < 1)
+                                                {
+                                                    <tr><td colspan="6">No Variant Groups added.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="btn-group pull-right">
+                                        <a class="btn btn-primary" href="@Url.Action("AddVariant", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">
+                                            <i class="fa fa-plus"></i> Add Variant
+                                        </a>
+                                        <a class="btn btn-info" href="@Url.Action("Inventory", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">
+                                            <i class="fa fa-braille"></i> Variant Inventory
+                                        </a>
+                                    </div>
+                                    <h4>Variants&emsp;<small id="tblVariantsFilter"></small></h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <table class="table table-hover" id="tblVariants" style="width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Sort</th>
+                                                <th>Group</th>
+                                                <th>Variant Name</th>
+                                                <th>SKU</th>
+                                                <th>Quantity</th>
+                                                <th>Price Adjustment</th>
+                                                <th>Sale Price Adjustment</th>
+                                                <th>Adjustment Type</th>
+                                                <th>Display Type</th>
+                                                <th>Required</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <a class="btn btn-default" href="@Url.Action("Index", "Product", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    //Prevent table row from being collapsed when sorting
+    var fixHelperModified = function (e, tr) {
+        var $originals = tr.children();
+        var $helper = tr.clone();
+        $helper.children().each(function (index) {
+            $(this).width($originals.eq(index).width())
+        });
+        return $helper;
+    }
+    //Update Sort Order values
+    function renumber_table(tableID, sortType) {
+        var sortData = new FormData();
+        $(tableID + ' tbody tr').each(function () {
+            count = $(this).parent().children().index($(this)) + 1;
+            var hndID = $(this).find('[type=hidden][name=tableSortId]');
+            var hndSort = $(this).find('[type=hidden][name=tableSortOrder]');
+            var sortBadge = $(this).find('span.badge');
+            hndSort.val(count);
+            sortBadge.html(count);
+            sortData.append(hndID.val(), hndSort.val());
+        })
+        .promise().done(function () {
+            $.ajax({
+                url: '@Url.Action("Sort", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })' + '&SortType=' + sortType,
+                type: 'POST',
+                data: sortData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (data, result) {
+                    console.log(data);
+                },
+                error: function (error) {
+                    console.log(error.status + ' ' + error.statusText);
+                }
+            });
+        });
+    }
+    $(document).ready(function () {
+        $('#tblVariants').DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: '',
+            },
+            lengthMenu: [[-1], ['All']],
+            columns: [
+                { data: 'VariantID', orderable: true },
+                {
+                    data: 'SortOrder', render: function (data, type, full, meta) {
+                        if (type == 'display') {
+                            return '<span class="glyphicon glyphicon-sort"></span>' +
+                                '<span class="text-muted badge">' + data + '</span>' +
+                                '<input type="hidden" name="tableSortId" value="' + full.VariantID + '" disabled />' +
+                                '<input type="hidden" name="tableSortOrder" value="' + data + '" disabled />';
+                        }
+                        else
+                            return data;
+                    }, orderable: true
+                },
+                { data: 'VariantGroup', orderable: true },
+                { data: 'VariantName', orderable: true },
+                { data: 'Sku', orderable: true },
+                { data: 'QtyOnHand', className: 'text-right', orderable: true },
+                {
+                    data: 'PriceAdjustment', render: function (data, type, full, meta) {
+                        if (full.PriceType === 'NoPriceAdjust')
+                            return '';
+                        else if (full.PriceType === 'AbsolutePrice' || full.PriceType === 'PriceAdjust')
+                            return $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', '@(Model.DecimalDigits)', '@(Model.CurrencySymbol)').display(data);
+                        else if (full.PriceType === 'PercentAdjust')
+                            return $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', '@(Model.DecimalDigits)', '', '@(Model.PercentSymbol)').display(data);
+                        else
+                            return data;
+                    }, className: 'text-right', orderable: true
+                },
+                {
+                    data: 'SalePrice', render: function (data, type, full, meta) {
+                        if (full.PriceType === 'NoPriceAdjust')
+                            return '';
+                        else if (full.PriceType === 'AbsolutePrice' || full.PriceType === 'PriceAdjust')
+                            return $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', '@(Model.DecimalDigits)', '@(Model.CurrencySymbol)').display(data);
+                        else if (full.PriceType === 'PercentAdjust')
+                            return $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', '@(Model.DecimalDigits)', '', '@(Model.PercentSymbol)').display(data);
+                        else
+                            return data;
+                    }, className: 'text-right', orderable: true
+                },
+                { data: 'PriceType', orderable: false },
+                { data: 'VariantDisplayType', orderable: true },
+                {
+                    data: 'VariantRequired', render: function (data, type, full, meta) {
+                        return '<i class="fa fa-' + (data ? 'check-circle' : 'circle-thin') + ' fa-lg" aria-hidden="true"></i>';
+                    }, orderable: false
+                },
+                {
+                    data: 'VariantID', render: function (data, type, full, meta) {
+                        var editUrl = '@Url.Action("EditVariant", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })' + '&VariantID=' + data;
+                        var deleteUrl = '@Url.Action("DeleteVariant", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })' + '&VariantID=' + data;
+                        return '<a href="' + editUrl + '"><i class="fa fa-pencil-square-o fa-lg"></i></a>' + '\n'
+                            + '<a href="' + deleteUrl + '" onclick="return confirm(\'Are you sure?\')"><i class="fa fa-trash-o fa-lg"></i></a>';
+                    }, className: 'text-right', orderable: false
+                }
+            ],
+            data: @Html.Raw(Json.Encode(Model.Variants)),
+            searching: true,
+            ordering: true,
+            paging: false,
+            order: [[1, 'asc']]
+        });
+        $('table tbody tr.row-clickable').click(function () {
+            $('#tblVariants').DataTable().column(2).search('^' + $(this).data('show') + '$', true, false, true).draw();
+            $('#tblVariantsFilter').html('<a href="javascript:void(0);" onclick="$(\'#tblVariants\').DataTable().column(2).search(\'\',false,true,true).draw();$(this).html(\'\');"><i class="fa fa-times"></i> remove filter</a>');
+        });
+        //jQuery UI Sortable: (https://jqueryui.com/sortable/)
+        $('#table-sortable tbody').sortable({
+            handle: 'span.glyphicon-sort, span.badge',
+            helper: fixHelperModified,
+            stop: function (event, ui) { renumber_table('#table-sortable', 'Group') }
+        });
+        $('#tblVariants tbody').sortable({
+            handle: 'span.glyphicon-sort, span.badge',
+            helper: fixHelperModified,
+            stop: function (event, ui) { renumber_table('#tblVariants', 'Variant') }
+        });
+        //Delete button in table rows
+        $('table').on('click', '.btn-delete', function () {
+            tableID = '#' + $(this).closest('table').attr('id');
+            r = confirm('Are you sure?');
+            if (r) {
+                $(this).closest('tr').remove();
+                renumber_table(tableID);
+            }
+        });
+    });
+</script>

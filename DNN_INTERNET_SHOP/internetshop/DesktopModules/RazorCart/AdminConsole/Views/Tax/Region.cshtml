@@ -1,0 +1,99 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.TaxModel>
+@using System.Web.Mvc.Html;
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Tax Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Region", "Tax", new { StoreID = Model.StoreID })" autocomplete="off">
+            @Html.Partial("_TaxMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a class="btn btn-primary pull-right" href="@Url.Action("AddRegion", "Tax", new { StoreID = Model.StoreID })">
+                                        <i class="fa fa-plus"></i> Add Tax Region
+                                    </a>
+                                    <h4>Tax Regions</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <table class="table table-hover" id="tblRegionalTaxes" style="width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>Country</th>
+                                                <th>Region/State</th>
+                                                <th>Postal Code</th>
+                                                <th>Tax Exempt</th>
+                                                <th>Tax Exempt Amount</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tblRegionalTaxes').DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: '',
+            },
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            columns: [
+                { data: 'CountryCode' },
+                { data: 'State' },
+                { data: 'ZipCode' },
+                {
+                    data: 'TaxExemptAmount', render: function (data, type, full, meta) {
+                        return data > -1 ? data == 0 ? "Tax Exempt All Orders" : "Tax Exempt Amount" : "Never Tax Exempt";
+                    }
+                },
+                {
+                    data: 'TaxExemptAmount', render: function (data, type, full, meta) {
+                        return data > -1 ? $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)').display(data) : data;
+                    }
+                },
+                {
+                    data: 'TaxStateID', render: function (data, type, full, meta) {
+                        var editRegion = '@Url.Action("EditRegion", "Tax", new { StoreID = Model.StoreID })' + '?TaxStateID=' + data;
+                        var deleteRegion = '@Url.Action("DeleteRegion", "Tax", new { StoreID = Model.StoreID })' + '?TaxStateID=' + data;
+                        return '<a href="' + editRegion + '"><i class="fa fa-pencil-square-o fa-lg"></i></a>' + '\n'
+                            + '<a href="' + deleteRegion + '" onclick="return confirm(\'Are you sure?\')"><i class="fa fa-trash-o fa-lg"></i></a>';
+                    }, className: 'text-right'
+                }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: false,
+            ordering: false,
+            ajax: '@Url.Action("ListRegion", "Tax", new { StoreID = Model.StoreID })'
+        });
+    });
+</script>

@@ -1,0 +1,232 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html
+
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Fields", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })" autocomplete="off">
+            @Html.Partial("_ProductMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="btn-group pull-right">
+                                        <a class="btn btn-primary" href="@Url.Action("AddFields", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">
+                                            <i class="fa fa-plus"></i> Add Custom Field
+                                        </a>
+                                        <a class="btn btn-info" href="#" data-toggle="modal" data-target="#fieldsModal1" data-backdrop="static" data-keyboard="true">
+                                            <i class="fa fa-clone"></i> Copy Template Fields
+                                        </a>
+                                    </div>
+                                    <h4>Custom Fields</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="table-sortable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sort</th>
+                                                    <th>Label</th>
+                                                    <th>Type</th>
+                                                    <th>Value</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var field in Model.CustomFields)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <span class="glyphicon glyphicon-sort"></span>
+                                                            <span class="text-muted badge">@field.SortOrder</span>
+                                                            <input type="hidden" name="tableSortId" value="@field.PCID" disabled />
+                                                            <input type="hidden" name="tableSortOrder" value="@field.SortOrder" disabled />
+                                                        </td>
+                                                        <td>@field.Label</td>
+                                                        <td>@field.Type</td>
+                                                        <td>@field.CustomFieldValue</td>
+                                                        <td class="text-right">
+                                                            <a href="@Url.Action("EditFields", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, PCID = field.PCID })"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                                            <a href="@Url.Action("DeleteFields", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, PCID = field.PCID })" onclick="return confirm('Are you sure?')">
+                                                                <i class="fa fa-trash-o fa-lg"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.CustomFields.Count < 1)
+                                                {
+                                                    <tr><td colspan="6">No Custom Fields added.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <a class="btn btn-default" href="@Url.Action("Index", "Product", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<div class="modal fade" id="fieldsModal1" role="dialog" tabindex="-1" aria-labelledby="fieldsModalLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" action="@Url.Action("CopyFields", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })" autocomplete="off">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="fieldsModalLabel1">Copy Template Fields</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <td>Copy</td>
+                                    <td>Field</td>
+                                    <td>Value</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var field in Model.TemplateFields)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.Hidden("PTID", field.PTID)
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("Active_" + field.PTID, false, new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @field.Label
+                                        </td>
+                                        <td>
+                                            <div data-show="conditional" data-cond-option="Active_@field.PTID" data-cond-value="true" style="display: none;">
+                                                @switch (field.Type)
+                                                {
+                                                    case "TextBox":
+                                                    case "DatePicker":
+                                                    case "Email":
+                                                    case "Url":
+                                                        @Html.TextBox("Value_" + field.PTID, field.Value, new { @class = "form-control", @placeholder = "Value", @required = "required" })
+                                                        break;
+                                                    case "Checkbox":
+                                                        <div class="checkbox">
+                                                            <label>
+                                                                @Html.CheckBox("Value_" + field.PTID, false, new { @onchange = "checkBoxChange(this);" })
+                                                                <span class="rc-control">
+                                                                    <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        break;
+                                                    case "DropDownList":
+                                                        string[] values = !string.IsNullOrEmpty(field.Value) ? field.Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries) : new string[] { };
+                                                        @Html.DropDownList("Value_" + field.PTID, values.Select(v => new SelectListItem { Text = v.Trim(), Value = v.Trim() }), new { @class = "form-control", @placeholder = "Value", @required = "required" })
+                                                        break;
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.TemplateFields.Count < 1)
+                                {
+                                    <tr>
+                                        <td colspan="3">No Template Fields added that match this product category(ies).</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @if (Model.TemplateFields.Count > 0)
+                    {
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-clone"></i> Copy</button>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- /.modal -->
+<script type="text/javascript">
+    //Prevent table row from being collapsed when sorting
+    var fixHelperModified = function (e, tr) {
+        var $originals = tr.children();
+        var $helper = tr.clone();
+        $helper.children().each(function (index) {
+            $(this).width($originals.eq(index).width())
+        });
+        return $helper;
+    }
+    //Update Sort Order values
+    function renumber_table(tableID, sortType) {
+        var sortData = new FormData();
+        $(tableID + ' tbody tr').each(function () {
+            count = $(this).parent().children().index($(this)) + 1;
+            var hndID = $(this).find('[type=hidden][name=tableSortId]');
+            var hndSort = $(this).find('[type=hidden][name=tableSortOrder]');
+            var sortBadge = $(this).find('span.badge');
+            hndSort.val(count);
+            sortBadge.html(count);
+            sortData.append(hndID.val(), hndSort.val());
+        })
+        .promise().done(function () {
+            $.ajax({
+                url: '@Url.Action("Sort", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })' + '&SortType=' + sortType,
+                type: 'POST',
+                data: sortData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (data, result) {
+                    console.log(data);
+                },
+                error: function (error) {
+                    console.log(error.status + ' ' + error.statusText);
+                }
+            });
+        });
+    }
+    $(document).ready(function () {
+        //jQuery UI Sortable: (https://jqueryui.com/sortable/)
+        $('#table-sortable tbody').sortable({
+            handle: 'span.glyphicon-sort, span.badge',
+            helper: fixHelperModified,
+            stop: function (event, ui) { renumber_table('#table-sortable', 'CustomField') }
+        });
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+    });
+</script>

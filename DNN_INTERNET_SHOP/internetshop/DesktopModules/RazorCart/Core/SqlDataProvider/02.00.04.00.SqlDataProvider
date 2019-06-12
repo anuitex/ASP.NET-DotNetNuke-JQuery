@@ -1,0 +1,353 @@
+﻿/************************************************************/
+/*****              SqlDataProvider                     *****/
+/*****                                                  *****/
+/*****                                                  *****/
+/***** Note: To manually execute this script you must   *****/
+/*****       perform a search and replace operation     *****/
+/*****       for {databaseOwner} and {objectQualifier}  *****/
+/*****                                                  *****/
+/************************************************************/
+
+
+
+/************************************************************/
+/*****               Create Tables                      *****/
+/************************************************************/
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_GiftCards') AND type IN (N'U'))
+BEGIN
+	CREATE TABLE {databaseOwner}{objectQualifier}RZC_GiftCards
+	(
+		[GiftCardID] [INT] IDENTITY(1,1) NOT NULL,
+		[Active] [BIT] NULL,
+		[OrderDetailID] [INT] NULL,
+		[ProductID] [INT] NULL,
+		[ProductName] [NVARCHAR](200) NULL,
+		[Amount] [MONEY] NULL,
+		[UsedAmount] [MONEY] NULL,
+		[Type] [VARCHAR](50) NULL,
+		[Code] [NVARCHAR](50) NULL,
+		[Subject] [NVARCHAR](200) NULL,
+		[Message] [NVARCHAR](1000) NULL,
+		[SenderCustomerID] [INT] NULL,
+		[SenderUserID] [INT] NULL,
+		[ReceiverCustomerID] [INT] NULL,
+		[ReceiverUserID] [INT] NULL,
+		[ReceiverName] [NVARCHAR](100) NULL,
+		[ReceiverEmail] [VARCHAR](100) NULL,
+		[ReceiverPhone] [VARCHAR](50) NULL,
+		[ExpiryDate] [DATETIME] NULL,
+		[CreateDate] [DATETIME] NULL,
+		[CreatedBy] [INT] NULL,
+		[ModifyDate] [DATETIME] NULL,
+		[ModifiedBy] [INT] NULL,
+		[StoreID] [INT] NULL,
+		[PortalID] [INT] NULL,
+		CONSTRAINT [PK_{objectQualifier}RZC_GiftCards] PRIMARY KEY CLUSTERED
+		(
+			[GiftCardID] ASC
+		)
+	)
+END
+GO
+
+
+
+/************************************************************/
+/*****                Alter Tables                      *****/
+/************************************************************/
+
+
+
+/************************************************************/
+/*****                Drop Sprocs                       *****/
+/************************************************************/
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_ListBundleProducts') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_ListBundleProducts
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_ListShoppingCartByTimeLapse') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_ListShoppingCartByTimeLapse
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_ListShoppingCartByUser') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_ListShoppingCartByUser
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_GetGiftCardByID') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_GetGiftCardByID
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_CreateGiftCard') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateGiftCard
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_DeleteGiftCard') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_DeleteGiftCard
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_ListGiftCardsByFilter') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_ListGiftCardsByFilter
+GO
+
+
+
+/************************************************************/
+/*****               Create Sprocs                      *****/
+/************************************************************/
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_ListBundleProducts
+	@ProductID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	SELECT
+		P.*, I.[ThumbImage], I.[LargeImage], I.[ZoomImage], V.[HasVariants]
+	FROM
+		{databaseOwner}{objectQualifier}RZC_Products P
+	INNER JOIN
+		{databaseOwner}{objectQualifier}RZC_BundleProducts BP
+	ON
+		P.[ProductID] = BP.[BundleProductID]
+	OUTER APPLY
+	(
+		SELECT TOP 1
+			PI.*
+		FROM
+			{databaseOwner}{objectQualifier}RZC_ProductImages PI
+		WHERE
+			PI.[ProductID] = P.[ProductID]
+		ORDER BY
+			PI.[SortOrder]
+	) I
+	CROSS APPLY
+	(
+		SELECT CASE WHEN EXISTS
+		(
+			SELECT
+				PV.[VariantID]
+			FROM
+				{databaseOwner}{objectQualifier}RZC_ProductVariant PV
+			WHERE
+				PV.[ProductID] = P.[ProductID]
+		)
+		THEN
+			CAST(1 AS BIT)
+		ELSE
+			CAST(0 AS BIT)
+		END
+		AS [HasVariants]
+	) V
+	WHERE
+		BP.[ProductID] = @ProductID
+		AND P.[PortalID] = @PortalID
+		AND (
+			P.[LogicallyDeleted] <> 1
+			AND P.[Archived] <> 1
+			AND P.[HideProduct] <> 1
+		)
+	ORDER BY
+		BP.[ID] ASC
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_ListShoppingCartByTimeLapse
+	@Hours INT = NULL,
+	@StoreID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	SELECT
+		SC.*
+	FROM
+		{databaseOwner}{objectQualifier}RZC_ShoppingCart SC
+		INNER JOIN {databaseOwner}{objectQualifier}RZC_Products P
+		ON
+			SC.[ProductID] = P.[ProductID]
+	WHERE
+		DATEDIFF(HOUR, SC.[CreateDate], GETDATE()) < @Hours + 1
+		AND DATEDIFF(HOUR, SC.[CreateDate], GETDATE()) > @Hours - 1
+		AND SC.[StoreID] = @StoreID
+		AND SC.[PortalID] = @PortalID
+	ORDER BY
+		ISNULL(NULLIF(SC.[BundleID], 0), SC.[CartID]), SC.[BundleID]
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_ListShoppingCartByUser
+	@Persistent VARCHAR(16) = NULL,
+	@CartCookie VARCHAR(100) = NULL,
+	@DNNLogin NVARCHAR(100) = NULL,
+	@StoreID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	SELECT
+		SC.*
+	FROM
+		{databaseOwner}{objectQualifier}RZC_ShoppingCart SC
+		INNER JOIN {databaseOwner}{objectQualifier}RZC_Products P
+		ON
+			SC.[ProductID] = P.[ProductID]
+	WHERE
+		(SC.[CartCookie] = @CartCookie OR (@Persistent <> 'Machine' AND @DNNLogin <> ''))
+		AND (SC.[DNNLogin] = @DNNLogin OR @Persistent <> 'User')
+		AND SC.[StoreID] = @StoreID
+		AND SC.[PortalID] = @PortalID
+	ORDER BY
+		ISNULL(NULLIF(SC.[BundleID], 0), SC.[CartID]), SC.[BundleID]
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_GetGiftCardByID
+	@GiftCardID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	SELECT
+		C.*, D.[OrderID]
+	FROM
+		{databaseOwner}{objectQualifier}RZC_GiftCards C
+	LEFT JOIN
+		{databaseOwner}{objectQualifier}RZC_StoreOrderDetails D
+	ON
+		D.[OrderDetailID] = C.[OrderDetailID]
+	WHERE
+		C.[GiftCardID] = @GiftCardID
+		AND C.[PortalID] = @PortalID
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateGiftCard
+	@Active BIT = NULL,
+	@OrderDetailID INT = NULL,
+	@ProductID INT = NULL,
+	@ProductName NVARCHAR(200) = NULL,
+	@Amount MONEY = NULL,
+	@UsedAmount MONEY = NULL,
+	@Type VARCHAR(50) = NULL,
+	@Code NVARCHAR(50) = NULL,
+	@Subject NVARCHAR(200) = NULL,
+	@Message NVARCHAR(1000) = NULL,
+	@SenderCustomerID INT = NULL,
+	@SenderUserID INT = NULL,
+	@ReceiverCustomerID INT = NULL,
+	@ReceiverUserID INT = NULL,
+	@ReceiverName NVARCHAR(100) = NULL,
+	@ReceiverEmail VARCHAR(100) = NULL,
+	@ReceiverPhone VARCHAR(50) = NULL,
+	@ExpiryDate DATETIME = NULL,
+	@CreatedBy INT = NULL,
+	@StoreID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	INSERT INTO
+		{databaseOwner}{objectQualifier}RZC_GiftCards
+		([Active]
+		,[OrderDetailID]
+		,[ProductID]
+		,[ProductName]
+		,[Amount]
+		,[UsedAmount]
+		,[Type]
+		,[Code]
+		,[Subject]
+		,[Message]
+		,[SenderCustomerID]
+		,[SenderUserID]
+		,[ReceiverCustomerID]
+		,[ReceiverUserID]
+		,[ReceiverName]
+		,[ReceiverEmail]
+		,[ReceiverPhone]
+		,[ExpiryDate]
+		,[CreateDate]
+		,[CreatedBy]
+		,[StoreID]
+		,[PortalID])
+	VALUES
+		(@Active
+		,@OrderDetailID
+		,@ProductID
+		,@ProductName
+		,@Amount
+		,@UsedAmount
+		,@Type
+		,@Code
+		,@Subject
+		,@Message
+		,@SenderCustomerID
+		,@SenderUserID
+		,@ReceiverCustomerID
+		,@ReceiverUserID
+		,@ReceiverName
+		,@ReceiverEmail
+		,@ReceiverPhone
+		,@ExpiryDate
+		,GETDATE()
+		,@CreatedBy
+		,@StoreID
+		,@PortalID)
+	SELECT SCOPE_IDENTITY()
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_DeleteGiftCard
+	@GiftCardID INT = NULL
+AS
+BEGIN
+	DELETE FROM
+		{databaseOwner}{objectQualifier}RZC_GiftCards
+	WHERE
+		[GiftCardID] = @GiftCardID
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_ListGiftCardsByFilter
+	@PageNumber INT = NULL,
+	@PageSize INT = NULL,
+	@SearchValue NVARCHAR(256) = NULL,
+	@StoreID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	SET NOCOUNT ON;
+	DECLARE @PageRecordStart INT
+	DECLARE @PageRecordEnd INT
+	SET @PageRecordStart = ((@PageNumber - 1) * @PageSize) + 1
+	SET @PageRecordEnd = @PageNumber * @PageSize
+	;WITH [GiftCardsPage] AS
+	(
+		SELECT
+			ROW_NUMBER() OVER (ORDER BY C.[GiftCardID] ASC) AS [RowNo], C.*
+		FROM
+			{databaseOwner}{objectQualifier}RZC_GiftCards C
+		WHERE
+			(C.[StoreID] = @StoreID)
+			AND C.[PortalID] = @PortalID
+			AND (NULLIF(@SearchValue, '') IS NULL OR (
+					C.[Code] LIKE '%' + @SearchValue + '%'
+					OR C.[ProductName] LIKE '%' + @SearchValue + '%'
+				)
+			)
+	)
+	SELECT
+		C.*, D.[OrderID],
+		TotalRecords = (
+			SELECT COUNT(*) FROM [GiftCardsPage]
+		),
+		MoreRecords = (
+			SELECT COUNT(*) FROM [GiftCardsPage]
+			WHERE [RowNo] > @PageRecordEnd
+		)
+	FROM
+		[GiftCardsPage] C
+	LEFT JOIN
+		{databaseOwner}{objectQualifier}RZC_StoreOrderDetails D
+	ON
+		D.[OrderDetailID] = C.[OrderDetailID]
+	WHERE
+		C.[RowNo] BETWEEN @PageRecordStart AND @PageRecordEnd
+	ORDER BY
+		C.[RowNo]
+END
+GO
+
+
+
+/************************************************************/
+/*****               End of Script                      *****/
+/************************************************************/

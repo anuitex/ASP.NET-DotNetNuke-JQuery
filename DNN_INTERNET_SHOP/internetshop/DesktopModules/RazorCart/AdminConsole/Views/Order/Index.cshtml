@@ -1,0 +1,348 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.OrderModel>
+@using System.Web.Mvc.Html
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Bootstrap DateTimePicker CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/bootstrap-datetimepicker.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Moment JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/moment.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Bootstrap DateTimePicker JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/bootstrap-datetimepicker.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<style>
+    @@media (max-width : 991px) {
+        .row-sm-pull-left * {
+            text-align: left !important;
+        }
+    }
+
+    div.dataTables_wrapper div.dataTables_filter input {
+        margin-left: 0 !important;
+    }
+</style>
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            Manage Orders
+            @(Model.Customer != null ? (" - " + Model.Customer.FirstName + " " + Model.Customer.LastName) : string.Empty)
+        </h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="alert alert-danger alert-dismissable">
+                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                @Html.Raw(HttpUtility.HtmlDecode(Html.ValidationMessage("Order Import Error").ToHtmlString()))
+            </div>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+}
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Index", "Order", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="btn-group pull-right">
+                        <a class="btn btn-primary" href="@Url.Action("Add", "Order", new { StoreID = Model.StoreID })">
+                            <i class="fa fa-plus"></i> Add Order
+                        </a>
+                        <a class="btn btn-success" href="#" data-toggle="modal" data-target="#orderModal" data-backdrop="static" data-keyboard="true">
+                            <i class="fa fa-download"></i> Import
+                        </a>
+                        <button type="submit" class="btn btn-warning" onclick="this.form.action='@Url.Action("Export", "Order", new { StoreID = Model.StoreID })'">
+                            @Html.Hidden("ExportType", "Orders")
+                            @Html.Hidden("SearchDt", string.Empty)
+                            @Html.Hidden("StatusDt", string.Empty)
+                            @Html.Hidden("PayStatusDt", string.Empty)
+                            @Html.Hidden("PayMethodDt", string.Empty)
+                            @Html.Hidden("TransTypeDt", string.Empty)
+                            @Html.Hidden("ColumnDt", string.Empty)
+                            @Html.Hidden("DirectionDt", string.Empty)
+                            @Html.Hidden("FromDateDt", string.Empty)
+                            @Html.Hidden("ToDateDt", string.Empty)
+                            @Html.Hidden("CustomerDt", string.Empty)
+                            <i class="fa fa-upload"></i> Export
+                        </button>
+                        <button type="submit" class="btn btn-default" id="btnPrintOrders" data-href="@Url.Action("Print", "Order", new { StoreID = Model.StoreID })">
+                            <i class="fa fa-print"></i> Print
+                        </button>
+                    </div>
+                    <h4>Orders</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <table class="table table-hover" id="tblOrders" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" id="chkSelectAll">
+                                            <span class="rc-control" style="left: 0;">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </th>
+                                <th>Status</th>
+                                <th>Order No.</th>
+                                <th>Order Date</th>
+                                <th>Purchased</th>
+                                <th>Ship To</th>
+                                <th>Username</th>
+                                <th>Order Total</th>
+                                <th>Pay Method</th>
+                                <th>Pay Total</th>
+                                <th>Balance</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            @Html.Partial("_OrderListFilters")
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<div class="modal fade" id="orderModal" role="dialog" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" enctype="multipart/form-data" action="@Url.Action("Import", "Order", new { StoreID = Model.StoreID })">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="orderModalLabel">Import Orders</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="ImportSheet">CSV File</label>
+                        <div class="input-group">
+                            <label class="input-group-btn">
+                                <span class="btn btn-primary">
+                                    Browse&hellip; @Html.TextBox("ImportSheet", string.Empty, new { @type = "file", @style = "opacity: 0; width: 1px; height: 1px", @required = "required" })
+                                </span>
+                            </label>
+                            @Html.TextBox("ImportSheet_FileName", string.Empty, new { @class = "form-control", @placeholder = "Select CSV file to upload", @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        @Html.Hidden("ImportType", "Orders")
+                        <i class="fa fa-download"></i> Import
+                    </button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.modal -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tblOrders').on('preXhr.dt', function (e, settings, data) {
+            if (settings.iDraw == 1) {
+                $('#tblOrders_statusfilter').find('select').eq(0).val(getParameterByName('Status'));
+                $('#tblOrders_statusfilter').find('select').eq(1).val(getParameterByName('PayStatus'));
+                $('#tblOrders_statusfilter').find('select').eq(2).val(getParameterByName('PayMethod'));
+                $('#tblOrders_statusfilter').find('select').eq(3).val(getParameterByName('TransType'));
+            }
+            data['date'] = { from: $('#tblOrders_datefilter').find('input[type="text"]').eq(0).val(), to: $('#tblOrders_datefilter').find('input[type="text"]').eq(1).val() };
+            data['status'] = { value: $('#tblOrders_statusfilter').find('select').eq(0).val() };
+            data['payStatus'] = { value: $('#tblOrders_statusfilter').find('select').eq(1).val() };
+            data['payMethod'] = { value: $('#tblOrders_statusfilter').find('select').eq(2).val() };
+            data['transType'] = { value: $('#tblOrders_statusfilter').find('select').eq(3).val() };
+            data['customerId'] = { value: getParameterByName('CustomerID') };
+            $('#SearchDt').val(data.search.value);
+            $('#StatusDt').val(data.status.value);
+            $('#PayStatusDt').val(data.payStatus.value);
+            $('#PayMethodDt').val(data.payMethod.value);
+            $('#TransTypeDt').val(data.transType.value);
+            $('#ColumnDt').val(data.columns[data.order[0].column].data);
+            $('#DirectionDt').val(data.order[0].dir.toUpperCase());
+            $('#FromDateDt').val(data.date.from);
+            $('#ToDateDt').val(data.date.to);
+            $('#CustomerDt').val(data.customerId.value);
+        }).on('init.dt', function (e, settings, data) {
+            $('[data-toggle="tooltip"]').tooltip();
+            $('#tblOrders_datefilter').appendTo('#tblOrders_wrapper .date-filter').show();
+            $('#tblOrders_statusfilter').appendTo('#tblOrders_wrapper .status-filter').show();
+        }).DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: '',
+                search: '_INPUT_',
+                searchPlaceholder: 'Search'
+            },
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            columns: [
+                {
+                    data: 'OrderID', render: function (data, type, full, meta) {
+                        return '<div class="checkbox"><label><input type="checkbox" id="ChkOrder_' + data + '" name="ChkOrder" value="' + data + '">' +
+                            '<span class="rc-control" style="left: 0;"><i class="rc-icon glyphicon glyphicon-checkbox"></i></span></label></div>';
+                    }, orderable: false
+                },
+                {
+                    data: 'Status', render: function (data, type, full, meta) {
+                        var iconType, iconColor, iconTooltip;
+                        switch (data) {
+                            default:
+                            case 'Open':
+                            case 'ReadyToShip':
+                            case 'Shipped':
+                            case 'PickedUp':
+                            case 'BackOrdered':
+                                if (full.GrandTotal == full.PayTotal) {
+                                    iconType = 'fa-check-circle';
+                                    iconColor = 'green';
+                                    iconTooltip = 'Status: ' + data + ' - Paid';
+                                }
+                                else if (full.PayTotal > 0 && full.PayTotal < full.GrandTotal) {
+                                    iconType = 'fa-dot-circle-o';
+                                    iconColor = 'blue';
+                                    iconTooltip = 'Status: ' + data + ' - Partially Paid';
+                                }
+                                else if (full.PayTotal == 0) {
+                                    iconType = 'fa-dot-circle-o';
+                                    iconColor = 'red';
+                                    iconTooltip = 'Status: ' + data + ' - Unpaid';
+                                }
+                                else if (full.PayTotal > full.GrandTotal) {
+                                    iconType = 'fa-check-circle';
+                                    iconColor = 'black';
+                                    iconTooltip = 'Status: ' + data + ' - Paid';
+                                }
+                                break;
+                            case 'Cancelled':
+                            case 'Incomplete':
+                            case 'Returned':
+                                iconType = 'fa-times-circle';
+                                iconColor = 'red';
+                                iconTooltip = 'Status: ' + data;
+                                break;
+                            case 'BillMeLater':
+                            case 'OnHold':
+                                if (full.GrandTotal == full.PayTotal) {
+                                    iconType = 'fa-clock-o';
+                                    iconColor = 'green';
+                                    iconTooltip = 'Status: ' + data + ' - Paid';
+                                }
+                                else if (full.PayTotal > 0 && full.PayTotal < full.GrandTotal) {
+                                    iconType = 'fa-clock-o';
+                                    iconColor = 'blue';
+                                    iconTooltip = 'Status: ' + data + ' - Partially Paid';
+                                }
+                                else if (full.PayTotal == 0) {
+                                    iconType = 'fa-clock-o';
+                                    iconColor = 'red';
+                                    iconTooltip = 'Status: ' + data + ' - Unpaid';
+                                }
+                                else if (full.PayTotal > full.GrandTotal) {
+                                    iconType = 'fa-clock-o';
+                                    iconColor = 'black';
+                                    iconTooltip = 'Status: ' + data + ' - Paid';
+                                }
+                                break;
+                        }
+                        return '<i class="fa ' + iconType + ' fa-lg" style="color:' + iconColor + '; cursor: help;" data-toggle="tooltip" title="' + iconTooltip + '"></i>';
+                    }, orderable: true
+                },
+                { data: 'OrderID', orderable: true },
+                { data: 'OrderDate', orderable: true},
+                {
+                    data: 'OrderDetails', render: function (data, type, full, meta) {
+                        return data.length == 1 ? data.length + ' item' : data.length + ' items';
+                    }, orderable: false
+                },
+                {
+                    render: function (data, type, full, meta) {
+                        return (full.ShipFirstName + ' ' + full.ShipLastName) +
+                            (full.ShipAddress1 ? ', ' + full.ShipAddress1 : '') +
+                            (full.ShipAddress2 ? ' ' + full.ShipAddress2 : '') +
+                            (full.ShipCity ? ', ' + full.ShipCity : '') +
+                            (full.ShipState ? ', ' + full.ShipState : '') +
+                            (full.ShipZipcode ? ' ' + full.ShipZipcode : '');
+                    }, orderable: false
+                },
+                { data: 'DNNLogin', orderable: false },
+                { data: 'GrandTotal', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)'), className: 'text-right', orderable: true },
+                { data: 'PayMethod', orderable: true },
+                { data: 'PayTotal', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)'), className: 'text-right', orderable: false },
+                {
+                    render: function (data, type, full, meta) {
+                        return $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)').display(full.GrandTotal - full.PayTotal);
+                    }, className: 'text-right', orderable: false
+                },
+                {
+                    data: 'OrderID', render: function (data, type, full, meta) {
+                        var editUrl = '@Url.Action("Edit", "Order", new { StoreID = Model.StoreID })' + '?OrderID=' + data;
+                        var subscriptionUrl = '@Url.Action("Index", "Subscription", new { StoreID = Model.StoreID })' + '?OrderID=' + data;
+                        var deleteUrl = '@Url.Action("Delete", "Order", new { StoreID = Model.StoreID })' + '?OrderID=' + data;
+                        var content = '<a title="Edit Order" href="' + editUrl + '"><i class="fa fa-pencil-square-o fa-lg"></i></a>' + '\n';
+                        var subscription = $.grep(full.OrderDetails, function (od) { return od.DetailRecurring.IsRecurring; });
+                        if (subscription.length) {
+                            content += '<a title="Order Subscriptions" href="' + subscriptionUrl + '" class="fa-stack fa-sm" style="font-size: 0.63em; line-height: 2.5em; top: -3px;">'
+                                    + '<i class="fa fa-calendar-o fa-stack-2x"></i>'
+                                    + '<i class="fa fa-usd fa-stack-1x"></i>'
+                                    + '</a>' + '\n';
+                        }
+                        content += '<a title="Delete Order" href="' + deleteUrl + '" onclick="return confirm(\'Are you sure?\')"><i class="fa fa-trash-o fa-lg"></i></a>';
+                        return content;
+                    }, className: 'text-right', orderable: false
+                }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            order: [[2, 'desc']],
+            dom: '<"row row-sm-pull-left"<"col-sm-12 col-md-2 col-lg-1"l><"col-sm-12 col-md-4 col-lg-4 date-filter"><"col-sm-12 col-md-4 col-lg-5 status-filter"><"col-sm-12 col-md-2 col-lg-2"f>>' + '<"row"<"col-sm-12"tr>>' + '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+            ajax: {
+                url: '@Url.Action("List", "Order", new { StoreID = Model.StoreID })',
+                type: 'POST'
+            },
+            oSearch: {
+                sSearch: getParameterByName('Search')
+            }
+        });
+        var dPickers = new RZCDateTimePicker('[data-provide="datepicker"]', { format: '@Model.ShortDateFormat.ToUpper()' });
+        for (var i = 0; i < dPickers.length; i++) {
+            var dPicker = dPickers[i];
+            dPicker.on('dp.change', function (e) {
+                $('#tblOrders').DataTable().draw();
+            });
+        }
+        $('#tblOrders_statusfilter').find('select').each(function () {
+            $(this).on('change', function () {
+                $('#tblOrders').DataTable().draw();
+            });
+        });
+        $('#chkSelectAll').on('click', function () {
+            var checked = $(this).prop('checked');
+            $('#tblOrders input[name="ChkOrder"]').prop('checked', checked);
+        });
+        $('#btnPrintOrders').on('click', function (e) {
+            if ($('#tblOrders input[name="ChkOrder"]:checked').length) {
+                this.form.action = $(this).data('href');
+            }
+            else {
+                e.preventDefault();
+                alert('Please select at leaset one order to print!');
+            }
+        });
+    });
+</script>

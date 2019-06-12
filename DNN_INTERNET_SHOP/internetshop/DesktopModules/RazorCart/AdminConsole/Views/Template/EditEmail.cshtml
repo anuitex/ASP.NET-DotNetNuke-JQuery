@@ -1,0 +1,141 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.TemplateModel>
+@using System.Web.Mvc;
+@using System.Web.Mvc.Html;
+
+<!-- CKEditor JavaScript -->
+<script type="text/javascript">window.CKEDITOR_BASEPATH = '@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/CKEditor/")';</script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/ckeditor.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Manage Email Templates</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Submitted)
+        {
+            <div class="alert alert-success alert-dismissable">
+                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                @Model.SaveMessage
+            </div>
+        }
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Template", new { StoreID = Model.StoreID, TemplateID = Model.EmailTemplate.TemplateID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Type</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("Type", new SelectList(Model.EmailTemplateTypes, "Value", "Text", Model.EmailTemplate.Type), Model.EmailTemplate.TemplateID > 0 ? new { @class = "form-control", @required = "", @disabled = "" } : (object)new { @class = "form-control", @required = "" })
+                        </div>
+                    </div>
+                    @foreach (var emailTemplateType in Model.EmailTemplateTypes)
+                    {
+                        <div class="form-group" data-show="conditional" data-cond-option="Type" data-cond-value="@emailTemplateType.Value" data-cond-destroy="true" style="display: none;">
+                            <label class="col-md-3 col-sm-4 control-label">Name</label>
+                            <div class="col-md-6 col-sm-8">
+                                @Html.DropDownList("Name_" + emailTemplateType.Value, new SelectList(emailTemplateType.EmailTemplateNames, "Value", "Text", Model.EmailTemplate.Name), new { @class = "form-control", @required = "" })
+                            </div>
+                        </div>
+                    }
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Language</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("LanguageLocale", Model.PortalLanguages, new { @class = "form-control", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Subject</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Subject", Model.EmailTemplate.Subject, new { @class = "form-control", @placeholder = "Template Subject", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            @Html.TextArea("Template", Model.EmailTemplate.Template, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    <a class="btn btn-default" href="@Url.Action("Email", "Template", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+@Html.Partial("EditEmailModal")
+<style type="text/css">
+    .cke_button__useaceeditor .cke_button_label {
+        display: inline !important;
+    }
+    .cke_button__useaceeditor .cke_button_icon {
+        background-image: url('@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/CKEditor/plugins/icons.png?v=" + Model.ProductVersion)');
+        background-position: 0 -840px;
+        background-size: auto;
+    }
+</style>
+<script type="text/javascript">
+    // CK Editor Initialization
+    CKEDITOR.config.height = 360;
+    CKEDITOR.config.language = 'en';
+    CKEDITOR.config.uiColor = '#222222';
+    CKEDITOR.config.allowedContent = true;
+    CKEDITOR.config.autoParagraph = false;
+    CKEDITOR.config.htmlEncodeOutput = true;
+    CKEDITOR.config.toolbarCanCollapse = true;
+    CKEDITOR.config.contentsCss = '@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/cke.contents.css?v=" + Model.ProductVersion)';
+    CKEDITOR.plugins.add('aceEditor', {
+        init: function (editor) {
+            editor.addCommand('useAceEditor', {
+                exec: function (editor) {
+                    $("#emailModal1").modal();
+                },
+                startDisabled: @((Model.EmailTemplate.TemplateID == 0).ToString().ToLower())
+            });
+            editor.ui.addButton('useAceEditor', {
+                label: 'Use MVC Editor',
+                command: 'useAceEditor',
+                toolbar: 'others'
+            });
+        }
+    });
+    CKEDITOR.config.extraPlugins = 'aceEditor';
+    CKEDITOR.replace('Template');
+    function updateEditorTemplate() {
+        var type = $('select[name=Type]').val();
+        var name = $('select[name=Name_' + type + ']').val();
+        if (type && name) {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetEmail", "Template", new { StoreID = Model.StoreID })',
+                data: { Type: type, Name: name },
+                contentType: 'text/html; charset=utf-8',
+                success: function (response) {
+                    CKEDITOR.instances.Template.setData(response);
+                },
+                error: function (response, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+    }
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        $('select[name^=Name_]').on('change', function () {
+            if (!this.disabled)
+                updateEditorTemplate();
+        });
+    });
+</script>

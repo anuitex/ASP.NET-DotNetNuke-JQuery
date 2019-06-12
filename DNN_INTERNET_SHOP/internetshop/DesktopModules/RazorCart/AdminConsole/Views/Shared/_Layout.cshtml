@@ -1,0 +1,295 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.BaseModel>
+
+<!DOCTYPE html>
+<html lang="@(Model.Culture.Name)">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="content-language" content="@(Model.Culture.Name)">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="@Model.ProductName" />
+    <meta name="author" content="Smith Consulting" />
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+    <link rel="icon" href="@Href("~/DesktopModules/RazorCart/AdminConsole/Images/favicon.ico")" type="image/x-icon">
+    <link rel="shortcut icon" href="@Href("~/DesktopModules/RazorCart/AdminConsole/Images/favicon.ico")" type="image/x-icon">
+    <link rel="fluid-icon" href="@Href("~/DesktopModules/RazorCart/AdminConsole/Images/fluidicon.png")" title="@Model.AppName">
+    <title>@Model.AppName</title>
+    <!-- Styles -->
+    <!-- Bootstrap Core CSS -->
+    <link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/bootstrap.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+    <!-- MetisMenu CSS -->
+    <link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/metisMenu.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+    <!-- Custom Fonts -->
+    <link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/font-awesome.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+    <!-- JavaScript -->
+    <!-- jQuery -->
+    <script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+    <!-- jQuery UI -->
+    <script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery-ui.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+    <!-- Microsoft jQuery Validation & Ajax JavaScript -->
+    <script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.validate.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+    <script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.validate.unobtrusive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+    <script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.unobtrusive-ajax.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/metisMenu.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+</head>
+<body lang="@(Model.Culture.Name)">
+    <div id="wrapper">
+        @if (ViewBag.HasLayout)
+        {
+            <!-- Navigation -->
+            <nav class="navbar navbar-inverse navbar-static-top" role="navigation" style="margin-bottom: 0">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="@Url.Action("Index", "Home", new { StoreID = Model.StoreID })" style="position: absolute; margin-right: 50px; display: table;">
+                        <span style="display: table-cell;">
+                            <img class="navbar-left" src="@Href("~/DesktopModules/RazorCart/AdminConsole/Images/razorcart.png")" alt="RazorCart" style="max-height: 24px; margin-right: 6px;" />
+                        </span>
+                        <span style="display: table-cell; font-size: larger; vertical-align: middle;">
+                            <strong>@Model.AppName</strong> (@Model.StoreName)
+                        </span>
+                    </a>
+                </div>
+                <!-- /.navbar-header -->
+                <ul class="nav navbar-top-links navbar-right">
+                    @if (Model.UserInfo.IsSuperUser || Model.UserInfo.IsInRole(Model.PortalSettings.AdministratorRoleName))
+                    {
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-shopping-cart fa-fw"></i> <i class="fa fa-caret-down"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-alerts">
+                                @foreach (var link in Model.StoreLinks)
+                                {
+                                    <li>
+                                        <a href="@link.Url">
+                                            <div>
+                                                <i class="fa fa-sign-in fa-fw"></i> @link.Name
+                                                <span class="pull-right text-muted badge">#@link.ID</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                }
+                                <li>
+                                    <a class="text-center" href="@Url.Action("Index", "Store", new { Ctrl = "Manage" })">
+                                        <strong>@Model.GetString("ManageStores")</strong>
+                                        <i class="fa fa-arrow-circle-right fa-fw"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                            <!-- /.dropdown-alerts -->
+                        </li>
+                        <!-- /.dropdown -->
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-server fa-fw"></i> <i class="fa fa-caret-down"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li>
+                                    <a href="@Url.Action("Clean", "Home", new { StoreID = Model.StoreID, Actn = ViewContext.RouteData.Values["action"].ToString(), Ctrl = ViewContext.RouteData.Values["controller"].ToString() })">
+                                        <i class="fa fa-recycle fa-fw"></i> @Model.GetString("ClearCache")
+                                    </a>
+                                </li>
+                                @if (Model.UserInfo.IsSuperUser)
+                                {
+                                    <li>
+                                        <a href="@Url.Action("Recycle", "Home", new { StoreID = Model.StoreID, Actn = ViewContext.RouteData.Values["action"].ToString(), Ctrl = ViewContext.RouteData.Values["controller"].ToString() })">
+                                            <i class="fa fa-refresh fa-fw"></i> @Model.GetString("RestartApplication")
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                        <!-- /.dropdown -->
+                    }
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-globe fa-fw"></i> <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li>
+                                <a href="@Model.SiteUrl"><i class="fa fa-home fa-fw"></i> @Model.PortalSettings.PortalName</a>
+                            </li>
+                            <li>
+                                <a href="@Model.UserUrl"><i class="fa fa-user fa-fw"></i> @Model.GetString("UserProfile")</a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a href="@Model.LogoutUrl"><i class="fa fa-power-off fa-fw"></i> @Model.GetString("Logout")</a>
+                            </li>
+                        </ul>
+                        <!-- /.dropdown-user -->
+                    </li>
+                    <!-- /.dropdown -->
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" href="@Model.SiteUrl">
+                            <i class="fa fa-sign-out fa-fw"></i> @Model.GetString("Exit")
+                        </a>
+                    </li>
+                </ul>
+                <!-- /.navbar-top-links -->
+                <div class="navbar-inverse sidebar" role="navigation">
+                    <div class="sidebar-nav navbar-collapse collapse">
+                        <ul class="nav" id="side-menu">
+                            <li class="sidebar-search">
+                                <div class="input-group custom-search-form">
+                                    <input type="text" class="form-control" placeholder="Search...">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <!-- /input-group -->
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index", "Home", new { StoreID = Model.StoreID })"><i class="fa fa-tachometer fa-fw"></i> @Model.GetString("Dashboard")</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-cogs fa-fw"></i> @Model.GetString("StoreSetup")<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="@Url.Action("Index", "Setup", new { StoreID = Model.StoreID })"><i class="fa fa-home fa-fw"></i> @Model.GetString("Store")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index", "Payment", new { StoreID = Model.StoreID })"><i class="fa fa-credit-card fa-fw"></i> @Model.GetString("Payment")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index", "Shipping", new { StoreID = Model.StoreID })"><i class="fa fa-truck fa-fw"></i> @Model.GetString("Shipping")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index", "Tax", new { StoreID = Model.StoreID })"><i class="fa fa-bank fa-fw"></i> @Model.GetString("Tax")</a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-files-o fa-fw"></i> @Model.GetString("Templates")<span class="fa arrow"></span></a>
+                                        <ul class="nav nav-third-level">
+                                            <li>
+                                                <a href="@Url.Action("View", "Template", new { StoreID = Model.StoreID })"><i class="fa fa-file-code-o fa-fw"></i> @Model.GetString("Viewsets")</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("Email", "Template", new { StoreID = Model.StoreID })"><i class="fa fa-envelope-o fa-fw"></i> @Model.GetString("Email")</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("Invoice", "Template", new { StoreID = Model.StoreID })"><i class="fa fa-file-pdf-o fa-fw"></i> @Model.GetString("Invoice")</a>
+                                            </li>
+                                        </ul>
+                                        <!-- /.nav-third-level -->
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index", "Extension", new { StoreID = Model.StoreID })"><i class="fa fa-plug fa-fw"></i> @Model.GetString("Extensions")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index", "License", new { StoreID = Model.StoreID })"><i class="fa fa-certificate fa-fw"></i> @Model.GetString("License")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index", "API", new { StoreID = Model.StoreID })"><i class="fa fa-key fa-fw"></i> @Model.GetString("ApiKeys")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index", "Permission", new { StoreID = Model.StoreID })"><i class="fa fa-shield fa-fw"></i> @Model.GetString("Permissions")</a>
+                                    </li>
+                                </ul>
+                                <!-- /.nav-second-level -->
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-line-chart fa-fw"></i> @Model.GetString("Marketing")<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="@Url.Action("Index", "Coupon", new { StoreID = Model.StoreID })"><i class="fa fa-tags fa-fw"></i> @Model.GetString("Coupons")</a>
+                                    </li>
+                                    @if (false)
+                                    {
+                                        <li>
+                                            <a href="@Url.Action("Index", "GiftCard", new { StoreID = Model.StoreID })"><i class="fa fa-gift fa-fw"></i> @Model.GetString("GiftCards")</a>
+                                        </li>
+                                    }
+                                    <li>
+                                        <a href="@Url.Action("Index", "Discount", new { StoreID = Model.StoreID })"><i class="fa fa-percent fa-fw"></i> @Model.GetString("Discounts")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index", "Campaign", new { StoreID = Model.StoreID })"><i class="fa fa-envelope fa-fw"></i> @Model.GetString("EmailCampaigns")</a>
+                                    </li>
+                                </ul>
+                                <!-- /.nav-second-level -->
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-archive fa-fw"></i> @Model.GetString("Inventory")<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="@Url.Action("Index", "Product", new { StoreID = Model.StoreID })"><i class="fa fa-cubes fa-fw"></i> @Model.GetString("Products")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Category", "Product", new { StoreID = Model.StoreID })"><i class="fa fa-sitemap fa-fw"></i> @Model.GetString("Categories")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Manufacturer", "Product", new { StoreID = Model.StoreID })"><i class="fa fa-industry fa-fw"></i> @Model.GetString("Manufacturers")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Field", "Product", new { StoreID = Model.StoreID })"><i class="fa fa-columns fa-fw"></i> @Model.GetString("TemplateFields")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Review", "Product", new { StoreID = Model.StoreID })"><i class="fa fa-star-half-o fa-fw"></i> @Model.GetString("Reviews")</a>
+                                    </li>
+                                </ul>
+                                <!-- /.nav-second-level -->
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index", "Customer", new { StoreID = Model.StoreID })"><i class="fa fa-address-card-o fa-fw"></i> @Model.GetString("Customers")</a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index", "Order", new { StoreID = Model.StoreID })"><i class="fa fa-list-alt fa-fw"></i> @Model.GetString("Orders")</a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index", "Subscription", new { StoreID = Model.StoreID })"><i class="fa fa-retweet fa-fw"></i> @Model.GetString("Subscriptions")</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-pie-chart fa-fw"></i> @Model.GetString("Reports")<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="@Url.Action("Abandoned", "Report", new { StoreID = Model.StoreID })"><i class="fa fa-cart-arrow-down fa-fw"></i> @Model.GetString("AbandonedCart")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Booking", "Report", new { StoreID = Model.StoreID })"><i class="fa fa-calendar fa-fw"></i> @Model.GetString("Booking")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Sales", "Report", new { StoreID = Model.StoreID })"><i class="fa fa-usd fa-fw"></i> @Model.GetString("SalesSummary")</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("SafetyStock", "Report", new { StoreID = Model.StoreID })"><i class="fa fa-shopping-bag fa-fw"></i> @Model.GetString("SafetyStock")</a>
+                                    </li>
+                                </ul>
+                                <!-- /.nav-second-level -->
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- /.sidebar-collapse -->
+                </div>
+                <!-- /.navbar-static-side -->
+            </nav>
+            <!-- Page Content -->
+            <div id="page-wrapper">
+                @RenderBody()
+            </div>
+            <!-- /#page-wrapper -->
+        }
+        else
+        {
+            @RenderBody()
+        }
+    </div>
+    <!-- /#wrapper -->
+    <!-- Admin Console CSS -->
+    <link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/rzc-admin.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+    <!-- Admin Console JavaScript -->
+    <script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/rzc-admin.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+    <!-- Collapse JavaScript -->
+    <script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/rzc-collapse.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.MyAccount.Models.AccountModel>
+@using DotNetNuke.Web.Mvc.Helpers;
+
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header" data-toggle="collapse" data-target="#myAcount-@Dnn.ModuleContext.ModuleId">
+            <button type="button" class="navbar-toggle">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="">@Dnn.LocalizeString("MyAccount")</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myAcount-@Dnn.ModuleContext.ModuleId">
+            <ul class="nav navbar-nav navbar-right">
+                @if (Request.IsAuthenticated)
+                {
+                    <li ng-class="account.tabName == 'dashboard' ? 'active' : ''">
+                        <a href="" ng-click="account.tabName = 'dashboard'" onclick="$('#myAcount-@Dnn.ModuleContext.ModuleId').collapse('hide');">
+                            <i class="fa fa-dashboard"></i> @Dnn.LocalizeString("Dashboard")
+                        </a>
+                    </li>
+                    <li ng-class="account.tabName == 'orders' ? 'active' : ''">
+                        <a href="" ng-click="account.tabName = 'orders'" onclick="$('#myAcount-@Dnn.ModuleContext.ModuleId').collapse('hide');">
+                            <i class="fa fa-list-alt"></i> @Dnn.LocalizeString("Orders")
+                        </a>
+                    </li>
+                    <li ng-class="account.tabName == 'subscriptions' ? 'active' : ''">
+                        <a href="" ng-click="account.tabName = 'subscriptions'" onclick="$('#myAcount-@Dnn.ModuleContext.ModuleId').collapse('hide');">
+                            <span class="fa-stack fa-sm" style="font-size: 0.62em; line-height: 2.6em; top: -2px;">
+                                <i class="fa fa-calendar-o fa-stack-2x"></i>
+                                <i class="fa fa-usd fa-stack-1x"></i>
+                            </span> @Dnn.LocalizeString("Subscriptions")
+                        </a>
+                    </li>
+                    <li ng-class="account.tabName == 'downloads' ? 'active' : ''">
+                        <a href="" ng-click="account.tabName = 'downloads'" onclick="$('#myAcount-@Dnn.ModuleContext.ModuleId').collapse('hide');">
+                            <i class="fa fa-download"></i> @Dnn.LocalizeString("Downloads")
+                        </a>
+                    </li>
+                    <li ng-class="account.tabName == 'wallet' ? 'active' : ''">
+                        <a href="" ng-click="account.tabName = 'wallet'" onclick="$('#myAcount-@Dnn.ModuleContext.ModuleId').collapse('hide');">
+                            <i class="fa fa-suitcase"></i> @Dnn.LocalizeString("Wallet")
+                        </a>
+                    </li>
+                    <li ng-class="account.tabName == 'address' ? 'active' : ''">
+                        <a href="" ng-click="account.tabName = 'address'" onclick="$('#myAcount-@Dnn.ModuleContext.ModuleId').collapse('hide');">
+                            <i class="fa fa-home"></i> @Dnn.LocalizeString("Address")
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="row">
+    <div class="col-md-12">
+        <div ng-switch="account.tabName" ng-init="account.tabName = 'dashboard'">
+            <div ng-switch-when="dashboard">
+                @if (Request.IsAuthenticated)
+                {
+                    @Html.Raw(string.Format(Dnn.LocalizeString("WelcomeUser"), Dnn.User.DisplayName, DotNetNuke.Common.Globals.NavigateURL("Logoff")))
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        @Dnn.LocalizeString("WelcomeGuest") (<a href="@(DotNetNuke.Common.Globals.LoginURL(Url.Encode(Request.RawUrl), false))">@Dnn.LocalizeString("Login")</a>)
+                    </div>
+                }
+            </div>
+            <div ng-switch-when="orders">
+                @if (Request.IsAuthenticated)
+                {
+                    @Html.Partial("_Orders")
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        @Dnn.LocalizeString("WelcomeGuest") (<a href="@(DotNetNuke.Common.Globals.LoginURL(Url.Encode(Request.RawUrl), false))">@Dnn.LocalizeString("Login")</a>)
+                    </div>
+                }
+            </div>
+            <div ng-switch-when="subscriptions">
+                @if (Request.IsAuthenticated)
+                {
+                    @Html.Partial("_Subscriptions")
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        @Dnn.LocalizeString("WelcomeGuest") (<a href="@(DotNetNuke.Common.Globals.LoginURL(Url.Encode(Request.RawUrl), false))">@Dnn.LocalizeString("Login")</a>)
+                    </div>
+                }
+            </div>
+            <div ng-switch-when="downloads">
+                @if (Request.IsAuthenticated)
+                {
+                    @Html.Partial("_Downloads")
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        @Dnn.LocalizeString("WelcomeGuest") (<a href="@(DotNetNuke.Common.Globals.LoginURL(Url.Encode(Request.RawUrl), false))">@Dnn.LocalizeString("Login")</a>)
+                    </div>
+                }
+            </div>
+            <div ng-switch-when="wallet">
+                @if (Request.IsAuthenticated)
+                {
+                    @Html.Partial("_Wallet")
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        @Dnn.LocalizeString("WelcomeGuest") (<a href="@(DotNetNuke.Common.Globals.LoginURL(Url.Encode(Request.RawUrl), false))">@Dnn.LocalizeString("Login")</a>)
+                    </div>
+                }
+            </div>
+            <div ng-switch-when="address">
+                @if (Request.IsAuthenticated)
+                {
+                    @Html.Partial("_Address")
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        @Dnn.LocalizeString("WelcomeGuest") (<a href="@(DotNetNuke.Common.Globals.LoginURL(Url.Encode(Request.RawUrl), false))">@Dnn.LocalizeString("Login")</a>)
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

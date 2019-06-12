@@ -1,0 +1,80 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.ProductList.Models.ListModel>
+@using DotNetNuke.Common;
+@using DotNetNuke.Web.Mvc.Helpers;
+@using RazorCart.Core.Components.Url;
+
+<!-- This Hidden Div Is Only For SEO Purposes, Since Crawlers cannot execute Javascript -->
+<div ng-hide="true" itemscope itemtype="http://schema.org/Store" class="h-card vcard">
+    <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+        <meta itemprop="url" content="@Model.StoreImageShareUrl" />
+        <img itemprop="image" class="u-photo photo" src="@Model.StoreImageShareUrl" alt="Logo" />
+    </div>
+    <h1 itemprop="name" class="p-name fn">
+        @(!string.IsNullOrEmpty(Model.StoreName) ? Model.StoreName : Dnn.PortalSettings.PortalName)
+    </h1>
+    <h2 itemprop="description" class="e-description description">
+        @Dnn.ActivePage.Description
+    </h2>
+    <a href="@string.Format(Model.DisplayURL, "gridview")" target="_self">
+        Grid View
+    </a>
+    <a href="@string.Format(Model.DisplayURL, "listview")" target="_self">
+        List View
+    </a>
+    <a href="@string.Format(Model.SortingURL, "order-asc")" target="_self">Sorting: Normal</a>
+    <a href="@string.Format(Model.SortingURL, "price-asc")" target="_self">Sorting: Price Low to High</a>
+    <a href="@string.Format(Model.SortingURL, "price-desc")" target="_self">Sorting: Price High to Low</a>
+    <a href="@string.Format(Model.SortingURL, "date-desc")" target="_self">Sorting: New Arrivals</a>
+    <a href="@string.Format(Model.SortingURL, "brand-asc")" target="_self">Sorting: Brand A-Z</a>
+    <a href="@string.Format(Model.SortingURL, "brand-desc")" target="_self">Sorting: Brand Z-A</a>
+    @foreach (var product in Model.Products)
+    {
+        <div itemscope itemtype="http://schema.org/Product" class="h-product hproduct" title="@product.ModelName">
+            <meta itemprop="url" content="@product.ProductDetailUrl" />
+            <a class="u-url url" href="@product.ProductDetailUrl" target="_self">
+                <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+                    @{
+                        var imgUrl = UrlExtension.RelativeToAbsoluteUrl(product.ThumbImage);
+                    }
+                    <meta itemprop="url" content="@imgUrl" />
+                    <img itemprop="image" class="u-photo photo" src="@imgUrl" title="@product.ImageTitle" alt="@product.ImageAlt" />
+                </div>
+                <h1 itemprop="name" class="p-name fn">
+                    @product.ModelName
+                </h1>
+                <h2 class="u-identifier identifier">
+                    <span class="type" ng-hide="true">sku</span>
+                    Product SKU:&nbsp;
+                    <span itemprop="sku" class="value">@product.ModelNumber</span>
+                </h2>
+                <h3 itemprop="description" class="e-description description">
+                    @Html.Raw(product.Description)
+                </h3>
+                <h3 itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                    <span itemprop="priceCurrency" class="p-currency currency">@Model.ISOCurrencySymbol</span>
+                    <span itemprop="price" class="p-price price">@(Model.IsSaleEnabled && product.IsUnderSale ? (product.BundleSalePrice > 0 ? product.BundleSalePrice : product.SalePrice) : (product.BundleUnitCost > 0 ? product.BundleUnitCost : product.UnitCost))</span>
+                </h3>
+            </a>
+        </div>
+    }
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        @Html.Partial("_FilterPanel", Model)
+    </div>
+    <div class="col-lg-12">
+        @Html.Partial("_ProductTemplate", Model)
+    </div>
+    <div class="col-lg-12">
+        @Html.Partial("_Pager", Model.Pager)
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <button type="button" class="btn btn-primary" onclick="window.location.href='@(Model.CheckoutPage)';">
+            <i class="fa fa-shopping-cart"></i>
+            @Dnn.LocalizeString("ViewCart")
+        </button>
+    </div>
+</div>

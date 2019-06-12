@@ -1,0 +1,36 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Search.Models.AutoCompleteModel>
+
+@using DotNetNuke.Web.Mvc.Helpers;
+@using DotNetNuke.Web.Client.ClientResourceManagement;
+
+@{
+    int moduleID = Dnn.ModuleContext.ModuleId;
+    int tabModuleID = Dnn.ModuleContext.TabModuleId;
+
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/Search/Content/Styles/jquery-ui.min.css", 100, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/Search/Content/Scripts/razorCart.autoComplete.js", 100, "DnnPageHeaderProvider");
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading @(Model.IsCollapsible ? "show-collapse-icon" : "")">
+        <h4 class="panel-title">
+            <a class="no-underline accordion-toggle @(Model.IsCollapsible && Model.StartCollapsed ? "collapsed" : "")" data-toggle="collapse" href="#autoCompleteCollapse_@tabModuleID">
+                Quick Search
+            </a>
+        </h4>
+    </div>
+    <div id="@(Model.IsCollapsible ? "autoCompleteCollapse_" + tabModuleID : "")" class="panel-collapse collapse @(Model.IsCollapsible && Model.StartCollapsed ? "" : "in")">
+        <div class="panel-body">
+            <div class="input-group">
+                <input type="text" name="txtAutoCompleteSearch_@tabModuleID" class="form-control" placeholder="Search..." data-mid="@moduleID"
+                    data-store-id="@Model.StoreID" data-detail-tid="@Model.ProductDetailsPageTabID" value="@Model.SearchText" required validation-group="auto-complete">
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit" name="submitAutoComplete_@tabModuleID" value="Search" validation-group="auto-complete">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+

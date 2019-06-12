@@ -1,0 +1,88 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Checkout.Models.CheckoutModel>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                @if (!string.IsNullOrEmpty(Convert.ToString(TempData["AuthenticationMessage"] ?? string.Empty)))
+                {
+                    <div class="alert alert-danger">
+                        @TempData["AuthenticationMessage"].ToString()
+                    </div>
+                    TempData.Remove("AuthenticationMessage");
+                }
+                <div class="form-horizontal">
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).username.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).username.$invalid }">
+                        <label class="col-md-5 col-sm-4 col-xs-4 control-label">@Dnn.LocalizeString("Username")</label>
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <input type="text" name="username" class="form-control" placeholder="@Dnn.LocalizeString("Username")" ng-model="checkout.username" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).username.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).username.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("UsernameRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).password.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).password.$invalid }">
+                        <label class="col-md-5 col-sm-4 col-xs-4 control-label">@Dnn.LocalizeString("Password")</label>
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <input type="password" name="password" class="form-control" placeholder="@Dnn.LocalizeString("Password")" ng-model="checkout.password" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).password.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).password.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("PasswordRequired")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).confirmPassword.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).confirmPassword.$invalid }" ng-if="checkout.newAccount">
+                        <label class="col-md-5 col-sm-4 col-xs-4 control-label">@Dnn.LocalizeString("ConfirmPassword")</label>
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <input type="password" name="confirmPassword" class="form-control" placeholder="@Dnn.LocalizeString("ConfirmPassword")" ng-model="checkout.confirmPassword" ng-pattern="checkout.password" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).confirmPassword.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).confirmPassword.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ConfirmPasswordRequired")
+                                </div>
+                                <div class="form-control-required" ng-message="pattern">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ConfirmPasswordNotMatch")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).email.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).email.$invalid }" ng-if="checkout.newAccount">
+                        <label class="col-md-5 col-sm-4 col-xs-4 control-label">@Dnn.LocalizeString("Email")</label>
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <input type="email" name="email" class="form-control" placeholder="@Dnn.LocalizeString("Email")" ng-model="checkout.email" required>
+                            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).email.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).email.$dirty">
+                                <div class="form-control-required" ng-message="required">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("EmailRequired")
+                                </div>
+                                <div class="form-control-required" ng-message="email">
+                                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("EmailInvalid")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-5 col-md-4 col-xs-offset-4 col-sm-5 col-xs-6 col-xxs-offset-0">
+                            <input type="submit" class="btn btn-primary btn-block" name="rzcLogin" value="@Dnn.LocalizeString("SignIn")" ng-click="checkout.submitted = true" ng-if="!checkout.newAccount" onclick="this.form.action='@Url.Action("Authenticate", "Checkout", new { })';" />
+                            <hr class="hr-text" data-content="New user?" ng-if="!checkout.newAccount">
+                            <input type="button" class="btn btn-primary btn-block" value="@Dnn.LocalizeString("CreateAccount")" ng-click="checkout.newAccount = true" ng-if="!checkout.newAccount" />
+                            <input type="submit" class="btn btn-primary btn-block" name="rzcRegister" value="@Dnn.LocalizeString("CreateAccount")" ng-click="checkout.submitted = true" ng-if="checkout.newAccount" onclick="this.form.action='@Url.Action("Authenticate", "Checkout", new { })';" />
+                            <div class="clearfix" style="margin-bottom: 5px;"></div>
+                            <label ng-if="checkout.newAccount">
+                                @Dnn.LocalizeString("AlreadyHaveAccount")
+                                <button class="btn btn-link" ng-click="checkout.newAccount = false" style="padding: 0 6px; margin-bottom: 5px;">
+                                    @Dnn.LocalizeString("SignIn") <i class="fa fa-caret-right"></i>
+                                </button>
+                            </label>
+                            @if (Model.EnableGuestCheckout)
+                            {
+                                <input type="submit" class="btn btn-default btn-block" name="rzcGuest" value="@Dnn.LocalizeString("CheckoutAsGuest")" ng-if="!checkout.newAccount" onclick="this.form.action='@Url.Action("Authenticate", "Checkout", new {})';" formnovalidate />
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

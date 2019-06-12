@@ -1,0 +1,31 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ShippingModel>
+
+<ul class="nav nav-tabs" style="margin-bottom: 1em;">
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Index", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Index", "Shipping", new { StoreID = Model.StoreID })">Setup</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Custom", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Custom", "Shipping", new { StoreID = Model.StoreID })">Custom Methods</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Zone", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Zone", "Shipping", new { StoreID = Model.StoreID })">Zones</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Category", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Category", "Shipping", new { StoreID = Model.StoreID })">Categories</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Weight", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Weight", "Shipping", new { StoreID = Model.StoreID })">By Weight</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Quantity", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Quantity", "Shipping", new { StoreID = Model.StoreID })">By Quantity</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Amount", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Amount", "Shipping", new { StoreID = Model.StoreID })">By Amount</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Postal", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Postal", "Shipping", new { StoreID = Model.StoreID })">By Postal Code</a>
+    </li>
+   <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().EndsWith("Free", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("Free", "Shipping", new { StoreID = Model.StoreID })">Free Shipping</a>
+    </li>
+</ul>

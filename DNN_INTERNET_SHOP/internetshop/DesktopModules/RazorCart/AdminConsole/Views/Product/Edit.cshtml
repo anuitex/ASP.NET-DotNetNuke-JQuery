@@ -1,0 +1,689 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+@using System.Globalization;
+@using System.Data.SqlTypes;
+
+<!-- Bootstrap DateTimePicker CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/bootstrap-datetimepicker.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Moment JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/moment.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Bootstrap DateTimePicker JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/bootstrap-datetimepicker.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- CKEditor JavaScript -->
+<script type="text/javascript">window.CKEDITOR_BASEPATH = '@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/CKEditor/")';</script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/ckeditor.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Product.ProductID > 0)
+        {
+            <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+        }
+        else
+        {
+            <h1 class="page-header">Manage Products</h1>
+        }
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })" autocomplete="off">
+            @if (Model.Product.ProductID > 0)
+            {
+                @Html.Partial("_ProductMenu")
+            }
+            @if (Model.Submitted)
+            {
+                <div class="alert alert-success alert-dismissable">
+                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                    @Model.SaveMessage
+                </div>
+            }
+            <div class="panel-group" id="accordion">
+                <div class="lead">
+                    <a href="#" class="btn btn-default" data-toggle="collapse-all" data-target="#accordion .panel-collapse">
+                        Collapse All
+                    </a>
+                </div>
+                @* Product General Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseSetup">
+                            <h4 class="panel-title">Product Setup</h4>
+                        </a>
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div id="collapseSetup" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Sort Order</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("SortOrder", Model.Product.SortOrder, new { @class = "form-control", @placeholder = "Sort Order", @type = "number", @step = "1", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Product SKU</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("ModelNumber", Model.Product.ModelNumber, new { @class = "form-control", @placeholder = "Product SKU", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Product Name</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("ModelName", Model.Product.ModelName, new { @class = "form-control", @placeholder = "Product Name", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Manufacturer</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.DropDownList("Manufacturer", Model.ProductManufacturers, "-- Select --", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Price / Unit Cost</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("UnitCost", Model.Product.UnitCost.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Price / Unit Cost", @type = "number", @step = "0.01", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Quantity On Hand</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("QuantityOnHand", Model.Product.QuantityOnHand, new { @class = "form-control", @placeholder = "Quantity On Hand", @type = "number", @step = "1", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Unit Of Measure</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("PriceUnits", Model.Product.PriceUnits, new { @class = "form-control", @placeholder = "Unit Of Measure" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Weight</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("Weight", Model.Product.Weight.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Weight", @type = "number", @step = "0.01", @required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- /.panel -->
+                @* Sale Pricing Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseSale">
+                            <h4 class="panel-title">Sale Pricing</h4>
+                        </a>
+                    </div>
+                    <div id="collapseSale" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Price Class</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.DropDownList("PriceClass", Model.ProductClasses, "-- Select --", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Sale Price</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("SalePrice", Model.Product.SalePrice.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Sale Price", @type = "number", @step = "0.01", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Sale Start Date</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="input-group date" data-provide="datetimepicker" data-provide-format="@Model.ShortDateFormat.ToUpper()">
+                                        @Html.TextBox("SaleStartDate", Model.Product.SaleStartDate > SqlDateTime.MinValue.Value ? Model.Product.SaleStartDate.ToString(Model.ShortDateFormat) : null,
+                                                        new { @class = "form-control", @placeholder = "Sale Start Date" })
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Sale End Date</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="input-group date" data-provide="datetimepicker" data-provide-format="@Model.ShortDateFormat.ToUpper()">
+                                        @Html.TextBox("SaleEndDate", Model.Product.SaleEndDate > SqlDateTime.MinValue.Value ? Model.Product.SaleEndDate.ToString(Model.ShortDateFormat) : null,
+                                                        new { @class = "form-control", @placeholder = "Sale End Date" })
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- /.panel -->
+                @* Product Stock Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseInventory">
+                            <h4 class="panel-title">Inventory Stock Setup</h4>
+                        </a>
+                    </div>
+                    <div id="collapseInventory" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Date Added</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.LabelFor(m => m.Product.CreatedDate, Model.Product.CreatedDate != DateTime.MinValue ? Model.Product.CreatedDate.ToString() : " ", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Minimum Order Qty</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("MinOrderQty", Model.Product.MinOrderQty, new { @class = "form-control", @placeholder = "Minimum Order Qty", @type = "number", @step = "1", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Maximum Order Qty</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("MaxOrderQty", Model.Product.MaxOrderQty, new { @class = "form-control", @placeholder = "Maximum Order Qty", @type = "number", @step = "1", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Safety Stock Qty</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("SafetyStockQty", Model.ProductII.SafetyStockQty, new { @class = "form-control", @placeholder = "Safety Stock Qty", @type = "number", @step = "1", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Product Dimensions</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="input-group">
+                                        <span class="input-group-addon" style="min-width: 88px;">Width <i class="fa fa-arrows-h"></i></span>
+                                        @Html.TextBox("Width", Model.Product.Width, new { @class = "form-control", @placeholder = "Width", @type = "number", @step = "1", @required = "required" })
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-addon" style="min-width: 88px;">Height <i class="fa fa-arrows-v"></i></span>
+                                        @Html.TextBox("Height", Model.Product.Height, new { @class = "form-control", @placeholder = "Height", @type = "number", @step = "1", @required = "required" })
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-addon" style="min-width: 88px;">Length <i class="fa fa-arrow-up"></i></span>
+                                        @Html.TextBox("Length", Model.Product.Length, new { @class = "form-control", @placeholder = "Length", @type = "number", @step = "1", @required = "required" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- /.panel -->
+                @* Product Description Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseSummary">
+                            <h4 class="panel-title">Summary and Description</h4>
+                        </a>
+                    </div>
+                    <div id="collapseSummary" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Summary</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextArea("Summary", Model.Product.Summary, new { @class = "form-control", @placeholder = "Summary" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active"><a data-toggle="tab" href="#description1">Description 1</a></li>
+                                        <li><a data-toggle="tab" href="#description2">Description 2</a></li>
+                                        <li><a data-toggle="tab" href="#description3">Description 3</a></li>
+                                        <li><a data-toggle="tab" href="#description4">Description 4</a></li>
+                                        <li><a data-toggle="tab" href="#description5">Description 5</a></li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="description1">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 col-sm-4 control-label">Tab Name</label>
+                                                        <div class="col-md-6 col-sm-8">
+                                                            @Html.TextBox("TabName1", Model.Product.TabName1, new { @class = "form-control", @placeholder = "Tab Name" })
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">
+                                                            @Html.TextArea("Description", Model.Product.Description, new { @class = "form-control" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="description2">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 col-sm-4 control-label">Tab Name</label>
+                                                        <div class="col-md-6 col-sm-8">
+                                                            @Html.TextBox("TabName2", Model.Product.TabName2, new { @class = "form-control", @placeholder = "Tab Name" })
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">
+                                                            @Html.TextArea("Description2", Model.Product.Description2, new { @class = "form-control" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="description3">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 col-sm-4 control-label">Tab Name</label>
+                                                        <div class="col-md-6 col-sm-8">
+                                                            @Html.TextBox("TabName3", Model.Product.TabName3, new { @class = "form-control", @placeholder = "Tab Name" })
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">
+                                                            @Html.TextArea("Description3", Model.Product.Description3, new { @class = "form-control" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="description4">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 col-sm-4 control-label">Tab Name</label>
+                                                        <div class="col-md-6 col-sm-8">
+                                                            @Html.TextBox("TabName4", Model.Product.TabName4, new { @class = "form-control", @placeholder = "Tab Name" })
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">
+                                                            @Html.TextArea("Description4", Model.Product.Description4, new { @class = "form-control" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="description5">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 col-sm-4 control-label">Tab Name</label>
+                                                        <div class="col-md-6 col-sm-8">
+                                                            @Html.TextBox("TabName5", Model.Product.TabName5, new { @class = "form-control", @placeholder = "Tab Name" })
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">
+                                                            @Html.TextArea("Description5", Model.Product.Description5, new { @class = "form-control" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- /.panel -->
+                @* Product Options Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseOptions">
+                            <h4 class="panel-title">Product Options</h4>
+                        </a>
+                    </div>
+                    <div id="collapseOptions" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Share</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("Share", Model.Product.Share, new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Featured Product</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("Featured", Model.Product.Featured, new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="display: none;">
+                                <label class="col-md-3 col-sm-4 control-label">Gift Card</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("GiftCard", Model.Product.GiftCard, new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">User Entered Amount</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("UserEnteredAmount", Model.Product.UserEnteredAmount, new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Minimum Partial Amount</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("MinPartialAmount", Model.ProductII.MinPartialAmount.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Minimum Partial Amount", @type = "number", @step = "0.01", @required = "required" })
+                                    *Default = -1 (Will not require a minimum partial entered amount)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Details Page URL</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("ProductDetailUrl", Model.Product.ProductDetailUrl, new { @class = "form-control", @placeholder = "Details Page URL", @type = "url" })
+                                    Set to override the product details page URL
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Custom Modal Page</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.DropDownList("CustomModalTabID", Model.PortalPages, "-- Global Setting --", new { @class = "form-control" })
+                                    Set the custom modal page to override the global (module) setting
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Active From</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="input-group date" data-provide="datetimepicker" data-provide-format="@Model.ShortDateFormat.ToUpper() @Model.ShortTimeFormat.Replace("tt", "A")">
+                                        @Html.TextBox("ActiveFrom", Model.Product.ActiveFrom > SqlDateTime.MinValue.Value ? Model.Product.ActiveFrom.ToString(Model.ShortDateTimeFormat) : null,
+                                                        new { @class = "form-control", @placeholder = "Active From Date" })
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Active To</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="input-group date" data-provide="datetimepicker" data-provide-format="@Model.ShortDateFormat.ToUpper() @Model.ShortTimeFormat.Replace("tt", "A")">
+                                        @Html.TextBox("ActiveTo", Model.Product.ActiveTo > SqlDateTime.MinValue.Value ? Model.Product.ActiveTo.ToString(Model.ShortDateTimeFormat) : null,
+                                                        new { @class = "form-control", @placeholder = "Active To Date" })
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Deactivate Product</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("Archived", Model.Product.Archived, new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- /.panel -->
+                @* Product Tax & Shipping Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseTax">
+                            <h4 class="panel-title">Tax & Shipping Setup</h4>
+                        </a>
+                    </div>
+                    <div id="collapseTax" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Tax Exempt</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("TaxExempt", Model.Product.TaxExempt, new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Taxable Amount</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("TaxableAmount", Model.Product.TaxableAmount.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Taxable Amount", @type = "number", @step = "0.01", @required = "required" })
+                                    *Default = -1 (Will not affect the taxable amount of the product)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Shipping Cost</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("ShipCost", Model.Product.ShipCost.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Shipping Cost", @type = "number", @step = "0.01", @required = "required" })
+                                    *Default = -1 (When changed this will set a flat shipping rate that overrides the shipping method in use)
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- /.panel -->
+                @* Product Recurring Billing *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseRecurring">
+                            <h4 class="panel-title">Recurring Setup</h4>
+                        </a>
+                    </div>
+                    <div id="collapseRecurring" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Enable Recurring Billing</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("Recurring", Model.Product.Recurring, new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Subscription Interval</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.DropDownList("SubscriptionInterval", Model.SubscriptionIntervals, "-- Select --", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Subscription Occurrences</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("RecurringOccurances", Model.Product.RecurringOccurances >= 1 ? Model.Product.RecurringOccurances : 1,
+                                                    new { @class = "form-control", @placeholder = "Subscription Occurrences", @type = "number", @step = "1", @min = "1", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Billing Start Date</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="radio">
+                                        <label>
+                                            @Html.RadioButton("RecurStartDateSetup", "StartNow", Model.Product.RecurStartDateSetup == "StartNow" || string.IsNullOrWhiteSpace(Model.Product.RecurStartDateSetup), new { @required = "required" }) Immediately
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            @Html.RadioButton("RecurStartDateSetup", "PreDefined", Model.Product.RecurStartDateSetup == "PreDefined", new { @required = "required" }) Defined Start Date
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            @Html.RadioButton("RecurStartDateSetup", "PromptUser", Model.Product.RecurStartDateSetup == "PromptUser", new { @required = "required" }) Booking Start Date
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="RecurStartDateSetup" data-cond-value="PreDefined" style="display: none;">
+                                <label class="col-md-3 col-sm-4 control-label">Defined Start Date</label>
+                                <div class="col-md-3 col-sm-4">
+                                    @Html.DropDownList("IntervalMonth", Model.IntervalMonths, "-- Select --", new { @class = "form-control", @required = "required" })
+                                </div>
+                                <div class="col-md-3 col-sm-4">
+                                    @Html.DropDownList("IntervalDay", Model.IntervalDays, "-- Select --", new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- /.panel -->
+                @* Download Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseDownload">
+                            <h4 class="panel-title">Download Setup</h4>
+                        </a>
+                    </div>
+                    <div id="collapseDownload" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Download URL (External)</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("DownloadUrl", Model.Product.DownloadUrl, new { @class = "form-control", @placeholder = "Download URL", @type = "url" })
+                                    If the downloadable file hosted on an external server enter the full download link
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Relative Path (Internal)</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("UrlGUID", Model.Product.UrlGUID, new { @class = "form-control", @placeholder = "Relative Path", @type = "text" })
+                                    If the downloadable file hosted on this portal enter the file relative path
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Download Limits</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="input-group">
+                                        @Html.TextBox("MaxDownloadAttempts", Model.Product.MaxDownloadAttempts, new { @class = "form-control", @placeholder = "Max Download Attempts", @type = "number", @step = "1", @required = "required" })
+                                        <span class="input-group-addon" style="min-width: 88px;">Attempts</span>
+                                    </div>
+                                    <div class="input-group">
+                                        @Html.TextBox("MaxDownloadDays", Model.Product.MaxDownloadDays, new { @class = "form-control", @placeholder = "Max Download Days", @type = "number", @step = "1", @required = "required" })
+                                        <span class="input-group-addon" style="min-width: 88px;">Days</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- /.panel -->
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    <a class="btn btn-default" href="@Url.Action("Index", "Product", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // CK-Editor Settings
+        CKEDITOR.config.language = 'en';
+        CKEDITOR.config.uiColor = '#222222';
+        CKEDITOR.config.toolbarCanCollapse = true;
+        CKEDITOR.config.height = 320;
+        CKEDITOR.config.allowedContent = true;
+        CKEDITOR.config.htmlEncodeOutput = true;
+        CKEDITOR.config.contentsCss = '@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/cke.contents.css?v=" + Model.ProductVersion)';
+        CKEDITOR.replace('Description');
+        CKEDITOR.replace('Description2');
+        CKEDITOR.replace('Description3');
+        CKEDITOR.replace('Description4');
+        CKEDITOR.replace('Description5');
+        // Init Date Picker
+        $('[data-provide="datetimepicker"]').each(function () {
+            $(this).datetimepicker({
+                format: $(this).data('provide-format'),
+                showTodayButton: true,
+                showClear: true,
+                showClose: true,
+                useCurrent: false
+            }).find('input[type="text"]').click(function () {
+                $(this).closest('[data-provide="datetimepicker"]').data("DateTimePicker").toggle();
+            });
+        });
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        @if (ViewContext.RouteData.Values["action"].ToString() == "Add")
+        {
+
+            <text>
+            // Check if Sku exists
+            $(document).on('submit', 'form', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("CheckSku", "Product", new { StoreID = Model.StoreID })',
+                    type: 'POST',
+                    data: { Sku: $('#ModelNumber').val() },
+                    success: function(response) {
+                        if (response.Exist) {
+                            if (confirm('This SKU already exist! Are you sure you want to create a new product with the same SKU?')) {
+                                e.target.submit();
+                            }
+                        }
+                        else {
+                            e.target.submit();
+                        }
+                    }
+                });
+            });
+            </text>
+        }
+    });
+</script>

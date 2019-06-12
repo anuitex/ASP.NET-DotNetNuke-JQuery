@@ -1,0 +1,439 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.ProductDetails.Models.DetailsModel>
+@using DotNetNuke.Web.Mvc.Helpers;
+
+<div class="row">
+    @if (Model.Product == null)
+    {
+        <div class="col-sm-12">
+            <div class="alert alert-danger">
+                <strong>@Dnn.LocalizeString("NoProduct")</strong>
+            </div>
+            <div class="col-xs-6 text-left">
+                <input type="button" value="@Dnn.LocalizeString("ContinueShopping")" class="btn btn-default" onclick="window.location.href='@Model.ProductListPage';" />
+            </div>
+            <div class="col-xs-6 text-right">
+                <input type="button" value="@Dnn.LocalizeString("ViewCart")" class="btn btn-default" onclick="window.location.href='@Model.CheckoutPage';" />
+            </div>
+        </div>
+    }
+    else
+    {
+        if (Model.Product.IsEligible)
+        {
+            <div itemscope itemtype="http://schema.org/Product" class="h-product hproduct">
+                <!-- This Hidden Div Is Only For SEO Purposes, Since Crawlers cannot execute Javascript -->
+                <div ng-hide="true">
+                    <meta itemprop="url" content="@Model.ProductShareUrl" />
+                    <a class="u-url url" href="@Model.ProductShareUrl" target="_self">
+                        <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+                            <meta itemprop="url" content="@Model.ProductImageShareUrl" />
+                            <img itemprop="image" class="u-photo photo" src="@Model.ProductImageShareUrl" title="@Model.Product.ImageTitle" alt="@Model.Product.ImageAlt" />
+                        </div>
+                        <h1 itemprop="name" class="p-name fn">
+                            @Model.Product.ModelName
+                        </h1>
+                        <h2 class="u-identifier identifier">
+                            <span class="type">sku</span>
+                            <span itemprop="sku" class="value">@Model.Product.ModelNumber</span>
+                        </h2>
+                        @if (Model.ShowReviews && Model.ProductReviews.Count > 0)
+                        {
+                            <div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+                                <span itemprop="ratingValue">@Model.ProductReviews.Average</span>
+                                <span itemprop="reviewCount">@Model.ProductReviews.Count</span>
+                            </div>
+                        }
+                            <div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                <span itemprop="priceCurrency" class="p-currency currency">@Model.ISOCurrencySymbol</span>
+                                <span itemprop="price" class="p-price price">@(Model.IsSaleEnabled && Model.Product.IsUnderSale ? (Model.Product.BundleSalePrice > 0 ? Model.Product.BundleSalePrice : Model.Product.SalePrice) : (Model.Product.BundleUnitCost > 0 ? Model.Product.BundleUnitCost : Model.Product.UnitCost))</span>
+                            </div>
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <div id="slider_container" style="position: relative; top: 0px; left: 0px; width: 800px; height: 706px; overflow: hidden;">
+                        <div u="loading" style="position: absolute; top: 0px; left: 0px;">
+                            <div style="filter: alpha(opacity=70); opacity:0.7; position: absolute; display: block; background-color: #000000; top: 0px; left: 0px; width: 100%; height:100%;"></div>
+                            <div style="position: absolute; display: block; background: url('@Href("~/DesktopModules/MVC/RazorCart/ProductDetails/Images/loading.gif")') no-repeat center center; top: 0px; left: 0px; width: 100%; height: 100%;"></div>
+                        </div>
+                        <div u="slides" data-container="zoom" style="cursor: move; position: absolute; left: 0px; top: 0px; width: 800px; height: 556px; overflow: hidden;">
+                            <div ng-if="details.productImages.length > 0" ng-repeat="image in details.productImages" id="zoompan_{{image.ID}}" ng-class="{'zoom': details.productImages.length > 0}">
+                                <img u="image" ng-src="{{image.LargeImage}}" ng-href="{{image.ZoomImage}}" ng-init="details.zoom(image.ID, image.ZoomImage)" alt="{{image.AltTag}}" title="{{image.Title}}" />
+                                <img u="thumb" ng-src="{{image.ThumbImage}}" alt="{{image.AltTag}}" title="{{image.Title}}" data-id="imageId_{{image.ID}}" />
+                            </div>
+                            <div ng-if="details.productImages.length < 1">
+                                <img u="image" ng-src="~/DesktopModules/MVC/RazorCart/ProductDetails/Images/blank.png" alt="Default Image" />
+                                <img u="thumb" ng-src="~/DesktopModules/MVC/RazorCart/ProductDetails/Images/blank_thumb.png" alt="Default Image" />
+                            </div>
+                        </div>
+                        <span u="arrowleft" class="jssora05l" style="width: 45px; height: 76px; top: 250px; left: 8px;">
+                        </span>
+                        <span u="arrowright" class="jssora05r" style="width: 45px; height: 76px; top: 250px; right: 8px">
+                        </span>
+                        <div ng-if="details.productImages.length > 1" u="thumbnavigator" class="jssort01" style="position: absolute; width: 800px; height: 150px; left: 0px; bottom: 0px;">
+                            <div u="slides" style="cursor: move;">
+                                <div u="prototype" class="p" style="position: absolute; width: 106px; height: 106px; top: 0; left: 0;">
+                                    <div class="w"><div u="thumbnailtemplate" style="width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0;"></div></div>
+                                    <div class="c"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                jssor_slider_start('slider_container');
+                            });
+                        </script>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h1>{{details.product.ModelName}}</h1>
+                    @if (Model.ShowReviews)
+                    {
+                        <table>
+                            <tr>
+                                <td>
+                                    <rating ng-model="details.productReviews.Average" max="5" size="1" readonly="true"></rating>
+                                </td>
+                                <td>
+                                    <div style="margin-bottom: 10px;">
+                                        ({{details.productReviews.Count}} @Dnn.LocalizeString("Reviews"))
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    }
+                    <h4>
+                        @Dnn.LocalizeString("SKU"): {{details.product.ModelNumber}}
+                    </h4>
+                    @if (Model.AllowPriceView)
+                    {
+                        <div>
+                            <h3 ng-class="{'rzc-sale': details.isSaleEnabled && details.product.IsUnderSale}">
+                                @Dnn.LocalizeString("Price"): {{(details.product.BundleUnitCost || details.product.UnitCost) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                            </h3>
+                            <h3 ng-if="details.isSaleEnabled && details.product.IsUnderSale">
+                                @Dnn.LocalizeString("Now"): {{(details.product.BundleSalePrice || details.product.SalePrice) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                            </h3>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Product.Summary))
+                    {
+                        <span itemprop="description" class="e-description description rzc_product_desc">@Html.Raw(Model.Product.Summary)</span>
+                    }
+                    @{
+                        Model.ProductShareTitle = Uri.EscapeDataString(Model.ProductShareTitle);
+                        Model.ProductShareUrl = Uri.EscapeDataString(Model.ProductShareUrl);
+                        Model.ProductImageShareUrl = Uri.EscapeDataString(Model.ProductImageShareUrl);
+                    }
+                    <div class="rzc-social-bar">
+                        <a class="rzc-facebook" href='@("https://www.facebook.com/sharer.php?u=" + Model.ProductShareUrl)' ng-click="details.navigateShareUrl($event)">
+                            <i class="fa fa-facebook"></i>
+                            <span data-bg></span>
+                        </a>
+                        <a class="rzc-twitter" href='@("https://twitter.com/intent/tweet?url=" + Model.ProductShareUrl + "&text=" + Model.ProductShareTitle)' ng-click="details.navigateShareUrl($event)">
+                            <i class="fa fa-twitter"></i>
+                            <span data-bg></span>
+                        </a>
+                        <a class="rzc-google-plus" href='@("https://plus.google.com/share?url=" + Model.ProductShareUrl)' ng-click="details.navigateShareUrl($event)">
+                            <i class="fa fa-google-plus"></i>
+                            <span data-bg></span>
+                        </a>
+                        <a class="rzc-linkedin" href='@("https://www.linkedin.com/shareArticle?url=" + Model.ProductShareUrl + "&title=" + Model.ProductShareTitle)' ng-click="details.navigateShareUrl($event)">
+                            <i class="fa fa-linkedin"></i>
+                            <span data-bg></span>
+                        </a>
+                        <a class="rzc-pinterest" href='@("https://pinterest.com/pin/create/bookmarklet/?url=" + Model.ProductShareUrl + "&description=" + Model.ProductShareTitle + "&media=" + Model.ProductImageShareUrl)' ng-click="details.navigateShareUrl($event)">
+                            <i class="fa fa-pinterest-p"></i>
+                            <span data-bg></span>
+                        </a>
+                        <a class="rzc-email" href='@("mailto:?subject=" + Model.ProductShareTitle + "&body=Product%3A%20" + Model.ProductShareTitle + "%0A" + Model.ProductShareUrl)'>
+                            <i class="fa fa-envelope"></i>
+                            <span data-bg></span>
+                        </a>
+                    </div>
+                    <hr />
+                    @if (Model.Product.IsEvent)
+                    {
+                        <div class="form-horizontal">
+                            <h4 class="">
+                                <strong>@Dnn.LocalizeString("EventDetails")</strong>
+                            </h4>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">@Dnn.LocalizeString("Start")</label>
+                                <div class="col-sm-10">
+                                    <label class="form-control" style="height: auto;" ng-init="details.inputs.EventStart = '@string.Format(Model.Culture, "{0:s}", Model.Event.Start)'">
+                                        @string.Format(Model.Culture, "{0:f}", Model.Event.Start)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">@Dnn.LocalizeString("End")</label>
+                                <div class="col-sm-10">
+                                    <label class="form-control" style="height: auto;" ng-init="details.inputs.EventEnd = '@string.Format(Model.Culture, "{0:s}", Model.Event.End)'">
+                                        @string.Format(Model.Culture, "{0:f}", Model.Event.End)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (Model.ShowStockoutMessage)
+                    {
+                        <div class="alert alert-warning" ng-if="details.productQuantity > details.product.QuantityOnHand">
+                            @Dnn.LocalizeString("AvailabilityMessage")
+                        </div>
+                    }
+                    @if (Model.Product.HasVariants)
+                    {
+                        <div class="form">
+                            @Html.Partial("_Variants")
+                        </div>
+                    }
+                    @if (Model.Product.Booking)
+                    {
+                        @Html.Partial("_Booking")
+                    }
+                    @if (!Model.HasVariantQty)
+                    {
+                        <div class="form">
+                            <div class="form-group">
+                                <label class="control-label">@Dnn.LocalizeString("Quantity")</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" step="1" min="1" max="999999" ng-model="details.productQuantity" ng-init="details.productQuantity = 1" name="productQuantity" required />
+                                    <span class="input-group-addon">{{details.product.PriceUnits}}<i class="fa fa-cart-plus" ng-if="!details.product.PriceUnits"></i></span>
+                                </div>
+                                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).productQuantity.$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).productQuantity.$dirty">
+                                    <div class="form-control-required" ng-message="required">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldRequired")
+                                    </div>
+                                    <div class="form-control-required" ng-message="number">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldNumeric")
+                                    </div>
+                                    <div class="form-control-required" ng-message="min">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldMinValue")
+                                    </div>
+                                    <div class="form-control-required" ng-message="max">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldMaxValue")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (Model.Product.UserEnteredAmount)
+                    {
+                        <div class="form">
+                            <div class="form-group">
+                                <label class="control-label">@Dnn.LocalizeString("Price")</label>
+                                <div class="input-group">
+                                    @{
+                                        double stepValue = Math.Pow(10, Model.Culture.NumberFormat.CurrencyDecimalDigits * -1);
+                                        double minValue = Model.ProductII == null || Model.ProductII.MinPartialAmount == -1 ? stepValue : (double)Model.ProductII.MinPartialAmount;
+                                    }
+                                    <input type="number" class="form-control" step="@(stepValue)" min="@(minValue)" ng-model="details.productPrice" name="productPrice" ng-init="details.productPrice = (details.isSaleEnabled && details.product.IsUnderSale ? (details.product.BundleSalePrice || details.product.SalePrice) : (details.product.BundleUnitCost || details.product.UnitCost)) || null" ng-change="details.userEnteredAmountChange('productPrice')" ng-model-options="{updateOn: 'blur'}" required />
+                                    <span class="input-group-addon"><i class="fa fa-money"></i></span>
+                                </div>
+                                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).productPrice.$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).productPrice.$dirty">
+                                    <div class="form-control-required" ng-message="required">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldRequired")
+                                    </div>
+                                    <div class="form-control-required" ng-message="number">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldNumeric")
+                                    </div>
+                                    <div class="form-control-required" ng-message="min">
+                                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldInteger")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <hr />
+                    <div class="row panel-group">
+                        <div class="col-xs-12" ng-if="details.product.OrderHistory.length">
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i> @Dnn.LocalizeString("LastPurchasedOn") {{details.product.OrderHistory[0].OrderDate | date : '@Model.Culture.DateTimeFormat.ShortDatePattern'}}
+                            </div>
+                        </div>
+                        <div class="col-xxs-12">
+                            @if (Model.AllowAddToCart)
+                            {
+                                <button type="button" class="btn btn-primary" ng-click="details.submitted = true; rzcForm_@(Dnn.ModuleContext.ModuleId).$valid && details.addToCart()" ng-if="details.product.QuantityOnHand > 0 || !details.manageInventory || rzcForm_@(Dnn.ModuleContext.ModuleId).$invalid" focus-invalid
+                                        uib-popover="@(Model.AddToCartTooltip)" popover-enable="@((!string.IsNullOrEmpty(Model.AddToCartTooltip)).ToString().ToLower())" popover-trigger="'mouseenter'" popover-placement="bottom">
+                                    @Dnn.LocalizeString("AddToCart")
+                                </button>
+                            }
+                            @if (Model.AllowQuantityView)
+                            {
+                                <button type="button" class="btn btn-danger disabled" ng-if="details.product.QuantityOnHand < 1 && details.manageInventory && rzcForm_@(Dnn.ModuleContext.ModuleId).$valid">
+                                    @Dnn.LocalizeString("SoldOut")
+                                </button>
+                            }
+                            @if (Model.EnableWishlist)
+                            {
+                                <button type="button" class="btn btn-default" value="@Dnn.LocalizeString("AddToWishlist")" ng-click="details.submitted = true; rzcForm_@(Dnn.ModuleContext.ModuleId).$valid && details.addToWishlist()" focus-invalid>
+                                    <i class="fa fa-heart"></i>
+                                </button>
+                            }
+                            @if (Model.EnableComparison)
+                            {
+                                <button type="button" class="btn btn-default" value="@Dnn.LocalizeString("AddToComparison")" ng-click="details.submitted = true; rzcForm_@(Dnn.ModuleContext.ModuleId).$valid && details.addToComparison()" focus-invalid>
+                                    <i class="fa fa-signal"></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12" ng-if="details.isGiftCardsEnabled && details.product.GiftCard">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-horizontal">
+                                <h4 class="">
+                                    <strong>Personal Greeting</strong>
+                                </h4>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Name</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Email</label>
+                                    <div class="col-sm-10">
+                                        <input type="email" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Subject</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Message</label>
+                                    <div class="col-sm-10">
+                                        <textarea class="form-control"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-6"></label>
+                                    <div class="col-sm-6 text-right">
+                                        <input type="button" value="Preview Gift Card" class="btn btn-default" onclick="" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row panel-group">
+                    <div class="col-lg-12 panel-group">
+                        <div class="col-xxs-6 text-left">
+                            <input type="button" value="@Dnn.LocalizeString("ContinueShopping")" class="btn btn-default" onclick="window.location.href='@Model.ProductListPage';" />
+                        </div>
+                        <div class="col-xxs-6 text-right">
+                            <input type="button" value="@Dnn.LocalizeString("ViewCart")" class="btn btn-default" onclick="window.location.href='@Model.CheckoutPage';" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <ul class="nav nav-tabs">
+                        @if (!Model.Product.TabName1.IsEmpty())
+                        {
+                            <li class="active"><a data-toggle="tab" href="#detailTab1">@Model.Product.TabName1</a></li>
+                        }
+                        @if (!Model.Product.TabName2.IsEmpty())
+                        {
+                            <li><a data-toggle="tab" href="#detailTab2">@Model.Product.TabName2</a></li>
+                        }
+                        @if (!Model.Product.TabName3.IsEmpty())
+                        {
+                            <li><a data-toggle="tab" href="#detailTab3">@Model.Product.TabName3</a></li>
+                        }
+                        @if (!Model.Product.TabName4.IsEmpty())
+                        {
+                            <li><a data-toggle="tab" href="#detailTab4">@Model.Product.TabName4</a></li>
+                        }
+                        @if (!Model.Product.TabName5.IsEmpty())
+                        {
+                            <li><a data-toggle="tab" href="#detailTab5">@Model.Product.TabName5</a></li>
+                        }
+                        @if (Model.ShowReviews)
+                        {
+                            <li><a data-toggle="tab" href="#detailTabRate">@Dnn.LocalizeString("Reviews")</a></li>
+                        }
+                    </ul>
+                    <div class="tab-content">
+                        @if (!Model.Product.TabName1.IsEmpty())
+                        {
+                            <div id="detailTab1" class="tab-pane fade in active">
+                                <div class="panel panel-default">
+                                    <div itemprop="description" class="e-description description panel-body">
+                                        @Html.Raw(Model.Product.Description)
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (!Model.Product.TabName2.IsEmpty())
+                        {
+                            <div id="detailTab2" class="tab-pane fade in">
+                                <div class="panel panel-default">
+                                    <div itemprop="description" class="e-description description panel-body">
+                                        @Html.Raw(Model.Product.Description2)
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (!Model.Product.TabName3.IsEmpty())
+                        {
+                            <div id="detailTab3" class="tab-pane fade in">
+                                <div class="panel panel-default">
+                                    <div itemprop="description" class="e-description description panel-body">
+                                        @Html.Raw(Model.Product.Description3)
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (!Model.Product.TabName4.IsEmpty())
+                        {
+                            <div id="detailTab4" class="tab-pane fade in">
+                                <div class="panel panel-default">
+                                    <div itemprop="description" class="e-description description panel-body">
+                                        @Html.Raw(Model.Product.Description4)
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (!Model.Product.TabName5.IsEmpty())
+                        {
+                            <div id="detailTab5" class="tab-pane fade in">
+                                <div class="panel panel-default">
+                                    <div itemprop="description" class="e-description description panel-body">
+                                        @Html.Raw(Model.Product.Description5)
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.ShowReviews)
+                        {
+                            <div id="detailTabRate" class="tab-pane fade in">
+                                <div class="panel panel-default">
+                                    @Html.Partial("_Reviews")
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-sm-12">
+                <div class="alert alert-danger">
+                    <strong>@Dnn.LocalizeString("NotEligible")</strong>
+                </div>
+                <div class="col-xs-6 text-left">
+                    <input type="button" value="@Dnn.LocalizeString("ContinueShopping")" class="btn btn-default" onclick="window.location.href='@Model.ProductListPage';" />
+                </div>
+                <div class="col-xs-6 text-right">
+                    <input type="button" value="@Dnn.LocalizeString("ViewCart")" class="btn btn-default" onclick="window.location.href='@Model.CheckoutPage';" />
+                </div>
+            </div>
+        }
+    }
+</div>

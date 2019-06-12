@@ -1,0 +1,188 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+@using System.Globalization;
+
+<!-- Select2 CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2-bootstrap.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Select2 JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/select2.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Category.CategoryID > 0)
+        {
+            <h1 class="page-header">Category: @Model.Category.CategoryName</h1>
+        }
+        else
+        {
+            <h1 class="page-header">Manage Categories</h1>
+        }
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, CategoryID = Model.Category.CategoryID })" autocomplete="off">
+            @if (Model.Category.CategoryID > 0)
+            {
+                @Html.Partial("_CategoryMenu")
+            }
+            @if (Model.Submitted)
+            {
+                <div class="alert alert-success alert-dismissable">
+                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                    @Model.SaveMessage
+                </div>
+            }
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Category Name</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("CategoryName", Model.Category.CategoryName, new { @class = "form-control", @placeholder = "Category Name", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Parent Category</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("ParentID", Model.ParentCategoryList, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    @if (ViewContext.RouteData.Values["action"].ToString() == "AddCategory")
+                    {
+                        <div class="form-group" data-show="conditional" data-cond-option="ParentID" data-cond-value="0">
+                            <label class="col-md-3 col-sm-4 control-label"></label>
+                            <div class="col-md-6 col-sm-8">
+                                @Html.ListBox("ParentCategories", Enumerable.Empty<SelectListItem>(), new { @class = "form-control" })
+                            </div>
+                        </div>
+                    }
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Minimum Order Quantity</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("MinOrderQty", Model.Category.MinOrderQty, new { @class = "form-control", @placeholder = "Minimum Order Quantity", @type = "number", @step = "1", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Minimum Order Amount</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("MinOrderAmount", Model.Category.MinOrderAmount.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Minimum Order Amount", @type = "number", @step = "0.01", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Description</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextArea("CatDescription", Model.Category.CatDescription, new { @class = "form-control", @placeholder = "Description" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">SEO URL</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("CatSEOURL", Model.Category.CatSEOURL, new { @class = "form-control", @placeholder = "SEO URL" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">H2 Tag</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("H2Tag", Model.Category.H2Tag, new { @class = "form-control", @placeholder = "H2 Tag" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Alt Tag</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("AltTag", Model.Category.AltTag, new { @class = "form-control", @placeholder = "Alt Tag" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Meta Description</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("MetaDescription", Model.Category.MetaDescription, new { @class = "form-control", @placeholder = "Meta Description" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Featured</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("Featured", Model.Category.Featured, new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Share</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("Share", Model.Category.Share, new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    <a class="btn btn-default" href="@Url.Action("Category", "Product", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#ParentCategories').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            placeholder: 'Select parent category(ies)',
+            ajax: {
+                type: 'POST',
+                url: '@Url.Action("ListCategories", "Product", new { StoreID = Model.StoreID })',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        'categoryID': @Model.Category.CategoryID,
+                        'search[value]': params.term,
+                        'length': 25,
+                        'start': 0
+                    };
+                },
+                processResults: function (data, params) {
+                    var selected = this.$element.val().map(Number);
+                    return {
+                        results: $.map(data.data, function (item) {
+                            if ($.inArray(item.CategoryID, selected) === -1) {
+                                return {
+                                    id: item.CategoryID,
+                                    text: item.CategoryName
+                                };
+                            }
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2,
+        });
+        setTimeout(function() {
+            // Init Conditionize Form
+            $('[data-show="conditional"]').conditionize();
+        });
+    });
+</script>

@@ -1,0 +1,198 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<!-- CKEditor JavaScript -->
+<script type="text/javascript">window.CKEDITOR_BASEPATH = '@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/CKEditor/")';</script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/ckeditor.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })" autocomplete="off">
+            @Html.Partial("_ProductMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            @if (Model.Submitted)
+                            {
+                                <div class="alert alert-success alert-dismissable">
+                                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                    @Model.SaveMessage
+                                </div>
+                            }
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Product Localization</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Language</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("LanguageLocale", Model.PortalLocales, new { @class = "form-control", @onchange = "changeCurrentLocale(this.value);" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Product Name</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ModelName", Model.ProductLocalization.ModelName, new { @class = "form-control", @placeholder = "Product Name", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Summary</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextArea("Summary", Model.ProductLocalization.Summary, new { @class = "form-control", @placeholder = "Summary" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <ul class="nav nav-tabs">
+                                                <li class="active"><a data-toggle="tab" href="#description1">Description 1</a></li>
+                                                <li><a data-toggle="tab" href="#description2">Description 2</a></li>
+                                                <li><a data-toggle="tab" href="#description3">Description 3</a></li>
+                                                <li><a data-toggle="tab" href="#description4">Description 4</a></li>
+                                                <li><a data-toggle="tab" href="#description5">Description 5</a></li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="description1">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 col-sm-4 control-label">Tab Name</label>
+                                                                <div class="col-md-6 col-sm-8">
+                                                                    @Html.TextBox("TabName1", Model.ProductLocalization.TabName1, new { @class = "form-control", @placeholder = "Tab Name" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="col-md-12">
+                                                                    @Html.TextArea("Description", Model.ProductLocalization.Description, new { @class = "form-control" })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane" id="description2">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 col-sm-4 control-label">Tab Name</label>
+                                                                <div class="col-md-6 col-sm-8">
+                                                                    @Html.TextBox("TabName2", Model.ProductLocalization.TabName2, new { @class = "form-control", @placeholder = "Tab Name" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="col-md-12">
+                                                                    @Html.TextArea("Description2", Model.ProductLocalization.Description2, new { @class = "form-control" })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane" id="description3">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 col-sm-4 control-label">Tab Name</label>
+                                                                <div class="col-md-6 col-sm-8">
+                                                                    @Html.TextBox("TabName3", Model.ProductLocalization.TabName3, new { @class = "form-control", @placeholder = "Tab Name" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="col-md-12">
+                                                                    @Html.TextArea("Description3", Model.ProductLocalization.Description3, new { @class = "form-control" })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane" id="description4">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 col-sm-4 control-label">Tab Name</label>
+                                                                <div class="col-md-6 col-sm-8">
+                                                                    @Html.TextBox("TabName4", Model.ProductLocalization.TabName4, new { @class = "form-control", @placeholder = "Tab Name" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="col-md-12">
+                                                                    @Html.TextArea("Description4", Model.ProductLocalization.Description4, new { @class = "form-control" })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane" id="description5">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 col-sm-4 control-label">Tab Name</label>
+                                                                <div class="col-md-6 col-sm-8">
+                                                                    @Html.TextBox("TabName5", Model.ProductLocalization.TabName5, new { @class = "form-control", @placeholder = "Tab Name" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="col-md-12">
+                                                                    @Html.TextArea("Description5", Model.ProductLocalization.Description5, new { @class = "form-control" })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("Index", "Product", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    CKEDITOR.config.language = 'en';
+    CKEDITOR.config.uiColor = '#222222';
+    CKEDITOR.config.toolbarCanCollapse = true;
+    CKEDITOR.config.height = 320;
+    CKEDITOR.config.allowedContent = true;
+    CKEDITOR.config.htmlEncodeOutput = true;
+    CKEDITOR.config.contentsCss = '@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/cke.contents.css?v=" + Model.ProductVersion)';
+    CKEDITOR.replace('Description');
+    CKEDITOR.replace('Description2');
+    CKEDITOR.replace('Description3');
+    CKEDITOR.replace('Description4');
+    CKEDITOR.replace('Description5');
+    function changeCurrentLocale(cultureCode) {
+        var kvp = document.location.search.substr(1).split('&');
+        kvp = kvp.filter(function (v) { return v });
+        var x, i = kvp.length;
+        while (i--) {
+            x = kvp[i].split('=');
+            if (x[0] == 'Locale') {
+                x[1] = cultureCode;
+                kvp[i] = x.join('=');
+                break;
+            }
+        }
+        if (i < 0)
+            kvp[kvp.length] = ['Locale', cultureCode].join('=');
+        document.location.search = kvp.join('&');
+    }
+</script>

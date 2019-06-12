@@ -1,0 +1,200 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Manage Categories</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Category", "Product", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="btn-group pull-right">
+                        <a class="btn btn-primary" href="@Url.Action("AddCategory", "Product", new { StoreID = Model.StoreID })">
+                            <i class="fa fa-plus"></i> Add Category
+                        </a>
+                        <a class="btn btn-success" href="#" data-toggle="modal" data-target="#categoryModal1" data-backdrop="static" data-keyboard="true">
+                            <i class="fa fa-download"></i> Import
+                        </a>
+                        <button type="submit" class="btn btn-warning" onclick="this.form.action='@Url.Action("Export", "Product", new { StoreID = Model.StoreID })'">
+                            @Html.Hidden("ExportType", "Categories")
+                            <i class="fa fa-upload"></i> Export
+                        </button>
+                    </div>
+                    <h4>Categories</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <table class="table table-hover" id="tblCategories" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Sort</th>
+                                <th>Category Name</th>
+                                <th>Description</th>
+                                <th>Parent Category(s)</th>
+                                <th>SEO URL</th>
+                                <th>Products</th>
+                                <th>Share</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<div class="modal fade" id="categoryModal1" role="dialog" tabindex="-1" aria-labelledby="categoryModalLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" enctype="multipart/form-data" action="@Url.Action("Import", "Product", new { StoreID = Model.StoreID })">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="categoryModalLabel1">Import Categories</h4>
+                </div>
+                <div class="modal-body">
+                    @Html.Hidden("ImportType", "Categories")
+                    <div class="form-group">
+                        <label for="ImportSheet">CSV File</label>
+                        <div class="input-group">
+                            <label class="input-group-btn">
+                                <span class="btn btn-primary">
+                                    Browse&hellip; @Html.TextBox("ImportSheet", string.Empty, new { @type = "file", @style = "opacity: 0; width: 1px; height: 1px", @required = "required" })
+                                </span>
+                            </label>
+                            @Html.TextBox("ImportSheet_FileName", string.Empty, new { @class = "form-control", @placeholder = "Select CSV file to upload", @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-download"></i> Import</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.modal -->
+<script type="text/javascript">
+    //Prevent table row from being collapsed when sorting
+    var fixHelperModified = function (e, tr) {
+        var $originals = tr.children();
+        var $helper = tr.clone();
+        $helper.children().each(function (index) {
+            $(this).width($originals.eq(index).width())
+        });
+        return $helper;
+    }
+    //Update Sort Order values
+    function renumber_table(tableID, sortType) {
+        var sortData = new FormData();
+        $(tableID + ' tbody tr').each(function () {
+            count = $(this).parent().children().index($(this)) + 1;
+            var hndID = $(this).find('[type=hidden][name=tableSortId]');
+            var hndSort = $(this).find('[type=hidden][name=tableSortOrder]');
+            var sortBadge = $(this).find('span.badge');
+            hndSort.val(count);
+            sortBadge.html(count);
+            sortData.append(hndID.val(), hndSort.val());
+        }).promise().done(function () {
+            $.ajax({
+                url: '@Url.Action("Sort", "Product", new { StoreID = Model.StoreID })' + '?SortType=' + sortType,
+                type: 'POST',
+                data: sortData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (data, result) {
+                    console.log(data);
+                },
+                error: function (error) {
+                    console.log(error.status + ' ' + error.statusText);
+                }
+            });
+        });
+    }
+    $(document).ready(function () {
+        $('#tblCategories').DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: '',
+            },
+            lengthMenu: [[10, 25, 50, 100, 500], [10, 25, 50, 100, 500]],
+            columns: [
+                { data: 'CategoryID', orderable: false },
+                {
+                    data: 'SortOrder', render: function (data, type, full, meta) {
+                        if (type == 'display') {
+                            return '<span class="glyphicon glyphicon-sort"></span>' +
+                                '<span class="text-muted badge">' + data + '</span>' +
+                                '<input type="hidden" name="tableSortId" value="' + full.CategoryID + '" disabled />' +
+                                '<input type="hidden" name="tableSortOrder" value="' + data + '" disabled />';
+                        }
+                        return data;
+                    }, orderable: true
+                },
+                { data: 'CategoryName', orderable: true },
+                { data: 'CatDescription', orderable: true },
+                {
+                    data: 'ParentID', render: function (data, type, full, meta) {
+                        if (type == 'display') {
+                            return full.ParentName;
+                        }
+                        return data;
+                    }, orderable: true
+                },
+                { data: 'CatSEOURL', orderable: true },
+                { data: 'ProductCount', orderable: false },
+                {
+                    data: 'Share', render: function (data, type, full, meta) {
+                        return '<i class="fa fa-' + (data ? 'check-circle' : 'circle-thin') + ' fa-lg" aria-hidden="true"></i>';
+                    }, orderable: false
+                },
+                {
+                    data: 'CategoryID', render: function (data, type, full, meta) {
+                        var editUrl = '@Url.Action("EditCategory", "Product", new { StoreID = Model.StoreID })' + '?CategoryID=' + data;
+                        var deleteUrl = '@Url.Action("DeleteCategory", "Product", new { StoreID = Model.StoreID })' + '?CategoryID=' + data;
+                        return '<a href="' + editUrl + '"><i class="fa fa-pencil-square-o fa-lg"></i></a>' + '\n'
+                            + '<a href="' + deleteUrl + '" onclick="return confirm(\'Are you sure?\')"><i class="fa fa-trash-o fa-lg"></i></a>';
+                    }, className: 'text-right', orderable: false
+                }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            order: [[1, 'asc']],
+            ajax: {
+                url: '@Url.Action("ListCategories", "Product", new { StoreID = Model.StoreID })',
+                type: 'POST'
+            }
+        }).on('init.dt', function () {
+            //jQuery UI Sortable: (https://jqueryui.com/sortable/)
+            $('#tblCategories tbody').sortable({
+                handle: 'span.glyphicon-sort, span.badge',
+                helper: fixHelperModified,
+                stop: function (event, ui) { renumber_table('#tblCategories', 'Category') }
+            });
+        }).on('draw.dt', function () {
+            if ($('#tblCategories tbody').hasClass('ui-sortable'))
+                $('#tblCategories tbody').sortable('refresh');
+        });
+    });
+</script>

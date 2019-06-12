@@ -1,0 +1,437 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.GiftCardModel>
+@using System.Web.Mvc.Html;
+@using System.Globalization;
+@using System.Data.SqlTypes;
+
+<!-- Bootstrap DateTimePicker CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/bootstrap-datetimepicker.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Select2 CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2-bootstrap.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Moment JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/moment.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Bootstrap DateTimePicker JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/bootstrap-datetimepicker.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Select2 JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/select2.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<style>
+    .select2-hidden-accessible {
+        height: 100% !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Gift Card Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @Html.Partial("_GiftCardMenu")
+        <div class="tab-content">
+            <div class="tab-pane active">
+                <div class="container-fluid">
+                    <div class="row">
+                        @if (Model.Submitted)
+                        {
+                            <div class="alert alert-success alert-dismissable">
+                                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                @Model.SaveMessage
+                            </div>
+                        }
+                        else if (Model.Errored)
+                        {
+                            <div class="alert alert-danger alert-dismissable">
+                                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                @Model.ErrorMessage
+                            </div>
+                        }
+                        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "GiftCard", new { StoreID = Model.StoreID, GiftCardID = Model.GiftCard.GiftCardID })" autocomplete="off">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Active</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("Active", Model.GiftCard.Active, new { @class = "styled", @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Customer (Sender)</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("SenderCustomerID", Model.SenderCustomerList, string.Empty, new { })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Order #</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("OrderID", Model.OrderList, string.Empty, new { })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="OrderID" data-cond-operator="!=" data-cond-value="" data-cond-destroy="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Order Product</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("OrderDetailID", Model.OrderDetailsList, new { @required = "required" })
+                                            @Html.Hidden("ProductID", Model.GiftCard.ProductID, new { id = "hdnProductID" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="OrderID" data-cond-operator="==" data-cond-value="" data-cond-destroy="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Product</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("ProductID", Model.ProductList, new { id = "ddlProductID" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Product</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ProductName", Model.GiftCard.ProductName, new { @class = "form-control", @placeholder = "Product", @maxlength = "200", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Amount</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("Amount", Model.GiftCard.Amount > 0 ? Model.GiftCard.Amount.ToString("0.##", CultureInfo.InvariantCulture) : "", new { @class = "form-control", @placeholder = "Amount", @type = "number", @step = "0.01", @min = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Used Amount</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("UsedAmount", Model.GiftCard.UsedAmount > 0 ? Model.GiftCard.UsedAmount.ToString("0.##", CultureInfo.InvariantCulture) : "", new { @class = "form-control", @placeholder = "Used Amount", @type = "number", @step = "0.01", @min = "0.00" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Type</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("Type", Model.GiftCardTypes, "-- Select --", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Code</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="input-group">
+                                                @Html.TextBox("FormattedCode", Model.GiftCard.FormattedCode, new { @class = "form-control", @placeholder = "Code", @maxlength = "50", @required = "required" })
+                                                <div class="input-group-addon checkbox" style="min-width: 148px;">
+                                                    <label>
+                                                        @Html.CheckBox("AutoGenerateCode", new { @onchange = "checkBoxChange(this);" }) Auto Generate
+                                                        <span class="rc-control">
+                                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Subject</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("Subject", Model.GiftCard.Subject, new { @class = "form-control", @placeholder = "Subject", @maxlength = "200", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Message</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextArea("Message", Model.GiftCard.Message, new { @class = "form-control", @placeholder = "Message", @maxlength = "1000", @rows = "4", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Customer (Receiver)</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("ReceiverCustomerID", Model.ReceiverCustomerList, string.Empty, new { })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Receiver Name</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ReceiverName", Model.GiftCard.ReceiverName, new { @class = "form-control", @placeholder = "Receiver Name", @maxlength = "100", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Receiver Email</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ReceiverEmail", Model.GiftCard.ReceiverEmail, new { @class = "form-control", @placeholder = "Receiver Email", @maxlength = "100", @type = "email", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Receiver Phone</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ReceiverPhone", Model.GiftCard.ReceiverPhone, new { @class = "form-control", @placeholder = "Receiver Phone", @maxlength = "50" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Expiry Date</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="input-group date" data-provide="datetimepicker">
+                                                @Html.TextBox("ExpiryDate", Model.GiftCard.ExpiryDate > SqlDateTime.MinValue.Value ? Model.GiftCard.ExpiryDate.ToString(Model.ShortDateFormat) : string.Empty,
+                                                        new { @class = "form-control", @placeholder = "Expiry Date" })
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("Code", "GiftCard", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- /.form -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        // Init Date Picker
+        $('[data-provide="datetimepicker"]').each(function () {
+            $(this).datetimepicker({
+                format: '@Model.ShortDateFormat.ToUpper()',
+                useCurrent: false
+            }).on('dp.change', function (e) {
+                if ($(this).data('min-date'))
+                    $($(this).data('min-date')).closest('[data-provide="datetimepicker"]').data('DateTimePicker').maxDate(e.date);
+                if ($(this).data('max-date'))
+                    $($(this).data('max-date')).closest('[data-provide="datetimepicker"]').data('DateTimePicker').minDate(e.date);
+            }).find('input[type="text"]').click(function () {
+                $(this).closest('[data-provide="datetimepicker"]').data("DateTimePicker").toggle();
+            });
+        });
+        // Init Auto Generate Code
+        $('#AutoGenerateCode').click(function () {
+            $('#FormattedCode').prop('disabled', $(this).is(':checked'));
+        });
+        // Init Select-2
+        $('#SenderCustomerID').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            allowClear: true,
+            placeholder: 'Select customer',
+            ajax: {
+                type: 'POST',
+                url: '@Url.Action("List", "Customer", new { StoreID = Model.StoreID })',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        'search[value]': params.term,
+                        'length': 10,
+                        'start': 0
+                    };
+                },
+                processResults: function (data, params) {
+                    var selected = Number(this.$element.val());
+                    return {
+                        results: $.map(data.data, function (customer) {
+                            if ($.inArray(customer.CustomerID, selected) === -1) {
+                                return {
+                                    id: customer.CustomerID,
+                                    text: customer.FirstName + ' ' + customer.LastName
+                                };
+                            }
+                        })
+                    };
+                },
+                cache: true
+            },
+            //minimumInputLength: 1,
+        }).on('select2:unselect', function (e) {
+            $('#OrderID').val('').trigger('change').trigger({ type: 'select2:unselect' });
+        });
+        $('#OrderID').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            allowClear: true,
+            placeholder: 'Select order',
+            ajax: {
+                type: 'POST',
+                url: '@Url.Action("List", "Order", new { StoreID = Model.StoreID })',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var term = (params.term || '').trim().replace(/#/g, '');
+                    if (term == parseInt(term, 10))
+                        term = '#' + term;
+                    return {
+                        'search[value]': term,
+                        'customerId[value]': $('#SenderCustomerID').val(),
+                        'detailVariants[get]': true,
+                        'length': 10,
+                        'start': 0
+                    };
+                },
+                processResults: function (data, params) {
+                    var selected = Number(this.$element.val());
+                    return {
+                        results: $.map(data.data, function (order) {
+                            if ($.inArray(order.OrderID, selected) === -1) {
+                                return {
+                                    id: order.OrderID,
+                                    text: '#' + order.OrderID.toString() + ' - ' + order.ShipFirstName + ' ' + order.ShipLastName + ' - ' + order.OrderDate,
+                                    customerId: order.CustomerID,
+                                    customerName: order.ShipFirstName + ' ' + order.ShipLastName,
+                                    orderDetails: order.OrderDetails
+                                };
+                            }
+                        })
+                    };
+                },
+                cache: true
+            },
+            //minimumInputLength: 1,
+        }).on('select2:select', function (e) {
+            var data = $(e.target).select2('data')[0];
+            if (!$('#SenderCustomerID').val()) {
+                $('#SenderCustomerID').empty();
+                var option = new Option(data.customerName, data.customerId, false, false);
+                $('#SenderCustomerID').append(option);
+                $('#SenderCustomerID').val(data.customerId).trigger('change');
+            }
+            $('#OrderDetailID').empty();
+            data.orderDetails.forEach(function (od, i, orderDetails) {
+                var text = od.ProductName + (od.DetailVariants.length ? ' => ' + od.DetailVariants.map(function (v) { return v.VariantHasText ? (v.VariantName + ': ' + v.VariantText) : (v.VariantGroup + ': ' + v.VariantName); }).join(', ') : '');
+                var option = new Option(text, od.OrderDetailID, false, false);
+                $(option).data('orderDetail', od);
+                $('#OrderDetailID').append(option);
+            });
+            $('#OrderDetailID').val('').trigger('change');
+        }).on('select2:unselect', function (e) {
+            var orderDetails = $(e.target).select2('data')[0].orderDetails;
+            $('#OrderDetailID').empty();
+            $('#hdnProductID').val(null);
+            $('#ddlProductID').empty().trigger({ type: 'select2:unselect' });
+        });
+        $('#OrderDetailID').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            allowClear: true,
+            placeholder: 'Select order product'
+        }).on('select2:select', function (e) {
+            var element = $(e.target).select2('data')[0].element;
+            var od = $(element).data('orderDetail');
+            $('#Amount').val(od.UnitCost);
+            $('#hdnProductID').val(null);
+            $('#ddlProductID').empty();
+            var text = od.ProductName + (od.DetailVariants.length ? ' => ' + od.DetailVariants.map(function (v) { return v.VariantHasText ? (v.VariantName + ': ' + v.VariantText) : (v.VariantGroup + ': ' + v.VariantName); }).join(', ') : '');
+            var option = new Option(text, od.ProductID, false, false);
+            $(option).data('unitCost', od.UnitCost);
+            $('#hdnProductID').val(od.ProductID);
+            $('#ddlProductID').append(option).val(od.ProductID).trigger('change').trigger({ type: 'select2:select' });
+        }).on('select2:unselect', function (e) {
+            var element = $(e.target).select2('data')[0].element;
+            var od = $(element).data('orderDetail');
+            $('#hdnProductID').val(null);
+            $('#ddlProductID').empty().trigger({ type: 'select2:unselect' });
+        });
+        $('#ddlProductID').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            allowClear: true,
+            placeholder: 'Select product',
+            ajax: {
+                type: 'POST',
+                url: '@Url.Action("List", "Product", new { StoreID = Model.StoreID })',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        'search[value]': params.term,
+                        'length': 10,
+                        'start': 0
+                    };
+                },
+                processResults: function (data, params) {
+                    var selected = Number(this.$element.val());
+                    return {
+                        results: $.map(data.data, function (item) {
+                            if ($.inArray(item.ProductID, selected) === -1) {
+                                return {
+                                    id: item.ProductID,
+                                    text: item.ModelName,
+                                    unitCost: item.UnitCost
+                                };
+                            }
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2,
+        }).on('select2:select', function (e) {
+            var element = $(e.target).select2('data')[0].element;
+            var productName = $(e.target).select2('data')[0].text;
+            var unitCost = $(e.target).select2('data')[0].unitCost || $(element).data('unitCost');
+            $('#ProductName').val(productName);
+            $('#Amount').val(unitCost);
+        }).on('select2:unselect', function (e) {
+            //$('#ProductName').val('');
+            //$('#Amount').val('');
+        });
+        $('#ReceiverCustomerID').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            allowClear: true,
+            placeholder: 'Select customer',
+            ajax: {
+                type: 'POST',
+                url: '@Url.Action("List", "Customer", new { StoreID = Model.StoreID })',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        'search[value]': params.term,
+                        'length': 10,
+                        'start': 0
+                    };
+                },
+                processResults: function (data, params) {
+                    var selected = Number(this.$element.val());
+                    return {
+                        results: $.map(data.data, function (customer) {
+                            if ($.inArray(customer.CustomerID, selected) === -1) {
+                                return {
+                                    id: customer.CustomerID,
+                                    text: customer.FirstName + ' ' + customer.LastName,
+                                    email: customer.Email,
+                                    phone: customer.Phone
+                                };
+                            }
+                        })
+                    };
+                },
+                cache: true
+            },
+            //minimumInputLength: 1,
+        }).on('select2:select', function (e) {
+            var name = $(e.target).select2('data')[0].text;
+            var email = $(e.target).select2('data')[0].email;
+            var phone = $(e.target).select2('data')[0].phone;
+            $('#ReceiverName').val(name);
+            $('#ReceiverEmail').val(email);
+            $('#ReceiverPhone').val(phone);
+        });
+        
+    });
+</script>

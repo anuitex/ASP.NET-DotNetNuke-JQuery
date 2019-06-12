@@ -1,0 +1,108 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<!-- Select2 CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2-bootstrap.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Select2 JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/select2.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, InventoryID = Model.ProductInventory.VariantInventoryID })" autocomplete="off">
+            @Html.Partial("_ProductMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            @if (Model.Submitted)
+                            {
+                                <div class="alert alert-success alert-dismissable">
+                                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                    @Model.SaveMessage
+                                </div>
+                            }
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Product Variants</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.ListBox("InventoryVariants", Model.InventoryVariantList, new { @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Variant SKU</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("Sku", Model.ProductInventory.Sku, new { @class = "form-control", @placeholder = "Variant SKU", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Quantity On Hand</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("QtyOnHand", Model.ProductInventory.QtyOnHand, new { @class = "form-control", @placeholder = "Quantity On Hand", @type = "number", @step = "1", @required = "required" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("Inventory", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#InventoryVariants').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            placeholder: 'Select product variants',
+            ajax: {
+                type: 'POST',
+                url: '@Url.Action("ListVariants", "Product", new { StoreID = Model.StoreID })',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        'productID': @Model.Product.ProductID,
+                        'search[value]': params.term,
+                        'length': 25,
+                        'start': 0
+                    };
+                },
+                processResults: function (data, params) {
+                    var selected = this.$element.val().map(Number);
+                    return {
+                        results: $.map(data.data, function (item) {
+                            if ($.inArray(item.VariantID, selected) === -1) {
+                                return {
+                                    id: item.VariantID,
+                                    text: item.VariantGroup + ' > ' + item.VariantName
+                                };
+                            }
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0,
+        });
+    });
+</script>

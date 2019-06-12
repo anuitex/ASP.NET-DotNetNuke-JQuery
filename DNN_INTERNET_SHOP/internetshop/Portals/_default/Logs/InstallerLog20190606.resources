@@ -1,0 +1,10 @@
+06/06/2019 06:48:29 [INFO] DotNetNuke.Services.Installer.XmlMerge Start UpdateNode: keyAttribute=name
+06/06/2019 06:48:29 [INFO] DotNetNuke.Services.Installer.XmlMerge Start UpdateNode: keyAttribute=name
+06/06/2019 06:48:29 [INFO] DotNetNuke.Services.Installer.XmlMerge Start UpdateAttribute:attributeName=oldVersion
+06/06/2019 06:48:29 [INFO] DotNetNuke.Services.Upgrade.Upgrade Start AddAdminPage:RazorCart Admin Console
+06/06/2019 06:48:29 [INFO] DotNetNuke.Services.Upgrade.Upgrade Start AddPagePermission:View
+06/06/2019 06:48:29 [INFO] DotNetNuke.Services.Upgrade.Upgrade Start AddPagePermission:Edit
+06/06/2019 06:48:29 [INFO] DotNetNuke.Services.Upgrade.Upgrade Start AddPage:RazorCart Admin Console
+06/06/2019 06:48:29 [INFO] DotNetNuke.Services.Upgrade.Upgrade Start AddModuleToPage:123
+06/06/2019 06:48:29 [INFO] DotNetNuke.Services.Upgrade.Upgrade End AddModuleToPage:123
+06/06/2019 06:49:39 [INFO] DotNetNuke.Services.Installer.XmlMerge Start UpdateNode: keyAttribute=name

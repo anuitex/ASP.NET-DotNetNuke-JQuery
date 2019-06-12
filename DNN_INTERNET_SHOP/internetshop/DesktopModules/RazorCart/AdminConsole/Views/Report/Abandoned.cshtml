@@ -1,0 +1,225 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ReportModel>
+@using System.Web.Mvc.Html;
+
+<!-- Morris Charts CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/morris.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Morris Charts JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/raphael.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/morris.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="page-header h1">
+            Abandoned Cart
+            <div class="pull-right">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-calendar"></i> Summary Statistics
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu slidedown" role="menu">
+                        <li>
+                            <a href="@Url.Action("Abandoned", "Report", new { StoreID = Model.StoreID, Frame = "Daily" })">Daily</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="@Url.Action("Abandoned", "Report", new { StoreID = Model.StoreID, Frame = "Weekly" })">Weekly</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="@Url.Action("Abandoned", "Report", new { StoreID = Model.StoreID, Frame = "Monthly" })">Monthly</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="@Url.Action("Abandoned", "Report", new { StoreID = Model.StoreID, Frame = "Quarterly" })">Quarterly</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="@Url.Action("Abandoned", "Report", new { StoreID = Model.StoreID, Frame = "Yearly" })">Yearly</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-cart-arrow-down fa-fw"></i>
+                    @Html.Display("ReportFrame") Summary Statistics
+                </h3>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
+                    <p><strong>Abandoned Carts</strong></p>
+                    <span class="huge">@Model.AbandonedSummary.CartCount</span>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
+                    <p><strong>Abandoned Revenue</strong></p>
+                    <span class="huge">@string.Format(Model.Culture, "{0:c}", Model.AbandonedSummary.CartRevenue)</span>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
+                    <p><strong>Orders</strong></p>
+                    <span class="huge">@Model.AbandonedSummary.OrderCount</span>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
+                    <p><strong>Orders Revenue</strong></p>
+                    <span class="huge">@string.Format(Model.Culture, "{0:c}", Model.AbandonedSummary.OrderRevenue)</span>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
+                    <p><strong>Abandoned Rate</strong></p>
+                    <span class="huge">@string.Format("{0:0.##}%", Model.AbandonedSummary.Rate)</span>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
+                    <p><strong>Recovered Carts</strong></p>
+                    <span class="huge">@Model.AbandonedSummary.CartRecovered</span>
+                </div>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-area-chart fa-fw"></i>
+                    @Html.Display("ReportFrame") Revenue Statistics
+                </h3>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div id="RevenueStatistics"></div>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-table fa-fw"></i>
+                    @Html.Display("ReportFrame") Abandoned Carts
+                </h3>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <table class="table table-hover" id="tblCarts" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Abandon Date</th>
+                            <th>SKU</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Cost</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    @{
+        string xLabel = string.Empty;
+        IEnumerable<object> chartData = Enumerable.Empty<object>();
+        switch (Model.ReportFrame)
+        {
+            case RazorCart.Service.Data.ModelDataContext.ReportFrame.Daily:
+                xLabel = "day";
+                chartData = Model.AbandonedStatistics.Select(rs => new { period = string.Format("{0}-{1}-{2}", rs.Year, rs.Month, rs.Day), revenue = rs.Revenue });
+                break;
+            case RazorCart.Service.Data.ModelDataContext.ReportFrame.Weekly:
+                xLabel = "week";
+                chartData = Model.AbandonedStatistics.Select(rs => new { period = string.Format("{0} W{1}", rs.Year, rs.Week), revenue = rs.Revenue });
+                break;
+            case RazorCart.Service.Data.ModelDataContext.ReportFrame.Monthly:
+                xLabel = "month";
+                chartData = Model.AbandonedStatistics.Select(rs => new { period = string.Format("{0}-{1}", rs.Year, rs.Month), revenue = rs.Revenue });
+                break;
+            case RazorCart.Service.Data.ModelDataContext.ReportFrame.Quarterly:
+                xLabel = "month";
+                chartData = Model.AbandonedStatistics.Select(rs => new { period = string.Format("{0} Q{1}", rs.Year, rs.Quarter), revenue = rs.Revenue });
+                break;
+            case RazorCart.Service.Data.ModelDataContext.ReportFrame.Yearly:
+                xLabel = "year";
+                chartData = Model.AbandonedStatistics.Select(rs => new { period = string.Format("{0}", rs.Year), revenue = rs.Revenue });
+                break;
+        }
+    }
+    $(function () {
+        Morris.Area({
+            element: 'RevenueStatistics',
+            data: @Html.Raw(Json.Encode(chartData)),
+            formatter: function (value, data) { return '@Model.CurrencySymbol' + value.toFixed(2) },
+            xkey: 'period',
+            xLabels: '@xLabel',
+            ykeys: ['revenue'],
+            labels: ['Revenue'],
+            pointSize: 5,
+            hideHover: 'auto',
+            resize: true,
+            yLabelFormat: function (value) {
+                return '@Model.CurrencySymbol' + value.toFixed(2);
+            }
+        });
+    });
+    $(document).ready(function () {
+        $('#tblCarts').DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: '',
+            },
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            columns: [
+                {
+                    data: 'CreateDate', render: function (data, type, full, meta) {
+                        return new Date(parseInt(data.substr(6))).toLocaleString();
+                    }
+                },
+                { data: 'ProductSku' },
+                { data: 'ProductName' },
+                { data: 'Quantity', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits)), className: 'text-right' },
+                { data: 'UnitCost', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)'), className: 'text-right' },
+                { data: 'DNNLogin' },
+                { data: 'Email' }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: false,
+            ordering: false,
+            ajax: {
+                url: '@Url.Action("ListCarts", "Report", new { StoreID = Model.StoreID, Frame = Model.ReportFrame })',
+                type: 'POST'
+            }
+        });
+    });
+</script>

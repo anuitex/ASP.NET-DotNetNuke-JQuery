@@ -1,0 +1,29 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<dynamic>
+@using DotNetNuke.Web.Client.ClientResourceManagement;
+@using Newtonsoft.Json;
+
+@{
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/rzc-bootstrap.css", 100, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/rzc-bootstrap-theme.css", 101, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/font-awesome.css", 102, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterStyleSheet(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Styles/angular-toastr.css", 103, "DnnPageHeaderProvider");
+
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/angular.min.js", 100, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/angular-messages.min.js", 101, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/angular-toastr.tpls.js", 102, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/ProductSlider/Scripts/owl.carousel.min.js", 103, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/RazorCart/Core/Content/Scripts/razorcart.core.js", 104, "DnnPageHeaderProvider");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/ProductSlider/Scripts/razorcart.slider.js", 105, "DnnPageHeaderProvider");
+
+    string startupScript = "angular.bootstrap(angular.element(document.getElementById('rzcContainer_" + Dnn.ModuleContext.ModuleId + "')), ['RazorCart']);";
+    Dnn.DnnPage.ClientScript.RegisterStartupScript(Dnn.DnnPage.GetType(), string.Concat("rzc-init-", Dnn.ModuleContext.ModuleId), startupScript, true);
+}
+
+<div id="rzcContainer_@Dnn.ModuleContext.ModuleId" class="rzc-bootstrap" ng-controller="sliderCtrl as slider" ng-init="slider.init(@JsonConvert.SerializeObject(Model))" ng-form="rzcForm_@Dnn.ModuleContext.ModuleId" ng-cloak>
+    @RenderBody()
+    <div class="rc-backdrop" ng-if="slider.inProgress">
+        <div class="rc-backdrop-container">
+            <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+        </div>
+    </div>
+</div>

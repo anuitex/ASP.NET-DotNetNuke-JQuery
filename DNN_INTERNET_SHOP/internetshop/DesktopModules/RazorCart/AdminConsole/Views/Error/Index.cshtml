@@ -1,0 +1,63 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ErrorModel>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Error</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                @if (Model.Exception.GetType() == typeof(HttpException) && Model.Exception.Message.Equals("Not Found", StringComparison.OrdinalIgnoreCase))
+                {
+                    <pre class="error_output_text" style="margin-top: 15px; margin-bottom: 15px; text-align: center; font-size: 18px; border: 0;">
+ _  _    ___  _  _   
+| || |  / _ \| || |  
+| || |_| | | | || |_ 
+|__   _| | | |__   _|
+   | | | |_| |  | |  
+   |_|  \___/   |_|  
+                    </pre>
+                    <div class="alert alert-danger text-center">
+                        <strong><em class="fa fa-warning"></em>Sorry, this page could not be found. The page you're looking for might have been removed, had its name changed, or is temporarily unavailable!</strong>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger text-center">
+                        <strong><em class="fa fa-warning"></em> Uh oh! Looks like something went wrong!</strong>
+                    </div>
+                    <div class="bs-callout bs-callout-primary">
+                        <h4>@Model.Exception.GetType()</h4>
+                        <span>@(Model.Exception.Message)</span>
+                    </div>
+                    <div class="bs-callout bs-callout-default">
+                        <h4>Stack Trace</h4>
+                        <span>@(Model.Exception.StackTrace)</span>
+                    </div>
+                    <div class="bs-callout bs-callout-warning">
+                        <h4>Exception Method</h4>
+                        @if (Model.StackTrace.FrameCount > 0)
+                        {
+                            <span>@(Model.StackTrace.GetFrame(0).GetMethod().DeclaringType)</span>
+                        }
+                    </div>
+                    <div class="bs-callout bs-callout-info">
+                        <h4>Source File</h4>
+                        @if (Model.StackTrace.FrameCount > 0)
+                        {
+                            <span>@(Model.StackTrace.GetFrame(0).GetFileName()) [@(Model.StackTrace.GetFrame(0).GetFileLineNumber())]</span>
+                        }
+                    </div>
+                }
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->

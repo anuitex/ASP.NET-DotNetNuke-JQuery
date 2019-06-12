@@ -1,0 +1,75 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Search.Models.SearchResultsModel>
+
+@using DotNetNuke.Web.Mvc.Helpers;
+@using DotNetNuke.Web.Client.ClientResourceManagement;
+
+@{
+    int tabModuleID = Dnn.ModuleContext.TabModuleId;
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/Search/Content/Scripts/bootbox.min.js");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/Search/Content/Scripts/razorCart.searchResults.js");
+}
+
+@if (Model.Products.Count > 0)
+{
+    <div class="rzc-search-results" data-tmid="@tabModuleID">
+        <div class="list-group1" style="margin-bottom: 10px;">
+            @foreach (var tag in Model.SearchTags)
+            {
+                <span class="list-group-item clearfix" style="margin-right: 2px; padding: 4px 8px; border-radius: 4px; display: inline-block;">
+                    @tag.Item2
+                    <span class="pull-right" style="margin-left: 8px;">
+                        <a href="#" class="rzc-delete-tag no-underline" style="font-size: 16px" data-tag-type="@tag.Item1" data-tag-val="@tag.Item2">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                </span>
+            }
+        </div>
+        <div class="row" style="margin-bottom: 10px;">
+            <div class="col-sm-5" style="margin-bottom: 5px;">
+                <select id="ddlRecords_@tabModuleID" name="ddlRecords_@tabModuleID" class="form-control rzc-records-dropdown" style="display: inline-block; width: auto;">
+                    @foreach (var record in Model.RecordsOptions)
+                {
+                        <option value="@record.Key" @(record.Value ? "selected" : "")>@record.Key</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-7 pagination-wrapper" style="margin-bottom: 5px;">
+                @Html.Partial("_Pager", Model.Pager)
+            </div>
+        </div>
+        <div class="row list-group" style="padding: 8px;">
+            @foreach (var product in Model.Products)
+            {
+                <div class="grid-group-item text-center rzc-search-item col-xxs-12 col-xs-6 col-sm-4 col-md-4 col-lg-3">
+                    <div class="thumbnail" style="margin-bottom: 8px !important;">
+                        <a class="no-underline" href="@(product.ProductDetailUrl)" title="@product.ModelName" target="_self">
+                            <div class="rzc-img-wrapper">
+                                <img alt="@product.ModelName" class="list-group-image img-responsive" src="@product.ThumbImage" style="display: inline-block;">
+                            </div>
+                            <div>
+                                <h5 class="list-group-item-heading">
+                                    @product.ModelName
+                                </h5>
+                                <h6 class="list-group-item-heading">
+                                    @product.ModelNumber
+                                </h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-12">
+                        <label class="@(Model.IsSaleEnabled && product.IsUnderSale ? "strike-through" : "")">
+                            @string.Format(Model.Culture, "{0:c}", product.BundleUnitCost > 0 ? product.BundleUnitCost : product.UnitCost)
+                        </label>
+                        @if (Model.IsSaleEnabled && product.IsUnderSale)
+                        {
+                            <label>
+                                @string.Format(Model.Culture, "{0:c}", product.BundleSalePrice > 0 ? product.BundleSalePrice : product.SalePrice)
+                            </label>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

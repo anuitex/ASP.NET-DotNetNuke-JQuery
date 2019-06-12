@@ -1,0 +1,105 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ExtensionModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Extension Setup: @Model.Extension.FullName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Submitted)
+        {
+            <div class="alert alert-success alert-dismissable">
+                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                @Model.SaveMessage
+            </div>
+        }
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Extension", new { StoreID = Model.StoreID, Name = HttpServerUtility.UrlTokenEncode(System.Text.Encoding.UTF8.GetBytes(Model.Extension.AssemblyQualifiedName)) })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @foreach (var setting in Model.ExtensionSettings.Where(s => s.SettingType != RazorCart.Core.ActionPipeline.SettingType.Hidden))
+                    {
+                        <div class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label">@(setting.SettingLabel)</label>
+                            <div class="col-md-6 col-sm-8">
+                                @switch (setting.SettingType)
+                                {
+                                    case RazorCart.Core.ActionPipeline.SettingType.Label:
+                                        @Html.Label(setting.SettingName.Replace(" ", "_"), !string.IsNullOrEmpty(setting.SettingValue) ? setting.SettingValue : " ", new { @class = "form-control", @style = "height: auto; word-wrap: break-word; white-space: pre-wrap;" })
+                                        break;
+                                    case RazorCart.Core.ActionPipeline.SettingType.TextBox:
+                                        @Html.TextBox(setting.SettingName.Replace(" ", "_"), setting.SettingValue, setting.Required ? new { @class = "form-control", @required = "required" } : (object)new { @class = "form-control" })
+                                        break;
+                                    case RazorCart.Core.ActionPipeline.SettingType.DropdownList:
+                                        @Html.DropDownList(setting.SettingName.Replace(" ", "_"), new System.Web.Mvc.SelectList(setting.SettingOptions, "Key", "Value", setting.SettingValue), "-- Select --", setting.Required ? new { @class = "form-control", @required = "required" } : (object)new { @class = "form-control" })
+                                        break;
+                                    case RazorCart.Core.ActionPipeline.SettingType.RadioButtons:
+                                        foreach (var option in setting.SettingOptions)
+                                        {
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton(setting.SettingName.Replace(" ", "_"), option.Key, setting.SettingValue == option.Key, setting.Required ? new { @required = "required" } : (object)new { }) @option.Value
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        }
+                                        break;
+                                    case RazorCart.Core.ActionPipeline.SettingType.CheckBox:
+                                        <div class="checkbox">
+                                            <label>
+                                                @Html.CheckBox(setting.SettingName.Replace(" ", "_"), Convert.ToBoolean(!string.IsNullOrWhiteSpace(setting.SettingValue) ? setting.SettingValue : bool.FalseString), setting.Required ? new { @onchange = "checkBoxChange(this);", @required = "required" } : (object)new { @onchange = "checkBoxChange(this);" })
+                                                <span class="rc-control">
+                                                    <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                </span>
+                                            </label>
+                                        </div>
+                                        break;
+                                    case RazorCart.Core.ActionPipeline.SettingType.MultiLineTextBox:
+                                        @Html.TextArea(setting.SettingName.Replace(" ", "_"), setting.SettingValue, setting.Required ? new { @class = "form-control", @required = "required" } : (object)new { @class = "form-control" })
+                                        break;
+                                    case RazorCart.Core.ActionPipeline.SettingType.Information:
+                                        <div class="alert alert-info">
+                                            @Html.Raw(setting.SettingValue)
+                                        </div>
+                                        break;
+                                    case RazorCart.Core.ActionPipeline.SettingType.Error:
+                                        <div class="alert alert-danger">
+                                            @Html.Raw(setting.SettingValue)
+                                        </div>
+                                        break;
+                                    case RazorCart.Core.ActionPipeline.SettingType.Warning:
+                                        <div class="alert alert-warning">
+                                            @Html.Raw(setting.SettingValue)
+                                        </div>
+                                        break;
+                                    case RazorCart.Core.ActionPipeline.SettingType.Html:
+                                        @Html.Raw(setting.SettingValue)
+                                        break;
+                                }
+                            </div>
+                        </div>
+                    }
+                    @foreach (var setting in Model.ExtensionSettings.Where(s => s.SettingType == RazorCart.Core.ActionPipeline.SettingType.Hidden))
+                    {
+                        @Html.Hidden(setting.SettingName.Replace(" ", "_"), setting.SettingValue)
+                    }
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    <a class="btn btn-default" href="@Url.Action("Index", "Extension", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->

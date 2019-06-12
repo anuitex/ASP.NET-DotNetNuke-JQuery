@@ -1,0 +1,317 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.PaymentModel>
+@using System.Web.Mvc.Html;
+
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Payment Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Save", "Payment", new { StoreID = Model.StoreID })" autocomplete="off">
+            @if (Model.Submitted)
+            {
+                <div class="alert alert-success alert-dismissable">
+                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                    @Model.SaveMessage
+                </div>
+            }
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a class="btn btn-primary pull-right" href="@Url.Action("Add", "Payment", new { StoreID = Model.StoreID })">
+                        <i class="fa fa-plus"></i> Add Method/Gateway
+                    </a>
+                    <h4>Payment Gateways</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="table-sortable">
+                            <thead>
+                                <tr>
+                                    <th>Sort</th>
+                                    <th>Method Name</th>
+                                    <th>Method Type</th>
+                                    <th>Gateway Code/Source</th>
+                                    <th>Surcharge Amount</th>
+                                    <th>Surcharge Percent</th>
+                                    <th>Active</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var method in Model.PaymentMethods)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="glyphicon glyphicon-sort"></span>
+                                            <span class="text-muted badge">@method.SortOrder</span>
+                                            <input type="hidden" name="tableSortId" value="@method.PayMethodID" disabled />
+                                            <input type="hidden" name="tableSortOrder" value="@method.SortOrder" disabled />
+                                        </td>
+                                        <td>@method.Name</td>
+                                        <td>@method.Type</td>
+                                        <td>@method.GatewayCode</td>
+                                        <td>@string.Format(Model.Culture, "{0:c}", method.SurchargeAmount)</td>
+                                        <td>@string.Format("{0}%", method.SurchargePercentage)</td>
+                                        <td>@method.Active</td>
+                                        <td class="text-right">
+                                            <a href="@Url.Action("Edit", "Payment", new { StoreID = Model.StoreID, PayMethodID = method.PayMethodID })"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                            <a href="@Url.Action("Delete", "Payment", new { StoreID = Model.StoreID, PayMethodID = method.PayMethodID })" onclick="return confirm('Are you sure?')">
+                                                <i class="fa fa-trash-o fa-lg"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.PaymentMethods.Count < 1)
+                                {
+                                    <tr><td colspan="8">No Payment Methods added.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Payment Processing</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Test Mode</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("TestMode", Convert.ToBoolean(Model.StoreConfig["TestMode"]), new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Authorize Only</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("AuthOnly", Convert.ToBoolean(Model.StoreConfig["AuthOnly"]), new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Accepted Cards</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("Visa", Convert.ToBoolean(Model.StoreConfig["Visa"]), new { @onchange = "checkBoxChange(this);" }) Visa
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("MasterCard", Convert.ToBoolean(Model.StoreConfig["MasterCard"]), new { @onchange = "checkBoxChange(this);" }) MasterCard
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("Amex", Convert.ToBoolean(Model.StoreConfig["Amex"]), new { @onchange = "checkBoxChange(this);" }) Amex
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("Discover", Convert.ToBoolean(Model.StoreConfig["Discover"]), new { @onchange = "checkBoxChange(this);" }) Discover
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Do Not Save Credit Cards</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("SaveCC", Convert.ToBoolean(Model.StoreConfig["SaveCC"] ?? bool.FalseString), new { @onchange = "checkBoxChange(this); toggleDontSaveCC(this.checked);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Show Wallet</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("ShowWallet", Convert.ToBoolean(Model.StoreConfig["ShowWallet"] ?? bool.FalseString), new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional1" data-cond-option="SaveCC" data-cond-value="false">
+                        <label class="col-md-3 col-sm-4 control-label">Encryption Key</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("EncryptKey", Model.StoreConfig["EncryptKey"], Model.StoreConfig["EncryptKey"] == null ? new { @type = "password", @autocomplete = "new-password", @class = "form-control", @maxlength = "16", @pattern = "^(\\S{1,16})$", @required = "required" } : (object)new { @type = "password", @autocomplete = "new-password", @class = "form-control", @maxlength = "16", @pattern = "^(\\S{1,16})$", @required = "required", @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Recurring Settings</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Use Gateway Recurring Billing</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("GatewayRecurring", Convert.ToBoolean(Model.StoreConfig["GatewayRecurring"]), new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="GatewayRecurring" data-cond-value="false" data-cond-destroy="true">
+                        <label class="col-md-3 col-sm-4 control-label">Enable RazorCart Recurring Scheduler</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("RecurringScheduler", Model.RecurringScheduler.Enabled, new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Enable RazorCart Recurring Notifier Scheduler</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("RecurringNotifierScheduler", Model.RecurringNotifierScheduler.Enabled, new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="GatewayRecurring" data-cond-value="false">
+                        <label class="col-md-3 col-sm-4 control-label">Suspend Subscription After</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="input-group">
+                                @Html.TextBox("SuspendSubscription", Model.StoreConfig["SuspendSubscription"] ?? 3, new { @type = "number", @class = "form-control", @pattern = "\\d+", @min = "1", @max = "999", @required = "required" })
+                                <span class="input-group-addon">Failed Attempts</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    //Prevent table row from being collapsed when sorting
+    var fixHelperModified = function (e, tr) {
+        var $originals = tr.children();
+        var $helper = tr.clone();
+        $helper.children().each(function (index) {
+            $(this).width($originals.eq(index).width())
+        });
+        return $helper;
+    }
+    //Update Sort Order values
+    function renumber_table(tableID) {
+        var sortData = new FormData();
+        $(tableID + ' tbody tr').each(function () {
+            count = $(this).parent().children().index($(this)) + 1;
+            var hndID = $(this).find('[type=hidden][name=tableSortId]');
+            var hndSort = $(this).find('[type=hidden][name=tableSortOrder]');
+            var sortBadge = $(this).find('span.badge');
+            hndSort.val(count);
+            sortBadge.html(count);
+            sortData.append(hndID.val(), hndSort.val());
+        })
+        .promise().done(function () {
+            $.ajax({
+                url: '@Url.Action("Sort", "Payment", new { StoreID = Model.StoreID })',
+                type: 'POST',
+                data: sortData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (data, result) {
+                    console.log(data);
+                },
+                error: function (error) {
+                    console.log(error.status + ' ' + error.statusText);
+                }
+            });
+        });
+    }
+    function toggleDontSaveCC(dontSaveCC) {
+        if (!dontSaveCC) {
+            $('#ShowWallet, #GatewayRecurring').removeAttr("readonly").prop('onclick', null).off('click');
+            $('#EncryptKey').removeAttr("disabled").prop('onkeydown', null).off('keydown');
+        }
+        else {
+            $('#ShowWallet').attr('readonly', 'readonly').prop('checked', false).change().on('click', function () { return false; });
+            $('#GatewayRecurring').attr('readonly', 'readonly').prop('checked', true).change().on('click', function () { return false; });
+            $('#EncryptKey').attr('disabled', 'disabled').on('keydown', function (e) { e.preventDefault(); });
+        }
+    }
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        //jQuery UI Sortable: (https://jqueryui.com/sortable/)
+        $('#table-sortable tbody').sortable({
+            handle: 'span.glyphicon-sort, span.badge',
+            helper: fixHelperModified,
+            stop: function (event, ui) { renumber_table('#table-sortable') }
+        });
+        toggleDontSaveCC($('#SaveCC').prop('checked'));
+    });
+</script>

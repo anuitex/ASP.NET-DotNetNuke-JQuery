@@ -1,0 +1,160 @@
+﻿/************************************************************/
+/*****              SqlDataProvider                     *****/
+/*****                                                  *****/
+/*****                                                  *****/
+/***** Note: To manually execute this script you must   *****/
+/*****       perform a search and replace operation     *****/
+/*****       for {databaseOwner} and {objectQualifier}  *****/
+/*****                                                  *****/
+/************************************************************/
+
+
+
+/************************************************************/
+/*****               Create Tables                      *****/
+/************************************************************/
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_ProductEmail') AND type IN (N'U'))
+BEGIN
+	CREATE TABLE {databaseOwner}{objectQualifier}RZC_ProductEmail
+	(
+		[ID] [INT] IDENTITY(1,1) NOT NULL,
+		[ProductID] [INT] NOT NULL,
+		[TemplateID] [INT] NOT NULL,
+		[EmailAddress] [VARCHAR](1024) NULL,
+		CONSTRAINT [PK_{objectQualifier}RZC_ProductEmail] PRIMARY KEY CLUSTERED
+		(
+			[ID] ASC
+		)
+	)
+END
+GO
+
+
+
+/************************************************************/
+/*****                Alter Tables                      *****/
+/************************************************************/
+
+
+
+/************************************************************/
+/*****                Drop Sprocs                       *****/
+/************************************************************/
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_CreateProductEmail') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateProductEmail
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_DeleteProductEmail') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_DeleteProductEmail
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_GetProductEmailByID') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_GetProductEmailByID
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_ListProductEmails') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_ListProductEmails
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_UpdateProductEmail') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_UpdateProductEmail
+GO
+
+
+
+/************************************************************/
+/*****               Create Sprocs                      *****/
+/************************************************************/
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateProductEmail
+	@ProductID INT = NULL,
+	@TemplateID INT = NULL,
+	@EmailAddress VARCHAR(1024) = NULL
+AS
+BEGIN
+	INSERT INTO
+		{databaseOwner}{objectQualifier}RZC_ProductEmail
+		([ProductID]
+		,[TemplateID]
+		,[EmailAddress])
+	VALUES
+		(@ProductID
+		,@TemplateID
+		,@EmailAddress)
+	SELECT SCOPE_IDENTITY()
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_DeleteProductEmail
+	@ID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	DELETE PE FROM
+		{databaseOwner}{objectQualifier}RZC_ProductEmail PE
+	INNER JOIN
+		{databaseOwner}{objectQualifier}RZC_Products P
+	ON
+		PE.[ProductID] = P.[ProductID]
+	WHERE
+		PE.[ID] = @ID
+		AND P.[PortalID] = @PortalID
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_GetProductEmailByID
+	@ID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	SELECT
+		PE.*
+	FROM
+		{databaseOwner}{objectQualifier}RZC_ProductEmail PE
+	INNER JOIN
+		{databaseOwner}{objectQualifier}RZC_Products P
+	ON
+		PE.[ProductID] = P.[ProductID]
+	WHERE
+		PE.[ID] = @ID
+		AND P.[PortalID] = @PortalID
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_ListProductEmails
+	@ProductID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	SELECT
+		PE.*
+	FROM
+		{databaseOwner}{objectQualifier}RZC_ProductEmail PE
+	INNER JOIN
+		{databaseOwner}{objectQualifier}RZC_Products P
+	ON
+		PE.[ProductID] = P.[ProductID]
+	WHERE
+		PE.[ProductID] = @ProductID
+		AND P.[PortalID] = @PortalID
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_UpdateProductEmail
+	@ID INT = NULL,
+	@ProductID INT = NULL,
+	@TemplateID INT = NULL,
+	@EmailAddress VARCHAR(1024) = NULL
+AS
+BEGIN
+	UPDATE
+		{databaseOwner}{objectQualifier}RZC_ProductEmail
+	SET
+		[ProductID] = @ProductID,
+		[TemplateID] = @TemplateID,
+		[EmailAddress] = @EmailAddress
+	WHERE
+		[ID] = @ID
+END
+GO
+
+
+
+/************************************************************/
+/*****               End of Script                      *****/
+/************************************************************/

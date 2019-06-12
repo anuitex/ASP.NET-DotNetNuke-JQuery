@@ -1,0 +1,23 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.CategoryMenu.Models.CategoryModel>
+@using DotNetNuke.Web.Mvc.Helpers;
+
+@* This Hidden Div Is Only For SEO Purposes, Since Crawlers cannot execute Javascript *@
+<div ng-hide="true">
+    @foreach (var category in Model.Categories)
+    {
+        <a href="@(string.Format(Model.CategoryMenuURL, string.IsNullOrEmpty(category.CatSEOURL) ? category.CategoryID.ToString() : category.CatSEOURL))" target="_self">
+            <h2>@Html.Raw(category.CategoryName)</h2>
+        </a>
+    }
+</div>
+
+@* Load Angular Template for Sub Category Tree *@
+@Html.Partial("_SubTreeTemplate")
+
+<nav>
+    <div class="list-group">
+        <div class="list-group-item" ng-repeat="category in catMenu.categories" ng-click="catMenu.toggleCategory($event, category)">
+            <div ng-include="'subCategoryTree'"></div>
+        </div>
+    </div>
+</nav>

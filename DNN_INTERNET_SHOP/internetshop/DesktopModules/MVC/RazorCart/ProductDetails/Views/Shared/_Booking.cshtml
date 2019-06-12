@@ -1,0 +1,62 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.ProductDetails.Models.DetailsModel>
+
+@{
+    string startLabel = (Model.Booking.BookingFields == RazorCart.Service.Data.ModelDataContext.BookingFields.Two) ? Dnn.LocalizeString("Start") : Dnn.LocalizeString("Date");
+    string endLabel = Dnn.LocalizeString("End");
+}
+
+<div class="form">
+    <div class="form-group">
+        <label class="control-label">@startLabel</label>
+        <div class="control">
+            <input type="text" class="form-control" placeholder="@Dnn.LocalizeString("Date")" ng-model="details.booking.start.dateModel" ng-change="details.bookingChange()" name="bookingStartDate"
+                    pick-a-date="details.booking.start.value" pick-a-date-options="details.booking.start.dateOptions" required />
+            <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).bookingStartDate.$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).bookingStartDate.$dirty">
+                <div class="form-control-required" ng-message="required">
+                    <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("DateRequired")
+                </div>
+            </div>
+        </div>
+        @if (Model.Booking.DisplayTime)
+        {
+            <div class="control">
+                <input type="text" class="form-control" placeholder="@Dnn.LocalizeString("Time")" ng-model="details.booking.start.timeModel" ng-change="details.bookingChange()" name="bookingStartTime"
+                       pick-a-time="details.booking.start.value" pick-a-time-options="details.booking.start.timeOptions" required />
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).bookingStartTime.$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).bookingStartTime.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("TimeRequired")
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@if (Model.Booking.BookingFields == RazorCart.Service.Data.ModelDataContext.BookingFields.Two)
+{
+    <div class="form">
+        <div class="form-group">
+            <label class="control-label">@endLabel</label>
+            <div class="control">
+                <input type="text" class="form-control" placeholder="@Dnn.LocalizeString("Date")" ng-model="details.booking.end.dateModel" ng-change="details.bookingChange()" name="bookingEndDate"
+                        pick-a-date="details.booking.end.value" pick-a-date-options="details.booking.end.dateOptions" required />
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).bookingEndDate.$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).bookingEndDate.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("DateRequired")
+                    </div>
+                </div>
+            </div>
+            @if (Model.Booking.DisplayTime)
+            {
+                <div class="control">
+                    <input type="text" class="form-control" placeholder="@Dnn.LocalizeString("Time")" ng-model="details.booking.end.timeModel" ng-change="details.bookingChange()" name="bookingEndTime"
+                           pick-a-time="details.booking.end.value" pick-a-time-options="details.booking.end.timeOptions" required />
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).bookingEndTime.$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).bookingEndTime.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("TimeRequired")
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

@@ -1,0 +1,115 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.TaxModel>
+@using System.Web.Mvc.Html;
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Tax Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("ClearTable", "Tax", new { StoreID = Model.StoreID })" autocomplete="off">
+            @Html.Partial("_TaxMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="btn-group pull-right">
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taxModal1" data-backdrop="static" data-keyboard="true">
+                                            <i class="fa fa-download"></i> Import Tax Table
+                                        </button>
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">
+                                            <i class="fa fa-eraser"></i> Clear Tax Table
+                                        </button>
+                                    </div>
+                                    <h4>Tax Table</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <table class="table table-hover" id="tblTaxes" style="width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>Region/State</th>
+                                                <th>County</th>
+                                                <th>City</th>
+                                                <th>Postal Code</th>
+                                                <th>Tax Rate</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<div class="modal fade" id="taxModal1" role="dialog" tabindex="-1" aria-labelledby="taxModalLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" enctype="multipart/form-data" action="@Url.Action("ImportTable", "Tax", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="taxModalLabel1">Import Tax Table</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="ImportSheet">CSV File</label>
+                        <div class="input-group">
+                            <label class="input-group-btn">
+                                <span class="btn btn-primary">
+                                    Browse&hellip; @Html.TextBox("ImportSheet", string.Empty, new { @type = "file", @style = "opacity: 0; width: 1px; height: 1px", @required = "required" })
+                                </span>
+                            </label>
+                            @Html.TextBox("ImportSheet_FileName", string.Empty, new { @class = "form-control", @placeholder = "Select CSV file to upload", @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-download"></i> Import</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tblTaxes').DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: '',
+            },
+            lengthMenu: [[10, 25, 50, 100, 500], [10, 25, 50, 100, 500]],
+            columns: [
+                { data: 'State' },
+                { data: 'County' },
+                { data: 'City' },
+                { data: 'PostalCode' },
+                { data: 'TaxRate', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '', '@(Model.PercentSymbol)'), className: 'text-right' }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: false,
+            ordering: false,
+            ajax: '@Url.Action("ListTable", "Tax", new { StoreID = Model.StoreID })'
+        });
+    });
+</script>

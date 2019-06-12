@@ -1,0 +1,142 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })" autocomplete="off">
+            @Html.Partial("_ProductMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a class="btn btn-primary pull-right" href="@Url.Action("AddQtyDiscount", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">
+                                        <i class="fa fa-plus"></i> Add Quantity Discount
+                                    </a>
+                                    <h4>Discounts By Quantity</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Label</th>
+                                                    <th>Qty From</th>
+                                                    <th>Qty To</th>
+                                                    <th>Adjust Type</th>
+                                                    <th>Discount</th>
+                                                    <th>Security Role</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var discount in Model.QtyDiscounts)
+                                                {
+                                                    <tr>
+                                                        <td>@discount.DisplayLabel</td>
+                                                        <td>@discount.QtyFrom</td>
+                                                        <td>@discount.QtyTo</td>
+                                                        <td>@discount.AdjustType</td>
+                                                        <td>
+                                                            @switch (discount.AdjustType)
+                                                            {
+                                                                case "AbsolutePrice":
+                                                                case "PriceAdjust":
+                                                                    @(string.Format("{0:C}", discount.Price))
+                                                                    break;
+                                                                case "PercentAdjust":
+                                                                    @(string.Format("{0:f2}%", discount.Price))
+                                                                    break;
+                                                            }
+                                                        </td>
+                                                        <td>@discount.RoleName</td>
+                                                        <td class="text-right">
+                                                            <a href="@Url.Action("EditQtyDiscount", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, DiscountID = discount.QtyDiscountID })"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                                            <a href="@Url.Action("DeleteQtyDiscount", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, DiscountID = discount.QtyDiscountID })" onclick="return confirm('Are you sure?')">
+                                                                <i class="fa fa-trash-o fa-lg"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.QtyDiscounts.Count < 1)
+                                                {
+                                                    <tr><td colspan="7">No Quantity Discounts added.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a class="btn btn-primary pull-right" href="@Url.Action("AddRoleDiscount", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">
+                                        <i class="fa fa-plus"></i> Add Role Discount
+                                    </a>
+                                    <h4>Discounts By Role</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Where Member</th>
+                                                    <th>Security Role</th>
+                                                    <th>User Name</th>
+                                                    <th>Discount Percent</th>
+                                                    <th>Discount Amount</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var discount in Model.RoleDiscounts)
+                                                {
+                                                    <tr>
+                                                        <td>@(discount.InvertRole ? "Is Not In" : "Is In")</td>
+                                                        <td>@discount.RoleName</td>
+                                                        <td>@discount.UserName</td>
+                                                        <td>@string.Format("{0:f2}%", discount.DiscountPercent)</td>
+                                                        <td>@string.Format(Model.Culture, "{0:C}", discount.DiscountAmount)</td>
+                                                        <td class="text-right">
+                                                            <a href="@Url.Action("EditRoleDiscount", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, DiscountID = discount.DiscountID })"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                                            <a href="@Url.Action("DeleteRoleDiscount", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, DiscountID = discount.DiscountID })" onclick="return confirm('Are you sure?')">
+                                                                <i class="fa fa-trash-o fa-lg"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.RoleDiscounts.Count < 1)
+                                                {
+                                                    <tr><td colspan="5">No Role Discounts added.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <a class="btn btn-default" href="@Url.Action("Index", "Product", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->

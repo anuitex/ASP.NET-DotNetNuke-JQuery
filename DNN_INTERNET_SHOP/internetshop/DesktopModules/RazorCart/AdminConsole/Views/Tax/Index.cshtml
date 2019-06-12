@@ -1,0 +1,354 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.TaxModel>
+@using System.Web.Mvc.Html;
+
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Tax Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Save", "Tax", new { StoreID = Model.StoreID })" autocomplete="off">
+            @Html.Partial("_TaxMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+					    <div class="row">
+                            @if (Model.Submitted)
+                            {
+                                <div class="alert alert-success alert-dismissable">
+                                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                    @Model.SaveMessage
+                                </div>
+                            }
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Tax Method</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Tax Method</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "TaxAll", (string)Model.StoreConfig["SmithTax"] == "TaxAll", new { @required = "required" }) Flat Tax all Orders
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "TaxHome", (string)Model.StoreConfig["SmithTax"] == "TaxHome", new { @required = "required" }) Flat Tax by Regions
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "TaxHomeCountry", (string)Model.StoreConfig["SmithTax"] == "TaxHomeCountry", new { @required = "required" }) Flat Tax Apply to Home Country
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "TaxTable", (string)Model.StoreConfig["SmithTax"] == "TaxTable", new { @required = "required" }) Tax Tables
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "HST", (string)Model.StoreConfig["SmithTax"] == "HST", new { @required = "required" }) HST (Canada)
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "GSTPST", (string)Model.StoreConfig["SmithTax"] == "GSTPST", new { @required = "required" }) GST/PST
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "VATProdInclusive", (string)Model.StoreConfig["SmithTax"] == "VATProdInclusive", new { @required = "required" }) VAT/GST (Product Inclusive)
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "EUVAT", (string)Model.StoreConfig["SmithTax"] == "EUVAT", new { @required = "required" }) Apply EU VAT Regulations
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "EUVATBYPRODUCT", (string)Model.StoreConfig["SmithTax"] == "EUVATBYPRODUCT", new { @required = "required" }) Apply EU VAT Regulations by Product
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "Zip2Tax", (string)Model.StoreConfig["SmithTax"] == "Zip2Tax", new { @required = "required" }) Zip2Tax Real Time Tax Calculation
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithTax", "NoTax", (string)Model.StoreConfig["SmithTax"] == "NoTax" || Model.StoreConfig["SmithTax"] == null, new { @required = "required" }) No Tax
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="alert alert-warning" data-show="conditional" data-cond-option="SmithTax" data-cond-value="TaxHome,TaxTable,HST,GSTPST" data-cond-operator="[]" style="display: none; margin-top: 10px;">
+                                                <span data-show="conditional" data-cond-option="SmithTax" data-cond-value="TaxHome">
+                                                    The tax method selected requires tax regions. Click the Tax Regions tab above to configure tax regions.
+                                                </span>
+                                                <span data-show="conditional" data-cond-option="SmithTax" data-cond-value="TaxTable,HST,GSTPST" data-cond-operator="[]">
+                                                    The tax method selected requires tax table. Click the Tax Table tab above to import your tax table.
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="SmithTax" data-cond-value="HST,GSTPST" data-cond-operator="[]" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Tax Registration #</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("TaxRegNbr", Model.StoreConfig["TaxRegNbr"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="SmithTax" data-cond-value="TaxTable,HST,EUVAT,EUVATBYPRODUCT,Zip2Tax,NoTax" data-cond-operator="![]" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Tax Rate</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("TaxRate", Model.StoreConfig["TaxRate"], new { @class = "form-control", @type = "number", @step = "0.01" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="SmithTax" data-cond-value="EUVAT,EUVATBYPRODUCT" data-cond-operator="[]" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Prices input include VAT</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("EUVATInputPricesVATInc", Convert.ToBoolean(Model.StoreConfig["EUVATInputPricesVATInc"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="SmithTax" data-cond-value="EUVAT,EUVATBYPRODUCT" data-cond-operator="[]" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">EU VAT Rate</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("EUVATRate", Model.StoreConfig["EUVATRate"], new { @class = "form-control", @type = "number", @step = "0.01" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="SmithTax" data-cond-value="EUVATBYPRODUCT" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Apply EU VAT on Shipping</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("EUVATRateForShippingSet", Convert.ToBoolean(Model.StoreConfig["EUVATRateForShippingSet"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="SmithTax" data-cond-value="EUVATBYPRODUCT" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">EU VAT Rate for Shipping</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("EUVATRateForShipping", Model.StoreConfig["EUVATRateForShipping"], new { @class = "form-control", @type = "number", @step = "0.01" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="SmithTax" data-cond-value="Zip2Tax" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Zip2Tax UserID</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("Zip2TaxUID", Model.StoreConfig["Zip2TaxUID"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="SmithTax" data-cond-value="Zip2Tax" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Zip2Tax Password</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("Zip2TaxPWD", Model.StoreConfig["Zip2TaxPWD"], new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="SmithTax" data-cond-value="Zip2Tax" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Match Tax Regions only (Tax Nexus)</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("UseTaxNexus", Convert.ToBoolean(Model.StoreConfig["UseTaxNexus"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Enable Tax Exempt by Role</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("EnableTaxExemptByRole", Convert.ToBoolean(Model.StoreConfig["EnableTaxExemptByRole"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" data-show="conditional" data-cond-option="EnableTaxExemptByRole" data-cond-value="true" style="display: none;">
+                                        <label class="col-md-3 col-sm-4 control-label">Tax Exempt Role</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @foreach (var role in Model.PortalRoles)
+                                            {
+                                                bool checkedRole = false;
+                                                string[] taxExemptRole = Model.StoreConfig.ContainsKey("TaxExemptRole") ?
+                                                    Model.StoreConfig["TaxExemptRole"].ToString().Split(',') : new string[0];
+                                                if (taxExemptRole.Contains(role.Value))
+                                                {
+                                                    checkedRole = true;
+                                                }
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" id="TaxExemptRole" name="TaxExemptRole" value="@role.Value" @(checkedRole ? "checked" : string.Empty) /> @role.Text
+                                                        <span class="rc-control">
+                                                            <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @Html.Hidden("TaxExemptRole", string.Empty)
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Tax Shipping</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Tax Shipping</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShippingTax", "TaxShippingNever", (string)Model.StoreConfig["SmithShippingTax"] == "TaxShippingNever" || Model.StoreConfig["SmithShippingTax"] == null, new { @required = "required" }) Never apply taxes
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShippingTax", "TaxShippingAlways", (string)Model.StoreConfig["SmithShippingTax"] == "TaxShippingAlways", new { @required = "required" }) Always apply taxes
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("SmithShippingTax", "TaxShippingProducts", (string)Model.StoreConfig["SmithShippingTax"] == "TaxShippingProducts", new { @required = "required" }) Only for taxable products
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Tax Handling</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    @Html.CheckBox("TaxHandling", Convert.ToBoolean(Model.StoreConfig["TaxHandling"]), new { @onchange = "checkBoxChange(this);" })
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Tax Discounts</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Tax Discounts</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("TaxDiscounts", "TaxBeforeDiscount", (string)Model.StoreConfig["TaxDiscounts"] == "TaxBeforeDiscount" || Model.StoreConfig["TaxDiscounts"] == null, new { @required = "required" }) Apply Tax Before Discounts
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    @Html.RadioButton("TaxDiscounts", "TaxAfterDiscount", (string)Model.StoreConfig["TaxDiscounts"] == "TaxAfterDiscount", new { @required = "required" }) Apply Tax After Discounts
+                                                    <span class="rc-control">
+                                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+					    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+    });
+</script>

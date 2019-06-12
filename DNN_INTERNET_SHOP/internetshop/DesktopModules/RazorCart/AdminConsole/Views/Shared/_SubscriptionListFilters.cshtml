@@ -1,0 +1,124 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.SubscriptionModel>
+@using System.Web.Mvc.Html;
+
+<!-- Date Range Template -->
+<div id="tblSubscriptions_datefilter" class="form-inline text-center" style="display: none;">
+    <div class="form-group col-md-12 input-datetype" style="margin-bottom: 5px;">
+        <div class="radio radio-inline" style="padding-left: 0; margin: 0 30px 0 0;">
+            <label>
+                @Html.RadioButton("Date", "Create", true, new { @aria_controls = "tblSubscriptions", @style = "position: absolute;" })
+                <span class="rc-control">
+                    <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                </span>
+                Create
+            </label>
+        </div>
+        <div class="radio radio-inline" style="padding-left: 0; margin: 0 30px 0 0;">
+            <label>
+                @Html.RadioButton("Date", "Next", false, new { @aria_controls = "tblSubscriptions", @style = "position: absolute;" })
+                <span class="rc-control">
+                    <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                </span>
+                Next
+            </label>
+        </div>
+    </div>
+    <div class="form-group col-md-12 input-daterange" data-provide="datepicker" style="margin-bottom: 5px;">
+        <div class="input-group date">
+            <input type="text" class="form-control input-sm" aria-controls="tblSubscriptions" placeholder="From" />
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+        <div class="input-group date">
+            <input type="text" class="form-control input-sm" aria-controls="tblSubscriptions" placeholder="To" />
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+    </div>
+</div>
+<!-- Status Drop-Down Template -->
+<div id="tblSubscriptions_statusfilter" class="form-inline" style="display: none;">
+    <div class="form-group col-md-12 input-status" style="margin-bottom: 5px;">
+        <select id="Status" name="Status" class="form-control input-sm" aria-controls="tblSubscriptions">
+            <option value="">-- Status --</option>
+            <option value="Inactive">Inactive</option>
+            <option value="Active" selected="selected">Active</option>
+            <option value="Canceled">Canceled</option>
+            <option value="Suspended">Suspended</option>
+            <option value="Expired">Expired</option>
+            <option value="Terminated">Terminated</option>
+        </select>
+        @Html.DropDownList("PayMethod", Model.PaymentMethods, "-- Pay Method --", new { @class = "form-control input-sm", @aria_controls = "tblSubscriptions" })
+        @Html.DropDownList("Interval", Model.SubscriptionIntervals, "-- Interval --", new { @class = "form-control input-sm", @aria_controls = "tblSubscriptions" })
+    </div>
+</div>
+
+<script type="text/javascript">
+    (function () {
+        this.RZCDateTimePicker = function (selector, options) {
+            return this.init(selector, options);
+        }
+        this.RZCDateTimePicker.prototype.init = function (selector, options) {
+            var dPickers = [];
+            this.selector = selector;
+            this.options = merge(defaults, options);
+            if (this.selector && typeof this.selector === 'string') {
+                dPickers = getDPickers(this.selector);
+            }
+            for (var i = 0; i < dPickers.length; i++) {
+                bindDPicker(this.options, dPickers[i]);
+            }
+            return dPickers.map(function (dPicker) { return dPicker.item; });
+        }
+        var defaults = {
+            format: 'MM/DD/YYYY',
+            showTodayButton: true,
+            showClear: true,
+            showClose: true,
+            useCurrent: false
+        };
+        var merge = function () {
+            var result = {};
+            for (var i = 0; i < arguments.length; i++) {
+                var source = arguments[i];
+                if (source && Object.prototype.toString.call(source) === '[object Object]') {
+                    for (var prop in source) {
+                        result[prop] = source[prop];
+                    }
+                }
+            }
+            return result;
+        };
+        var getDPickers = function (selector) {
+            var dPickers = [];
+            $(selector).each(function (index, dPicker) {
+                var $dPicker = $(dPicker);
+                if ($dPicker.hasClass('input-daterange')) {
+                    var $frm = $dPicker.find('.date').eq(0);
+                    var $to = $dPicker.find('.date').eq(1);
+                    dPickers.push({ item: $frm, linkItem: $to, linkMethod: 'minDate' });
+                    dPickers.push({ item: $to, linkItem: $frm, linkMethod: 'maxDate' });
+                } else {
+                    dPickers.push({ item: $dPicker });
+                }
+            });
+            return dPickers;
+        };
+        var bindDPicker = function (options, dPicker) {
+            dPicker.item.datetimepicker(options).on('dp.change', function (e) {
+                switch (dPicker.linkMethod) {
+                    case 'minDate':
+                        dPicker.linkItem.data("DateTimePicker").minDate(e.date);
+                        break;
+                    case 'maxDate':
+                        dPicker.linkItem.data("DateTimePicker").maxDate(e.date);
+                        break;
+                }
+            }).find('input[type="text"]').click(function () {
+                dPicker.item.data("DateTimePicker").toggle();
+            });
+        };
+    }());
+</script>

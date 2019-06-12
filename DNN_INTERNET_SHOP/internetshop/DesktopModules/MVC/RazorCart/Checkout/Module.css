@@ -1,0 +1,607 @@
+﻿.rzc-basket {
+    position: relative;
+    overflow: auto;
+    padding: 15px 5px 0px;
+    margin: 15px 0px;
+    /*background-color: #FFF;*/
+    /*box-shadow: inset 0 3px 6px rgba(0,0,0,.05);*/
+    border: 1px solid #CCC;
+    border-radius: 4px 4px 0 0;
+}
+.rzc-basket .cart-image {
+    width: auto !important;
+    height: auto !important;
+    max-width: 80px !important;
+    max-height: 80px !important;
+}
+.rzc-basket .table-hover > tbody:hover {
+    background-color: #f5f5f5;
+}
+select option[disabled] {
+    color: gray;
+    font-style: italic;
+}
+@media print {
+    /*body * {
+        visibility: hidden;
+    }
+    .rzc-bootstrap, .rzc-bootstrap * {
+        visibility: visible;
+    }
+    .rzc-bootstrap {
+        position: fixed;
+        overflow-y: auto;
+        overflow-x: hidden;
+        left: 10px;
+        top: 10px;
+        right: 10px;
+        bottom: 10px;
+    }*/
+}
+/************************************************************************************************/
+razorbody {
+    margin: 0px;
+    padding: 0px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display:         flex;
+    -webkit-flex-flow: row;
+            flex-flow: row;
+}
+razorbody > centerbox {
+    margin: 10px;
+    padding: 15px;
+    /*border: 1px solid;*/
+    border-radius: 7pt;
+    -webkit-flex: 3 1 60%;
+            flex: 3 1 60%;
+    max-width: 50%;
+    -webkit-order: 2;
+            order: 2;
+}
+razorbody > leftbox {
+    margin: 10px 10px 10px 0px;
+    padding: 15px 0px;
+    /*border: 1px solid;*/
+    border-radius: 7pt;
+    -webkit-flex: 1 6 20%;
+            flex: 1 6 20%;
+    max-width: 50%;
+    -webkit-order: 1;
+            order: 1;
+}
+razorbody > rightbox {
+    margin: 10px 0px 10px 10px;
+    padding: 15px 0px;
+    /*border: 1px solid;*/
+    border-radius: 7pt;
+    -webkit-flex: 1 6 20%;
+            flex: 1 6 20%;
+    -webkit-order: 3;
+            order: 3;
+    max-width: 50%;
+}
+razorheader, razorfooter {
+    display: block;
+    margin: 10px 0px;
+    padding: 15px 0px;
+    /*border: 1px solid;*/
+    border-radius: 7pt;
+}
+@media all and (max-width: 640px) {
+    razorbody, #page {
+        -webkit-flex-flow: column;
+                flex-flow: column;
+    }
+    razorbody > centerbox, razorbody > leftbox, razorbody > rightbox {
+        -webkit-order: 0;
+                order: 0;
+        max-width: initial;
+    }
+    razorbody > centerbox, razorbody > leftbox, razorbody > rightbox, razorheader, razorfooter {
+        min-height: initial;
+        max-height: initial;
+    }
+    razorbody > leftbox, razorbody > rightbox {
+        margin: 10px 0px;
+        padding: 15px 0px;
+    }
+}
+/************************************************************************************************/
+.basket, .field .label, .text-list, .message {
+    font-size: inherit;
+}
+/* Alerts */
+.alert {
+    margin: 1em 0;
+}
+/* Basket */
+.basket {
+    margin: 15px 0px;
+}
+.basket .field, .basket .total {
+    display: inline-block;
+}
+.basket .total {
+    float: right;
+    margin: 0 0 0 1ex;
+    min-width: 8ex;
+    text-align: right;
+}
+.basket >:last-child {
+    font-weight: bold;
+}
+/* Products */
+.basket .product {
+    display: block;
+    padding: 5px 0;
+    border-bottom: 1px dotted #ccc;
+}
+.basket .product .thumb {
+    width: 65px;
+    float: left;
+}
+.basket .product .sku {
+    display: none;
+}
+.basket .product .quantity {
+    width: 5em;
+    height: auto;
+}
+.basket .product .price, .basket .product .quantity {
+    margin: 0 0 0 2em;
+    text-align: right;
+}
+.basket .product .title {
+    display: inline-block;
+    width: 100px; /* HACK */
+}
+.basket .product .description {
+    display: -webkit-inline-box;
+    display: inline-flex; /* HACK */
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0.8;
+}
+.basket .product .delete {
+  float: right;
+  text-transform: lowercase;
+}
+/* Lists */
+.list {
+    margin: 0;
+    padding: 0;
+}
+.list > li {
+    list-style: none;
+}
+/* Text */
+.text-list > dt {
+    font-weight: bold;
+}
+.text-list > dd {
+    margin: 0 0 1em;
+}
+.text-list > dd:last-child {
+  margin-bottom: 0;
+}
+/* Forms */
+.btn {
+    cursor: pointer;
+    padding: 4px 12px;
+}
+.btn + .btn {
+    margin-left: 1em;
+}
+.field {
+    display: block;
+    margin-bottom: 5px;
+}
+.field .label {
+  display: block;
+  overflow: hidden;
+  text-align: left;
+}
+.field .text, .field textarea, .field select {
+    display: inline-block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+}
+.field select {
+    padding: 5px 8px;
+}
+.field .text.short {
+  width: calc((100% / 2) - 2px);
+}
+/* Layout */
+.field-row {
+    display: -webkit-flex;
+    display:         flex;
+    -webkit-flex-direction: row;
+            flex-direction: row;
+}
+.field-row.row-collapse {
+    display: block;
+}
+.field-row.row-justify {
+    -webkit-justify-content: space-between;
+            justify-content: space-between;
+}
+.field-row.row-reverse {
+    -webkit-justify-content: flex-end;
+            justify-content: flex-end;
+}
+.field-row > .field-major {
+    -webkit-flex: 1 1 50%;
+            flex: 1 1 50%;
+}
+.field-row > .field, .field-row > .field-row {
+    margin-left: 5px;
+}
+.field-row >.field:first-child, .field-row >.field-row:first-child {
+    margin-left: 0;
+}
+/* Tables */
+td.rz-command, td.rz-data {
+    text-align: center;
+}
+td.rz-data.rz-data-text {
+    text-align: left;
+}
+td.rz-data.rz-data-numeric {
+    text-align: right;
+}
+/* Desktop media */
+@media screen and (min-width: 526px) {
+    .list {
+        margin-left: 1em;
+        margin-right: 1em;
+    }
+    .field-row.row-collapse {
+        display: -webkit-flex;
+        display:         flex;
+    }
+}
+.form-control input[type="text"] {
+	height: auto !important;
+}
+/*
+ * Examples
+ *
+ * Isolated sections of example content for each component or feature. Usually
+ * followed by a code snippet.
+ */
+.rc-basket {
+    position: relative;
+    overflow: auto;
+    padding: 15px 5px 10px 5px;
+    /*margin: 0 -15px 15px;*/
+    /*background-color: #fafafa;*/
+    /*box-shadow: inset 0 3px 6px rgba(0,0,0,.05);*/
+    border-color: #C0C0C0;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 4px 4px 0 0;
+}
+/* Echo out a label for the example */
+.rc-basket:after {
+    content: "";
+    position: absolute;
+    top:  15px;
+    left: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+/* Tweak display of the code snippets when following an example */
+.rc-basket + .highlight {
+    margin: -15px -15px 15px;
+    border-radius: 0;
+    border-width: 0 0 1px;
+}
+/* Make the examples and snippets not full-width */
+@media (min-width: 768px) {
+    .rc-basket {
+        /*margin-left: 0;*/
+        /*margin-right: 0;*/
+        /*background-color: #fff;*/
+        /*border-width: 1px;*/
+        /*border-color: #C0C0C0;*/
+        border-radius: 4px 4px 0 0;
+        box-shadow: none;
+    }
+    .rc-basket + .highlight {
+        margin-top: -16px;
+        margin-left: 0;
+        margin-right: 0;
+        border-width: 1px;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
+}
+/* Undo width of container */
+.rc-basket .container {
+    width: auto;
+}
+/* Tweak content of examples for optimum awesome */
+.rc-basket > p:last-child,
+.rc-basket > ul:last-child,
+.rc-basket > ol:last-child,
+.rc-basket > blockquote:last-child,
+.rc-basket > .form-control:last-child,
+.rc-basket > .table:last-child,
+.rc-basket > .navbar:last-child,
+.rc-basket > .jumbotron:last-child,
+.rc-basket > .alert:last-child,
+.rc-basket > .panel:last-child,
+.rc-basket > .list-group:last-child,
+.rc-basket > .well:last-child,
+.rc-basket > .progress:last-child,
+.rc-basket > .table-responsive:last-child > .table {
+    margin-bottom: 0;
+}
+.rc-basket > p > .close {
+    float: none;
+}
+/* Typography */
+.rc-basket-type .table .info {
+    color: #999;
+    vertical-align: middle;
+}
+.rc-basket-type .table td {
+    padding: 15px 0;
+    border-color: #eee;
+}
+.rc-basket-type .table tr:first-child td {
+    border-top: 0;
+}
+.rc-basket-type h1,
+.rc-basket-type h2,
+.rc-basket-type h3,
+.rc-basket-type h4,
+.rc-basket-type h5,
+.rc-basket-type h6 {
+    margin: 0;
+}
+/* Images */
+.rc-basket > .img-circle,
+.rc-basket > .img-rounded,
+.rc-basket > .img-thumbnail {
+    margin: 5px;
+}
+/* Tables */
+.rc-basket > .table-responsive > .table {
+    background-color: #fff;
+}
+/* Buttons */
+.rc-basket > .btn,.rc-basket > .btn-group {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.rc-basket > .btn-toolbar + .btn-toolbar {
+    margin-top: 10px;
+}
+/* Forms */
+.rc-basket-control-sizing select,
+.rc-basket-control-sizing input[type="text"] + input[type="text"] {
+    margin-top: 10px;
+}
+.rc-basket-form .input-group {
+    margin-bottom: 10px;
+}
+.rc-basket > textarea.form-control {
+    resize: vertical;
+}
+/* List groups */
+.rc-basket > .list-group {
+    max-width: 400px;
+}
+/* Navbars */
+.rc-basket .navbar:last-child {
+    margin-bottom: 0;
+}
+/* Shopping Cart */
+.rcCheckoutImage{
+    width: 100%;
+    max-width: 100px;
+    max-height: 100px;
+    min-width: 75px;
+    min-height: 75px;
+}
+.rc-total-summary {
+    width: 50%;
+    float: right;
+}
+.rc-total-summary li {
+    border-bottom: 1px dotted;
+    border-color: #ddd;
+    box-shadow: none;
+}
+.rc-heading {
+    font-size: 1em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: normal;
+}
+.rc-regular {
+    font-style: italic;
+    text-decoration: line-through;
+}
+input[type="text"], select, textarea, input[type="email"], input[type="search"], input[type="password"] {
+    /*Hack DNN Gravity Skin*/
+    /*margin-bottom: 2px !important;*/
+}
+.dnnSecondaryAction, .dnnPrimaryAction {
+    /*Hack DNN Gravity Skin*/
+    /*padding: 7.5px !important;*/
+}
+/************************************************************************************************/
+/* Fancy Bootstrap Radio/Checkbox */
+.glyphicon-checkbox:before {
+    content: "\e067";
+    font-size: 1.5em;
+    float: left;
+    margin-left: -0.25em;
+}
+.glyphicon-radio:before {
+    content: "\e165";
+    font-size: 1.5em;
+    float: left;
+    margin-left: -0.25em;
+}
+.checkbox label:after,
+.radio label:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+.checkbox span.rc-control,
+.radio span.rc-control {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #a9a9a9;
+    border-radius: 0.25em;
+    width: 1.4em;
+    height: 1.4em;
+    float: left;
+    margin-right: -10px;
+    left: -20px;
+}
+.radio span.rc-control {
+    border-radius: 50%;
+}
+.checkbox span.rc-control .rc-icon,
+.radio span.rc-control .rc-icon {
+    position: absolute;
+    line-height: 0;
+    top: 50%;
+    left: 20%;
+}
+.radio span.rc-control .rc-icon {
+    margin-left: 0.5px;
+    margin-top: -0.5px;
+}
+.checkbox label input[type="checkbox"],
+.radio label input[type="radio"] {
+    display: none;
+}
+.checkbox label input[type="checkbox"] + span.rc-control > .rc-icon,
+.checkbox label input[type="checkbox"] + * + span.rc-control > .rc-icon,
+.radio label input[type="radio"] + span.rc-control > .rc-icon,
+.radio label input[type="radio"] + * + span.rc-control > .rc-icon {
+    opacity: 0;
+    /*transform: scale(3) rotateZ(-20deg);*/
+    /*transition: all 0.3s ease-in;*/
+}
+.checkbox label input[type="checkbox"]:checked + span.rc-control > .rc-icon,
+.checkbox label input[type="checkbox"]:checked + * + span.rc-control > .rc-icon,
+.radio label input[type="radio"]:checked + span.rc-control > .rc-icon,
+.radio label input[type="radio"]:checked + * + span.rc-control > .rc-icon {
+    opacity: 1;
+    /*transform: scale(1) rotateZ(0deg);*/
+}
+.checkbox label input[type="checkbox"]:checked + span.rc-control,
+.checkbox label input[type="checkbox"]:checked + * + span.rc-control,
+.radio label input[type="radio"]:checked + span.rc-control,
+.radio label input[type="radio"]:checked + * + span.rc-control {
+    border: none;
+}
+.checkbox label input[type="checkbox"]:disabled + span.rc-control,
+.checkbox label input[type="checkbox"]:disabled + * + span.rc-control,
+.radio label input[type="radio"]:disabled + span.rc-control,
+.radio label input[type="radio"]:disabled + * + span.rc-control {
+    opacity: 0.5;
+}
+/************************************************************************************************/
+.rc-backdrop {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    top: 0;
+    z-index: 1040;
+}
+.rc-backdrop-container {
+    position: relative;
+    top: 50%;
+    text-align: center;
+}
+/************************************************************************************************/
+.hr-text {
+    line-height: 1em;
+    position: relative;
+    outline: 0;
+    border: 0;
+    color: black;
+    text-align: center;
+    height: 1.5em;
+    opacity: 0.5;
+    border-top: 1px solid #000000 !important;
+}
+.hr-text:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+}
+.hr-text:after {
+    content: attr(data-content);
+    position: relative;
+    display: inline-block;
+    padding: 0.5em;
+    line-height: 18px;
+    background-color: #FFFFFF;
+    top: -18px;
+}
+/************************************************************************************************/
+.radio-image {
+    display: inline-block !important;
+}
+.radio-image label {
+    padding: 0 !important;
+}
+.radio-image input[type="radio"] {
+    margin: 0;
+    padding: 0;
+    display: none;
+}
+.rzc-donation-sale {
+    font-style: italic;
+    text-decoration: line-through;
+}
+.rzc-donation-button {
+    padding: 6px 10px !important;
+    border: 4px solid !important;
+}
+.rzc-donation-shadow {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+.rzc-donation-product-desc {
+    border: 1px solid;
+    border-radius: 10px;
+    padding: 10px 10px;
+    margin: 10px 0px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+    display: block;
+}
+.rc-donation-backdrop {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    top: 0;
+    z-index: 1040;
+}
+.rc-donation-backdrop-container {
+    position: relative;
+    top: 50%;
+    text-align: center;
+}

@@ -1,0 +1,99 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.GiftCardModel>
+@using System.Web.Mvc.Html;
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Gift Card Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Code", "GiftCard", new { StoreID = Model.StoreID })" autocomplete="off">
+            @Html.Partial("_GiftCardMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a class="btn btn-primary pull-right" href="@Url.Action("AddCode", "GiftCard", new { StoreID = Model.StoreID })">
+                                        <i class="fa fa-plus"></i> Add Gift Card
+                                    </a>
+                                    <h4>Store Gift Cards</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <table class="table table-hover" id="tblGiftCards" style="width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>Active</th>
+                                                <th>Order #</th>
+                                                <th>Date</th>
+                                                <th>Code</th>
+                                                <th>Product</th>
+                                                <th>Amount</th>
+                                                <th>Balance</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tblGiftCards').DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: '',
+            },
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            columns: [
+                {
+                    data: 'Active', render: function (data, type, full, meta) {
+                        return '<i class="fa fa-' + (data ? 'check-circle' : 'circle-thin') + ' fa-lg" aria-hidden="true"></i>';
+                    }
+                },
+                { data: 'OrderID' },
+                { data: 'CreateDate' },
+                { data: 'FormattedCode' },
+                { data: 'ProductName' },
+                { data: 'Amount', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)') },
+                { data: 'Balance', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)') },
+                {
+                    data: 'GiftCardID', render: function (data, type, full, meta) {
+                        var editUrl = '@Url.Action("EditCode", "GiftCard", new { StoreID = Model.StoreID })' + '?GiftCardID=' + data;
+                        var deleteUrl = '@Url.Action("DeleteCode", "GiftCard", new { StoreID = Model.StoreID })' + '?GiftCardID=' + data;
+                        return '<a href="' + editUrl + '"><i class="fa fa-pencil-square-o fa-lg"></i></a>' + '\n'
+                            + '<a href="' + deleteUrl + '" onclick="return confirm(\'Are you sure?\')"><i class="fa fa-trash-o fa-lg"></i></a>';
+                    }, className: 'text-right'
+                }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: true,
+            ordering: false,
+            ajax: '@Url.Action("ListCodes", "GiftCard", new { StoreID = Model.StoreID })'
+        });
+    });
+</script>

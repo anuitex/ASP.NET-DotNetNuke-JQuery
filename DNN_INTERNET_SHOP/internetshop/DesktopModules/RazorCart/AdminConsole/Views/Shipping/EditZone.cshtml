@@ -1,0 +1,127 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ShippingModel>
+@using System.Web.Mvc.Html;
+@using System.Globalization;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Shipping Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @Html.Partial("_ShippingMenu")
+        <div class="tab-content">
+            <div class="tab-pane active">
+                <div class="container-fluid">
+                    <div class="row">
+                        @if (Model.Submitted)
+                        {
+                            <div class="alert alert-success alert-dismissable">
+                                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                @Model.SaveMessage
+                            </div>
+                        }
+                        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Shipping", new { StoreID = Model.StoreID, ZoneID = Model.ShipZone.ZoneID })" autocomplete="off">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Zone Name</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("ZoneName", Model.ShipZone.ZoneName, new { @class = "form-control", @placeholder = "Zone Name", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Country</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.DropDownList("Country", Model.Countries, "-- Select --", new { @class = "form-control", @onchange = "defaultCountryChange(this.value);", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Region</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            <div class="row">
+                                                <div class="col-xs-5">
+                                                    @Html.DropDownList("Region", Model.Regions, new { @class = "form-control", @multiple = "multiple", @data_source = "true", @size = "10" })
+                                                </div>
+                                                <div class="col-xs-2">
+                                                    <button type="button" class="btn btn-block" onclick="multiSelectAdd(this);">Add <i class="fa fa-angle-double-right"></i></button>
+                                                    <button type="button" class="btn btn-block" onclick="multiSelectDel(this);"><i class="fa fa-angle-double-left"></i> Del</button>
+                                                </div>
+                                                <div class="col-xs-5">
+                                                    @Html.DropDownList("StateText", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_text = "Region", @size = "10" })
+                                                    @Html.DropDownList("State", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_value = "Region", @style = "display: none;" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Postal Codes</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextArea("Codes", Model.ShipZone.Codes, new { @class = "form-control", @placeholder = "Postal Codes", @rows = "2" })
+                                            * Use comma-separated values (enter to limit to specific ZIP/Postal Codes)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Zone Amount</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("Price", Model.ShipZone.Price.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Zone Amount", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 col-sm-4 control-label">Free Shipping Over Amount</label>
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("FreeShipOverAmount", Model.ShipZone.FreeShipOverAmount.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Free Shipping Over Amount", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary" onclick="multiSelectAll(this);"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("Zone", "Shipping", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- /.form -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    function defaultCountryChange(value) {
+        var regionDDL = $('select[name="Region"]');
+        var regionDDL_Text = $('select[name="StateText"]');
+        var regionDDL_Value = $('select[name="State"]');
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ListRegions", "Setup", new { StoreID = Model.StoreID })',
+            data: { 'Country': value },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                regionDDL.html('');
+                regionDDL_Text.html('');
+                regionDDL_Value.html('');
+                var data = JSON.parse(JSON.stringify(response));
+                $.each(data, function (index, option) {
+                    regionDDL.append($('<option></option>').val(option.Value).html(option.Text));
+                });
+            },
+            error: function (response, status, error) {
+                console.log(error);
+            }
+        });
+    }
+    $(document).ready(function () {
+        var regionCodes = '@(Model.ShipZone.State ?? string.Empty)'.split(';');
+        $.each(regionCodes, function (index, value) {
+            $('#Region').val(value).parents('.form-group').find('button[onclick^=multiSelectAdd]').trigger('onclick');
+        });
+    });
+</script>

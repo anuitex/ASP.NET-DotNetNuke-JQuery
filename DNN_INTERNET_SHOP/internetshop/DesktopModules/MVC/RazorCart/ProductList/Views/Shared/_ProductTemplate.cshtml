@@ -1,0 +1,95 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.ProductList.Models.ListModel>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="list-group">
+            <div class="rzc-item" ng-repeat="product in list.products" ng-class="list.displayMode === 'gridview' ? 'grid-group-item col-xs-6 col-sm-4 col-md-3 col-lg-3' : 'list-group-item'">
+                <div ng-class="{'row': list.displayMode !== 'gridview'}">
+                    <div class="rzc-item-main" ng-class="{'col-xs-12 col-sm-9 col-md-7': list.displayMode !== 'gridview'}">
+                        <div ng-class="{'thumbnail': list.displayMode === 'gridview'}">
+                            <a ng-href="{{product.ProductDetailUrl}}" title="{{product.ModelName}}" class="rzc-undecorated" target="_self">
+                                <div class="rzc-img-wrapper">
+                                    <img ng-src="{{product.ThumbImage}}" err-src="@DotNetNuke.Common.Globals.DesktopModulePath" err-size="200" title="{{product.ImageTitle}}" alt="{{product.ImageAlt}}" class="list-group-image img-responsive" />
+                                </div>
+                                <div>
+                                    <h5 class="list-group-item-heading">
+                                        {{product.ModelName}}
+                                    </h5>
+                                    <h6 class="list-group-item-heading">{{product.ModelNumber}}</h6>
+                                </div>
+                            </a>
+                            <div class="caption-list">
+                                <p class="list-group-item-text" ng-bind-html="product.Description | unSafeHtml"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rzc-item-sub" ng-class="{'col-xs-12 col-sm-3 col-md-5': list.displayMode !== 'gridview'}">
+                        <div class="row">
+                            <div style="margin-bottom: 5px;" ng-class="list.displayMode === 'gridview' ? 'col-lg-12' : 'col-md-6'">
+                                @if (Model.AllowPriceView)
+                                {
+                                    <span class="fa-stack fa-1x" ng-if="product.OrderHistory.length">
+                                        <i class="fa fa-repeat fa-flip-horizontal fa-stack-2x text-stroke-3"></i>
+                                        <i class="fa fa-usd fa-stack-1x"></i>
+                                    </span>
+                                    <label class="rzc-price-label" ng-class="{'strike-through': list.isSaleEnabled && product.IsUnderSale}">
+                                        {{(product.BundleUnitCost || product.UnitCost) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                                    </label>
+                                    <label class="rzc-price-label" ng-if="list.isSaleEnabled && product.IsUnderSale">
+                                        {{(product.BundleSalePrice || product.SalePrice) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                                    </label>
+                                }
+                                <div ng-style="(product.HasVariants || product.Booking || (list.isGiftCardsEnabled && product.GiftCard)) && {'visibility':'hidden'}">
+                                    <div class="row">
+                                        <div ng-class="list.displayMode === 'gridview' && product.UserEnteredAmount ? 'col-xxs-5 p-right-2' : 'col-lg-12'">
+                                            <input type="number" class="form-control" ng-model="list.productQuantity[product.ProductID]" ng-init="list.productQuantity[product.ProductID] = 1" min="1" placeholder="Qunatity" />
+                                        </div>
+                                        <div ng-class="list.displayMode === 'gridview' && product.UserEnteredAmount ? 'col-xxs-7 p-left-2' : 'col-lg-12 m-top-5'" ng-if="product.UserEnteredAmount">
+                                            <input type="number" class="form-control" ng-model="list.productPrice[product.ProductID]" ng-init="list.productPrice[product.ProductID] = null" min="0" step="@(Math.Pow(10, Model.Culture.NumberFormat.CurrencyDecimalDigits * -1))" placeholder="Price" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-class="list.displayMode === 'gridview' ? 'col-lg-12' : 'col-md-6'">
+                                <div class="btn-group btn-group-justified" style="table-layout: auto;">
+                                    @if (Model.AllowAddToCart)
+                                    {
+                                        <div class="btn-group" ng-if="product.QuantityOnHand || product.HasVariants || list.manageInventory">
+                                            <button type="button" class="btn btn-primary" ng-click="list.addToCart($index)">
+                                                {{product.HasVariants || product.Booking || (list.isGiftCardsEnabled && product.GiftCard) ? '@Dnn.LocalizeString("AddOptions")' : '@Dnn.LocalizeString("AddToCart")'}}
+                                            </button>
+                                        </div>
+                                    }
+                                    @if (Model.AllowQuantityView)
+                                    {
+                                        <div class="btn-group" ng-if="!product.QuantityOnHand && !product.HasVariants && !list.manageInventory">
+                                            <button type="button" class="btn btn-danger disabled">
+                                                @Dnn.LocalizeString("SoldOut")
+                                            </button>
+                                        </div>
+                                    }
+                                    @if (Model.EnableWishlist)
+                                    {
+                                        <div class="btn-group" ng-if="!(product.HasVariants || product.Booking || (list.isGiftCardsEnabled && product.GiftCard))">
+                                            <button type="button" class="btn btn-default" ng-click="list.addToWishlist($index)">
+                                                <i class="fa fa-heart"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                    @if (Model.EnableComparison)
+                                    {
+                                        <div class="btn-group" ng-if="!(list.isGiftCardsEnabled && product.GiftCard)">
+                                            <button type="button" class="btn btn-default" ng-click="list.addToComparison($index)">
+                                                <i class="fa fa-signal"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,695 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.SetupModel>
+@using System.Web.Mvc.Html;
+
+<!-- Select2 CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2-bootstrap.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Select2 JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/select2.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Store Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Save", "Setup", new { StoreID = Model.StoreID })" autocomplete="off">
+            @if (Model.Submitted)
+            {
+                <div class="alert alert-success alert-dismissable">
+                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                    @Model.SaveMessage
+                </div>
+            }
+            <div class="panel-group" id="accordion">
+                <div class="lead">
+                    <a href="#" class="btn btn-default" data-toggle="collapse-all" data-target="#accordion .panel-collapse">
+                        Collapse All
+                    </a>
+                </div>
+                @* General Store Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseGeneral">
+                            <h4 class="panel-title">General Store Setup</h4>
+                        </a>
+                    </div>
+                    <div id="collapseGeneral" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Store Name</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("StoreName", Model.StoreConfig["StoreName"], new { @class = "form-control", @placeholder = "Store Name" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Store Address 1</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("StoreAddress1", Model.StoreConfig["StoreAddress1"], new { @class = "form-control", @placeholder = "Store Address 1" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Store Address 2</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("StoreAddress2", Model.StoreConfig["StoreAddress2"], new { @class = "form-control", @placeholder = "Store Address 2" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">City</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("StoreCity", Model.StoreConfig["StoreCity"], new { @class = "form-control", @placeholder = "City" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Country</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.DropDownList("DefaultCountry", Model.Countries, "-- Select --", new { @class = "form-control", @onchange = "defaultCountryChange(this.value);", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Region/State</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.DropDownList("HomeState", Model.Regions, "-- Select --", new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Postal/Zip Code</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("StoreZipCode", Model.StoreConfig["StoreZipCode"], new { @class = "form-control", @placeholder = "Postal/Zip Code", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Currency</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.DropDownList("StoreCurrency", Model.Currencies, "-- Select --", new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @* Email/SMS Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseEmail">
+                            <h4 class="panel-title">Email/SMS Setup</h4>
+                        </a>
+                    </div>
+                    <div id="collapseEmail" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Store "From" Email</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("SendFromEmail", Model.StoreConfig["SendFromEmail"], new { @class = "form-control", @placeholder = "Store From Email", @type = "email" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Store "To" Email</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("SendToEmail", Model.StoreConfig["SendToEmail"], new { @class = "form-control", @placeholder = "Store To Email", @type = "email" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Store "CC" Emails</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextArea("SendCCEmails", Convert.ToString(Model.StoreConfig["SendCCEmails"]), new { @class = "form-control", @placeholder = "Store CC Emails" })
+                                    (Use comma/semicolon to separate multiple email addresses)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Disable Email On-Decline</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("DisableEmailOnDecline", Convert.ToBoolean(Model.StoreConfig["DisableEmailOnDecline"] ?? bool.FalseString), new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Send SMS Booking Reminders</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("SmsBookingReminder", Convert.ToBoolean(Model.StoreConfig["SmsBookingReminder"] ?? bool.FalseString), new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                            <span style="cursor: default;" onclick="return false;">
+                                                (To manage the carrier list: @string.Format("{0}{1}/Xml/PhoneCarriers.xml", Model.PortalSettings.HomeDirectory, Model.ProductName))
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="SmsBookingReminder" data-cond-value="true" style="display: none;">
+                                <label class="col-md-3 col-sm-4 control-label">Send Reminder In</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            @Html.DropDownList("BookingReminderInterval", Model.ReminderIntervals, new { @class = "form-control", @required = "required" })
+                                        </div>
+                                        <div class="col-xs-6">
+                                            @Html.DropDownList("BookingReminderUnit", Model.ReminderUnits, new { @class = "form-control", @required = "required" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-md-offset-0 col-sm-offset-4 control-label" style="text-align: left;">
+                                    <span class="badge">before booking date/time</span>
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="SmsBookingReminder" data-cond-value="true" style="display: none;">
+                                <label class="col-md-3 col-sm-4 control-label">Show Reminder Opt-In Checkbox</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("BookingReminderOptIn", Convert.ToBoolean(Model.StoreConfig["BookingReminderOptIn"]), new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @* Checkout Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseCheckout">
+                            <h4 class="panel-title">Cart and Checkout</h4>
+                        </a>
+                    </div>
+                    <div id="collapseCheckout" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Show Fields</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("ShowCompanyName", Convert.ToBoolean(Model.StoreConfig["ShowCompanyName"]), new { @onchange = "checkBoxChange(this);" }) Show Company Name
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("ShowManufacturer", Convert.ToBoolean(Model.StoreConfig["ShowManufacturer"]), new { @onchange = "checkBoxChange(this);" }) Show Manufacturer
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("ShowCustomerOptIn", Convert.ToBoolean(Model.StoreConfig["ShowCustomerOptIn"]), new { @onchange = "checkBoxChange(this);" }) Show Newsletter Opt-In Checkbox
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("ShowAcceptTerms", Convert.ToBoolean(Model.StoreConfig["ShowAcceptTerms"]), new { @onchange = "checkBoxChange(this);" }) Show Accept Terms Checkbox
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Show Custom Fields</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("ShowCustomField1", Convert.ToBoolean(Model.StoreConfig["ShowCustomField1"]), new { @onchange = "checkBoxChange(this);" }) Show Custom Field 1
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="checkbox" data-show="conditional" data-cond-option="ShowCustomField1" data-cond-value="true" style="display: none;">
+                                        <label>
+                                            @Html.CheckBox("CustomField1Required", Convert.ToBoolean(Model.StoreConfig["CustomField1Required"]), new { @onchange = "checkBoxChange(this);" }) Custom Field 1 Required
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("ShowCustomField2", Convert.ToBoolean(Model.StoreConfig["ShowCustomField2"]), new { @onchange = "checkBoxChange(this);" }) Show Custom Field 2
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="checkbox" data-show="conditional" data-cond-option="ShowCustomField2" data-cond-value="true" style="display: none;">
+                                        <label>
+                                            @Html.CheckBox("CustomField2Required", Convert.ToBoolean(Model.StoreConfig["CustomField2Required"]), new { @onchange = "checkBoxChange(this);" }) Custom Field 2 Required
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Hide Fields</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("HidePrice", Convert.ToBoolean(Model.StoreConfig["HidePrice"]), new { @onchange = "checkBoxChange(this);" }) Hide Price
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("HideSubTotal", Convert.ToBoolean(Model.StoreConfig["HideSubTotal"]), new { @onchange = "checkBoxChange(this);" }) Hide Subtotal
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Donations</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("EnableCheckoutDonation", Convert.ToBoolean(Model.StoreConfig["EnableCheckoutDonation"]), new { @onchange = "checkBoxChange(this);" }) Enable Donation at Checkout
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EnableCheckoutDonation" data-cond-value="true" data-cond-destroy="true" style="display: none;">
+                                <label class="col-md-3 col-sm-4 control-label">Checkout Donation Product</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.DropDownList("CheckoutDonationProduct", Model.DonationProducts, new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Special Instructions</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="radio">
+                                        <label>
+                                            @Html.RadioButton("SpecialInstructions", "NoSpecialInstructions", (string)Model.StoreConfig["SpecialInstructions"] == "NoSpecialInstructions" || Model.StoreConfig["SpecialInstructions"] == null, new { }) No Special Instructions
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            @Html.RadioButton("SpecialInstructions", "SpecialInstructionsStep1", (string)Model.StoreConfig["SpecialInstructions"] == "SpecialInstructionsStep1", new { }) Show Special Instructions on Step 1 Page
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            @Html.RadioButton("SpecialInstructions", "SpecialInstructionsConfStatus", (string)Model.StoreConfig["SpecialInstructions"] == "SpecialInstructionsConfStatus", new { }) Show Special Instructions on Confirmation Status Page
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Field Behavior</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("UserEnteredAmount", Convert.ToBoolean(Model.StoreConfig["UserEnteredAmount"]), new { @onchange = "checkBoxChange(this);" }) User Entered Amount
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Minimum Order Amount</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("MinOrderAmt", Model.StoreConfig["MinOrderAmt"], new { @class = "form-control", @placeholder = "Minimum Order Amount", @type = "number", @step = "0.01" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Limit Products in Cart</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("LimitProductsInCart", Model.StoreConfig["LimitProductsInCart"] ?? "-1", new { @class = "form-control", @placeholder = "Limit Products in Cart", @type = "number", @step = "1" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Customer Registration</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("CheckoutRegistration", Convert.ToBoolean(Model.StoreConfig["CheckoutRegistration"]), new { @onchange = "checkBoxChange(this); disableGuestCheckout(this.checked);" }) Enable Checkout Registration
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("GuestCheckout", Convert.ToBoolean(Model.StoreConfig["GuestCheckout"]), Convert.ToBoolean(Model.StoreConfig["CheckoutRegistration"]) ? new { @onchange = "checkBoxChange(this);" } : (object)new { @onchange = "checkBoxChange(this);", @onclick = "return false;", @readonly = "readonly" }) Allow Guest Checkout
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Persistent Cart Behavior</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="radio">
+                                        <label>
+                                            @Html.RadioButton("PersistCartBehavior", "PersistCartByPC", (string)Model.StoreConfig["PersistCartBehavior"] == "PersistCartByPC" || Model.StoreConfig["PersistCartBehavior"] == null, new { }) Persist By Machine
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            @Html.RadioButton("PersistCartBehavior", "PersistCartByUser", (string)Model.StoreConfig["PersistCartBehavior"] == "PersistCartByUser", new { }) Persist By DNN User
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Cookie Timeout</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="input-group">
+                                        @Html.TextBox("CookieTimeOut", Model.StoreConfig["CookieTimeOut"] ?? "30", new { @class = "form-control", @placeholder = "Cookie Timeout", @type = "number", @step = "1" })
+                                        <span class="input-group-addon">Days</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Product Image Server Location</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="radio">
+                                        <label>
+                                            @Html.RadioButton("ProductImageSource", "LocalWebServer", (string)Model.StoreConfig["ProductImageSource"] == "LocalWebServer" || Model.StoreConfig["ProductImageSource"] == null, new { }) Store Product Images on Local Web Server (Default)
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            @Html.RadioButton("ProductImageSource", "ExternalURL", (string)Model.StoreConfig["ProductImageSource"] == "ExternalURL", new { }) Store Product Images on External Server
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @* Inventory Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseInventory">
+                            <h4 class="panel-title">Inventory & Stock</h4>
+                        </a>
+                    </div>
+                    <div id="collapseInventory" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Enable Inventory Management</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("EnableInventory", Convert.ToBoolean(Model.StoreConfig["EnableInventory"] ?? (!Convert.ToBoolean(Model.StoreConfig["DisableInventory"] ?? bool.FalseString)).ToString() ?? bool.TrueString), new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EnableInventory" data-cond-value="true" style="display: none;">
+                                <label class="col-md-3 col-sm-4 control-label">Backorders</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.DropDownList("Backorders", Model.BackordersBehaviors, new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @* User Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseUser">
+                            <h4 class="panel-title">User Management</h4>
+                        </a>
+                    </div>
+                    <div id="collapseUser" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Disable User Profile Sync</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("DisableProfileSync", Convert.ToBoolean(Model.StoreConfig["DisableProfileSync"] ?? bool.FalseString), new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Show Price/Cost by Roles</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="input-group">
+                                        @Html.ListBox("PriceRoles", Model.PriceRoleList)
+                                        <div class="input-group-addon checkbox" style="width: 100px;">
+                                            <label>
+                                                @Html.CheckBox("ShowPriceByRoles", Convert.ToBoolean(Model.StoreConfig["ShowPriceByRoles"] ?? bool.FalseString), new { @onchange = "checkBoxChange(this);" }) Enable
+                                                <span class="rc-control">
+                                                    <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Show InStock Quantity by Roles</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="input-group">
+                                        @Html.ListBox("QuantityRoles", Model.QuantityRoleList)
+                                        <div class="input-group-addon checkbox" style="width: 100px;">
+                                            <label>
+                                                @Html.CheckBox("ShowQuantityByRoles", Convert.ToBoolean(Model.StoreConfig["ShowQuantityByRoles"] ?? bool.FalseString), new { @onchange = "checkBoxChange(this);" }) Enable
+                                                <span class="rc-control">
+                                                    <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Show Add-To-Cart by Roles</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="input-group">
+                                        @Html.ListBox("AddToCartRoles", Model.AddToCartRoleList)
+                                        <div class="input-group-addon checkbox" style="width: 100px;">
+                                            <label>
+                                                @Html.CheckBox("ShowAddToCartByRoles", Convert.ToBoolean(Model.StoreConfig["ShowAddToCartByRoles"] ?? bool.FalseString), new { @onchange = "checkBoxChange(this);" }) Enable
+                                                <span class="rc-control">
+                                                    <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">User Profile Property Map</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.DropDownList("ProfilePropertyMap", Model.ProfileProperties, "-- Select --", new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @* Wishlist Setup *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseWishlist">
+                            <h4 class="panel-title">Wishlist and Save Cart</h4>
+                        </a>
+                    </div>
+                    <div id="collapseWishlist" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Enable Wishlist/Save Cart</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("Wishlist", Convert.ToBoolean(Model.StoreConfig["Wishlist"]), new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @* Analytics Tracking *@
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" href="#collapseAnalytics">
+                            <h4 class="panel-title">Analytics Tracking</h4>
+                        </a>
+                    </div>
+                    <div id="collapseAnalytics" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-4 control-label">Enable Google Analytics</label>
+                                <div class="col-md-6 col-sm-8">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBox("EnableAnalytics", Convert.ToBoolean(Model.StoreConfig["EnableAnalytics"]), new { @onchange = "checkBoxChange(this);" })
+                                            <span class="rc-control">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EnableAnalytics" data-cond-value="true" style="display: none;">
+                                <label class="col-md-3 col-sm-4 control-label">Analytics Tracking ID</label>
+                                <div class="col-md-6 col-sm-8">
+                                    @Html.TextBox("AnalyticsTrackingID", Model.StoreConfig["AnalyticsTrackingID"], new { @class = "form-control", @placeholder = "Google Analytics Tracking ID" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        $('#PriceRoles, #QuantityRoles, #AddToCartRoles').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            containerCssClass: 'input-large',
+            placeholder: "Select roles",
+            minimumInputLength: 0,
+        }).on('change.select2', function (e) {
+            var selection = $(e.target).select2('data');
+            if (selection.length) {
+                $(this).parent().find('[type="hidden"][name="' + this.name + '"]').remove();
+            }
+            else {
+                $(this).parent().append($('<input type="hidden" name="' + this.name + '" value="">'));
+            }
+        });
+        $('#CheckoutDonationProduct').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            placeholder: "Select product",
+            ajax: {
+                type: 'POST',
+                url: '@Url.Action("List", "Product", new { StoreID = Model.StoreID })',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        'search[value]': params.term,
+                        'length': 25,
+                        'start': 0
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: $.map(data.data, function (item) {
+                            return {
+                                id: item.ProductID,
+                                text: item.ModelName
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2,
+        });
+    });
+    function defaultCountryChange(value) {
+        var regionDDL = $('select[name="HomeState"]');
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ListRegions", "Setup", new { StoreID = Model.StoreID })',
+            data: { 'Country': value },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                regionDDL.html('');
+                regionDDL.append($('<option></option>').val('').html('-- Select --'));
+                var data = JSON.parse(JSON.stringify(response));
+                $.each(data, function (index, option) {
+                    regionDDL.append($('<option></option>').val(option.Value).html(option.Text));
+                });
+            },
+            error: function (response, status, error) {
+                console.log(error);
+            }
+        });
+    }
+    function disableGuestCheckout(registration) {
+        if (registration) {
+            $('#GuestCheckout').prop('onclick', null).off('click');
+            $('#GuestCheckout').removeAttr("readonly");
+        }
+        else {
+            if ($('#GuestCheckout').is(':checked'))
+                $('#GuestCheckout').prop('checked', false).change();
+            $('#GuestCheckout').click(function () { return false; });
+            $('#GuestCheckout').attr('readonly', 'readonly');
+        }
+    }
+</script>

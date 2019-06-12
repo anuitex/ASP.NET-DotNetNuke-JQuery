@@ -1,0 +1,231 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.ProductDetails.Models.DetailsModel>
+
+@foreach (var group in Model.VariantList)
+{
+    int i = 1;
+    string ngIf = string.Empty;
+    string[] ngIfs = new string[group.Conditionals.Count + 1];
+    ngIfs[0] = group.Hide ? "false" : "true";
+    foreach (var condition in group.Conditionals)
+    {
+        switch (condition.VariantDisplayType)
+        {
+            case "DropdownList":
+            case "Buttons":
+            case "RadioButtons":
+            case "Icon":
+                ngIfs[i] = "details.variantsData.group_" + condition.VariantGroupID + " == " + condition.VariantID;
+                break;
+            case "CheckBox":
+                ngIfs[i] = "details.variantsData.variantChk_" + condition.VariantID;
+                break;
+        }
+        i++;
+    }
+    ngIf = string.Join(" || ", ngIfs);
+    <!-- Product Variants Form -->
+    <div class="form-group" ng-if="@ngIf">
+        <label class="control-label">
+            @(group.VariantGroup)
+            @if (!string.IsNullOrWhiteSpace(group.GroupDescription))
+            {
+                <i class="fa fa-info-circle" role="button" uib-popover="@(group.GroupDescription)" popover-trigger="'mouseenter'" popover-placement="right"></i>
+            }
+        </label>
+        <div class="control">
+            @switch (group.DisplayType)
+            {
+                case "DropdownList":
+                    <select class="form-control" ng-model="details.variantsData.group_@(group.VariantGroupID)" ng-init="details.variantsData.group_@(group.VariantGroupID) = null" destroy-y
+                            ng-change="details.price('rzcVariantGroup_@(group.VariantGroupID)');" name="rzcVariantGroup_@(group.VariantGroupID)" @(group.GroupRequired ? "required" : "")>
+                        <option value="" disabled selected>@Dnn.LocalizeString("Select")</option>
+                        @foreach (var variant in group.Variants)
+                        {
+                            <option value="@(variant.VariantID)" data-images="@(variant.VariantImage)">@(variant.VariantName)</option>
+                        }
+                    </select>
+                    if (group.GroupRequired)
+                    {
+                        <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("SelectRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "Buttons":
+                    foreach (var variant in group.Variants)
+                    {
+                        <div class="radio radio-image">
+                            <label>
+                                <input type="radio" ng-model="details.variantsData.group_@(group.VariantGroupID)" ng-init="details.variantsData.group_@(group.VariantGroupID) = null" data-images="@(variant.VariantImage)" destroy-y
+                                       ng-change="details.price('rzcVariantGroup_@(group.VariantGroupID)');" name="rzcVariantGroup_@(group.VariantGroupID)" ng-value="@(variant.VariantID)" @(group.GroupRequired ? "required" : "") />
+                                <strong class="img-thumbnail rzc-button" ng-mouseenter="details.variantButtonHover_@(variant.VariantID) = true" ng-mouseleave="details.variantButtonHover_@(variant.VariantID) = false" ng-class="(details.variantButtonHover_@(variant.VariantID) ? 'text-info rzc-shadow' : '') || (details.variantsData.group_@(group.VariantGroupID) == @(variant.VariantID) ? 'text-primary' : '')">
+                                    @(variant.VariantName)
+                                    @if (!string.IsNullOrWhiteSpace(variant.VariantDesc))
+                                    {
+                                        <i class="fa fa-info-circle" role="button" uib-popover="@(variant.VariantDesc)" popover-trigger="'mouseenter'" popover-placement="right"></i>
+                                    }
+                                </strong>
+                            </label>
+                        </div>
+                    }
+                    if (group.GroupRequired)
+                    {
+                        <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("OptionRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "RadioButtons":
+                    foreach (var variant in group.Variants)
+                    {
+                        <div class="radio">
+                            <label>
+                                <input type="radio" ng-model="details.variantsData.group_@(group.VariantGroupID)" ng-init="details.variantsData.group_@(group.VariantGroupID) = null" data-images="@(variant.VariantImage)" destroy-y
+                                       ng-change="details.price('rzcVariantGroup_@(group.VariantGroupID)');" name="rzcVariantGroup_@(group.VariantGroupID)" ng-value="@(variant.VariantID)" @(group.GroupRequired ? "required" : "") />
+                                @(variant.VariantName)
+                                @if (!string.IsNullOrWhiteSpace(variant.VariantDesc))
+                                {
+                                    <i class="fa fa-info-circle" role="button" uib-popover="@(variant.VariantDesc)" popover-trigger="'mouseenter'" popover-placement="right"></i>
+                                }
+                            </label>
+                        </div>
+                    }
+                    if (group.GroupRequired)
+                    {
+                        <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("OptionRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "Icon":
+                    foreach (var variant in group.Variants)
+                    {
+                        <div class="radio radio-image">
+                            <label>
+                                <input type="radio" ng-model="details.variantsData.group_@(group.VariantGroupID)" ng-init="details.variantsData.group_@(group.VariantGroupID) = null" data-images="@(variant.VariantImage)" destroy-y
+                                       ng-change="details.price('rzcVariantGroup_@(group.VariantGroupID)');" name="rzcVariantGroup_@(group.VariantGroupID)" ng-value="@(variant.VariantID)" @(group.GroupRequired ? "required" : "") />
+                                <img class="img-thumbnail" ng-class="details.variantsData.group_@(group.VariantGroupID) == @(variant.VariantID) ? 'btn-primary' : 'btn-default'" ng-src="@(variant.VariantIconImage)" />
+                            </label>
+                        </div>
+                    }
+                    if (group.GroupRequired)
+                    {
+                        <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).rzcVariantGroup_@(group.VariantGroupID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("OptionRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "CheckBox":
+                    foreach (var variant in group.Variants)
+                    {
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="details.variantsData.variantChk_@(variant.VariantID)" ng-init="details.variantsData.variantChk_@(variant.VariantID) = false" data-images="@(variant.VariantImage)" destroy-y
+                                       ng-change="details.price('variantChk_@(variant.VariantID)');" name="variantChk_@(variant.VariantID)" @(variant.VariantRequired ? "required" : "") />
+                                @(variant.VariantName)
+                                @if (!string.IsNullOrWhiteSpace(variant.VariantDesc))
+                                {
+                                    <i class="fa fa-info-circle" role="button" uib-popover="@(variant.VariantDesc)" popover-trigger="'mouseenter'" popover-placement="right"></i>
+                                }
+                            </label>
+                        </div>
+                        <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).variantChk_@(variant.VariantID).$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).variantChk_@(variant.VariantID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("CheckboxRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "TextBox":
+                    foreach (var variant in group.Variants)
+                    {
+                        <input type="text" class="form-control" ng-model="details.variantsData.variantTxt_@(variant.VariantID)" ng-init="details.variantsData.variantTxt_@(variant.VariantID) = ''" destroy-y
+                               name="variantTxt_@(variant.VariantID)" placeholder="@(variant.VariantName)" @(variant.VariantRequired ? "required" : "") />
+                        <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).variantTxt_@(variant.VariantID).$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).variantTxt_@(variant.VariantID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "MultiLineTextBox":
+                    foreach (var variant in group.Variants)
+                    {
+                        <textarea rows="2" class="form-control" ng-model="details.variantsData.variantTxt_@(variant.VariantID)" ng-init="details.variantsData.variantTxt_@(variant.VariantID) = ''" destroy-y
+                                  name="variantTxt_@(variant.VariantID)" placeholder="@(variant.VariantName)" @(variant.VariantRequired ? "required" : "")></textarea>
+                        <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).variantTxt_@(variant.VariantID).$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).variantTxt_@(variant.VariantID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "Grid":
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td>@Dnn.LocalizeString("Description")</td>
+                                <td>@Dnn.LocalizeString("Price")</td>
+                                <td>@Dnn.LocalizeString("Buy")</td>
+                            </tr>
+                            @foreach (var variant in group.Variants)
+                            {
+                                <tr>
+                                    <td><img src="@(variant.VariantIconImage)"></td>
+                                    <td>@(variant.VariantName)</td>
+                                    <td>@string.Format(Model.Culture, "{0:c}", variant.PriceAdjustment)</td>
+                                    <td>
+                                        <input type="number" step="1" min="1" max="999999" class="form-control" ng-model="details.variantsData.variantQty_@(variant.VariantID)" ng-init="details.variantsData.variantQty_@(variant.VariantID) = 1"
+                                               name="variantQty_@(variant.VariantID)" destroy-y @(variant.VariantRequired ? "required" : "") />
+                                        <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).variantQty_@(variant.VariantID).$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).variantQty_@(variant.VariantID).$dirty">
+                                            <div class="form-control-required" ng-message="required">
+                                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldRequired")
+                                            </div>
+                                            <div class="form-control-required" ng-message="number">
+                                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldNumeric")
+                                            </div>
+                                            <div class="form-control-required" ng-message="min">
+                                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldMinValue")
+                                            </div>
+                                            <div class="form-control-required" ng-message="max">
+                                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FieldMaxValue")
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    break;
+                case "FileUpload":
+                    foreach (var variant in group.Variants)
+                    {
+                        <div>
+                            <div class="btn btn-default btn-file">
+                                <input type="file" name="variantFile_@(variant.VariantID)" ng-model="details.variantsData.variantFile_@(variant.VariantID)" ng-init="details.variantsData.variantFile_@(variant.VariantID) = ''"
+                                       @(variant.VariantRequired ? "required" : "") valid-file="details.variantsFiles.variantFile_@(variant.VariantID)" destroy-y multiple />
+                            </div>
+                            <ul>
+                                <li ng-repeat="file in details.variantsFiles.variantFile_@(variant.VariantID)">{{file.name}} - {{file.size | fileSize:2}}</li>
+                            </ul>
+                        </div>
+                        <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).variantFile_@(variant.VariantID).$error" ng-if="details.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).variantFile_@(variant.VariantID).$dirty">
+                            <div class="form-control-required" ng-message="required">
+                                <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("FileRequired")
+                            </div>
+                        </div>
+                    }
+                    break;
+            }
+        </div>
+    </div>
+}

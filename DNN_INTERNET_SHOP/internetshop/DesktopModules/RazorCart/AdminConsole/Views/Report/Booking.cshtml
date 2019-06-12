@@ -1,0 +1,125 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ReportModel>
+@using System.Web.Mvc.Html;
+
+<!-- Full Calendar CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/fullcalendar.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Moment JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/moment.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Full Calendar JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/fullcalendar.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Booking</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-calendar fa-fw"></i> Booking Calendar
+                </h3>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div id="BookingCalendar"></div>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<style type="text/css">
+    .tooltip-inner {
+        min-width: 250px;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#BookingCalendar').fullCalendar({
+            themeSystem: 'bootstrap3',
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay,listWeek'
+            },
+            buttonText:{
+                today: 'Today',
+                month: 'Month',
+                agendaWeek: 'Week',
+                agendaDay: 'Day',
+                listWeek: 'List'
+            },
+            defaultDate: '@DateTime.Now.ToString("yyyy-MM-dd")',
+            navLinks: true,
+            editable: false,
+            eventLimit: true,
+            events: function (start, end, timezone, callback) {
+                $.ajax({
+                    url: '@Url.Action("ListBooking", "Report", new { StoreID = Model.StoreID })',
+                    type: 'POST',
+                    data: {
+                        start: start.format('YYYY-MM-DD'),
+                        end: end.format('YYYY-MM-DD')
+                    },
+                    success: function (response) {
+                        var events = [];
+                        $(response.data).each(function () {
+                            events.push({
+                                id: $(this)[0].ID,
+                                title: $(this)[0].ProductName,
+                                start: new Date(parseInt($(this)[0].StartDate.substr(6))),
+                                end: new Date(parseInt($(this)[0].EndDate.substr(6))),
+                                allDay: $(this)[0].AllDay,
+                                url: '@Url.Action("Edit", "Order", new { StoreID = Model.StoreID })?OrderID=' + $(this)[0].OrderID,
+                                color: ($(this)[0].VendorProductID + $(this)[0].ProductSKU).toHexColour(),
+                            });
+                        });
+                        callback(events);
+                    },
+                    error: function (error) {
+                        alert('There was an error while fetching events! Error Code: ' + error.status);
+                    },
+                });
+            },
+            timezone: 'UTC',
+            contentHeight: 'auto',
+            eventRender: function (event, element) {
+                @{ var dateTimeFormat = string.Format("{0} {1}", Model.ShortDateFormat.ToUpper(), Model.ShortTimeFormat.Replace("tt", "A")); }
+                element.tooltip({
+                    html: true,
+                    placement: 'bottom',
+                    title: event.start.format('@dateTimeFormat') + ' - '
+                        + (event.end ? event.end.format('@dateTimeFormat') : event.start.format('@dateTimeFormat'))
+                        + '<br />' + event.title
+                });
+            }
+        });
+        // Hash any string into an integer value
+        function hashCode(str) {
+            var hash = 0;
+            for (var i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return hash;
+        }
+        // Convert an int to hexadecimal with a max length of six characters
+        function intToARGB(i) {
+            var hex = ((i >> 24) & 0xFF).toString(16) +
+                    ((i >> 16) & 0xFF).toString(16) +
+                    ((i >> 8) & 0xFF).toString(16) +
+                    (i & 0xFF).toString(16);
+            hex += '000000';
+            return hex.substring(0, 6);
+        }
+        // Extend the string type to prototype method: string.toHexColour()
+        String.prototype.toHexColour = function () {
+            return '#' + intToARGB(hashCode(this));
+        }
+    });
+</script>

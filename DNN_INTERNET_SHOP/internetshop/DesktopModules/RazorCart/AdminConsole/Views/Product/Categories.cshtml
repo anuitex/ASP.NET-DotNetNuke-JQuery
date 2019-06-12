@@ -1,0 +1,151 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("SaveCategories", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })" autocomplete="off">
+            @Html.Partial("_ProductMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            @if (Model.Submitted)
+                            {
+                                <div class="alert alert-success alert-dismissable">
+                                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                    @Model.SaveMessage
+                                </div>
+                            }
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i>
+                                <strong>To assign categories to a product, check the desired category(ies).</strong>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Product Categories</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="list-group checked-list-box well">
+                                        @foreach (var category in Model.ProductCategories)
+                                        {
+                                            @Html.Partial("_ProductCategory", category);
+                                        }
+                                        @if (Model.ProductCategories.Count() < 1)
+                                        {
+                                            <div class="list-group-item message">No Product Categories added.</div>
+                                        }
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("Index", "Product", new { StoreID = Model.StoreID })">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<style type="text/css">
+    .list-group.checked-list-box {
+        margin: 0;
+        padding: 0;
+    }
+
+        .list-group.checked-list-box .list-group-item {
+            border-radius: 0;
+            border-width: 1px 0 0 0;
+        }
+
+        .list-group.checked-list-box.well > .list-group-item:first-child {
+            border-top-width: 0;
+        }
+</style>
+<script type="text/javascript">
+    $(function () {
+        $('.list-group.checked-list-box .list-group-item:not(.message)').each(function () {
+            // Settings
+            var $widget = $(this),
+                $checkbox = $('<input type="checkbox" class="hidden" />'),
+                color = ($widget.data('color') ? $widget.data('color') : "success"),
+                style = ($widget.data('style') == "button" ? "btn-" : "list-group-item-"),
+                settings = {
+                    on: {
+                        icon: 'glyphicon glyphicon-check'
+                    },
+                    off: {
+                        icon: 'glyphicon glyphicon-unchecked'
+                    }
+                };
+            $widget.css('cursor', 'pointer').css('padding-left', $widget.data('offset').toString().length * 20);
+            $checkbox[0].name = $widget.data('value');
+            $widget.append($checkbox);
+            // Event Handlers
+            $widget.on('click', function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                $checkbox.prop('checked', !$checkbox.is(':checked'));
+                $checkbox.triggerHandler('change');
+                updateDisplay();
+            });
+            $widget.find('.collapse-icon').on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).toggleClass('glyphicon-plus glyphicon-minus');
+                $($widget.attr('href')).collapse('toggle');
+            });
+            $checkbox.on('change', function () {
+                updateDisplay();
+            });
+            // Actions
+            function updateDisplay() {
+                var isChecked = $checkbox.is(':checked');
+                // Set the button's state
+                $widget.data('state', (isChecked) ? "on" : "off");
+                // Set the button's icon
+                $widget.find('.state-icon')
+                    .removeClass()
+                    .addClass('state-icon ' + settings[$widget.data('state')].icon);
+                // Update the button's color
+                if (isChecked) {
+                    $widget.addClass(style + color);
+                } else {
+                    $widget.removeClass(style + color);
+                }
+            }
+            // Initialization
+            function init() {
+                if ($widget.data('checked') == true) {
+                    $checkbox.prop('checked', !$checkbox.is(':checked'));
+                    $checkbox.parents('.list-group.checked-list-box[id]').each(function () {
+                        var $lstGrp = $(this);
+                        $lstGrp.addClass('in');
+                        $('.list-group-item[href="#' + $lstGrp.attr('id') + '"]').find('.collapse-icon').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+                    });
+                }
+                updateDisplay();
+                // Inject the icon if applicable
+                if ($widget.find('.state-icon').length == 0) {
+                    $widget.prepend('<span class="state-icon ' + settings[$widget.data('state')].icon + '"></span>');
+                }
+            }
+            init();
+        });
+    });
+</script>

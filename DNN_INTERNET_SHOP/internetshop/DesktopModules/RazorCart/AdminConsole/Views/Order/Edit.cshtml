@@ -1,0 +1,810 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.OrderModel>
+@using System.Web.Mvc.Html;
+@using System.Globalization;
+
+<!-- Bootstrap DateTimePicker CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/bootstrap-datetimepicker.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Select2 CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2-bootstrap.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Moment JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/moment.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Bootstrap DateTimePicker JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/bootstrap-datetimepicker.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Select2 JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/select2.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Manage Orders</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Submitted)
+        {
+            <div class="alert alert-success alert-dismissable">
+                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                @Model.SaveMessage
+            </div>
+        }
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })" autocomplete="off">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <span class="panel-title text-uppercase">General Details</span>
+                        </div>
+                        <div class="panel-body details">
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Order No.</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Order.OrderID, Model.Order.OrderID.ToString(), new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Order Date</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Order.OrderDate, Model.Order.OrderDate.ToString(), new { @class = "form-control label-ellipsis" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Customer</label>
+                                <div class="col-xs-8">
+                                    @if (Model.Order.OrderID > 0)
+                                    {
+                                        <label class="form-control">
+                                            @Html.ActionLink("#" + Model.Customer.CustomerID + " " + Model.Customer.FirstName + " " + Model.Customer.LastName, "Edit", "Customer",
+                                                                new { StoreID = Model.StoreID, CustomerID = Model.Order.CustomerID }, new { })
+                                        </label>
+                                    }
+                                    else
+                                    {
+                                        @Html.DropDownList("CustomerID", Model.Customers, new { @required = "required" })
+                                    }
+                                </div>
+                            </div>
+                            @if (Convert.ToBoolean(Model.StoreConfig["ShowCompanyName"] ?? bool.FalseString) && Model.Order.OrderID > 0)
+                            {
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Company</label>
+                                    <div class="col-xs-8">
+                                        @Html.LabelFor(m => m.Customer.CompanyName, !string.IsNullOrEmpty(Model.Customer.CompanyName) ? Model.Customer.CompanyName : " ", new { @class = "form-control label-ellipsis" })
+                                    </div>
+                                </div>
+                            }
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">IP Address</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Order.IPAddress, Model.Order.IPAddress, new { @class = "form-control label-ellipsis" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Status</label>
+                                <div class="col-xs-8">
+                                    @Html.DropDownList("Status", Model.Statuses, "-- Select --", new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Ship Date</label>
+                                <div class="col-xs-8">
+                                    <div class="input-group date" data-provide="datetimepicker" data-min-date="@Model.Order.OrderDate.ToString(Model.ShortDateFormat)">
+                                        @Html.TextBox("ShipDate", Model.Order.ShipDate > new DateTime(1900, 1, 1) ? Model.Order.ShipDate.ToString(Model.ShortDateFormat) : string.Empty,
+                                                        new { @class = "form-control", @placeholder = "Ship Date" })
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (Model.ProfileProperty != null)
+                            {
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Profile Property</label>
+                                    <div class="col-xs-8">
+                                        @Html.LabelFor(m => m.ProfileProperty.PropertyDefinitionId, Model.ProfileProperty.PropertyName + ": " + Model.ProfileProperty.PropertyValue, new { @class = "form-control label-multiline" })
+                                    </div>
+                                </div>
+                            }
+                            @if (Convert.ToBoolean(Model.StoreConfig["ShowCustomField1"]))
+                            {
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Custom Field 1</label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBox("CustomField1", Model.Order.UDF1, new { @class = "form-control", @maxlength = 50, @placeholder = "Custom Field 1" })
+                                    </div>
+                                </div>
+                            }
+                            @if (Convert.ToBoolean(Model.StoreConfig["ShowCustomField2"]))
+                            {
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Custom Field 2</label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBox("CustomField2", Model.Order.UDF2, new { @class = "form-control", @maxlength = 50, @placeholder = "Custom Field 2" })
+                                    </div>
+                                </div>
+                            }
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Last Modified</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Order.DateModified, Model.Order.ModifiedBy + " @ " + Model.Order.DateModified, new { @class = "form-control label-multiline" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            @if (Model.Order.OrderID > 0)
+                            {
+                                <a title="Edit Order Shipping Details" href="" class="close anchor-top" onclick="$('#EditShipping').val(!JSON.parse($('#EditShipping').val())).trigger('change'); return false;">
+                                    @Html.Hidden("EditShipping", bool.FalseString.ToLower())
+                                    <i class="fa fa-pencil-square-o" data-show="conditional" data-cond-option="EditShipping" data-cond-value="false" style="display: none;"></i>
+                                    <i class="fa fa-eye" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                @Html.Hidden("EditShipping", bool.TrueString.ToLower())
+                            }
+                            <span class="panel-title text-uppercase">Shipping Details</span>
+                        </div>
+                        <div class="panel-body details">
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="false">
+                                <label class="col-xs-4 control-label">Name</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Order.ShipFirstName, Model.Order.ShipFirstName + " " + Model.Order.ShipLastName, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="false">
+                                <label class="col-xs-4 control-label">Address</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Order.ShipAddress1, Model.Order.ShipAddress1 + ", " + Model.Order.ShipAddress2 + Environment.NewLine + Model.Order.ShipCity + ", "
+                                                    + Model.Order.ShipState + " " + Model.Order.ShipZipcode + " " + Model.Order.ShipCountry, new { @class = "form-control label-multiline" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="false">
+                                <label class="col-xs-4 control-label">Email</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Customer.Email, Model.Customer.Email ?? " ", new { @class = "form-control label-ellipsis" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="false">
+                                <label class="col-xs-4 control-label">Phone</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Customer.HomePhone, Model.Customer.HomePhone ?? " ", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="false">
+                                <label class="col-xs-4 control-label">Tracking No.</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Order.TrackingNumber, !string.IsNullOrEmpty(Model.Order.TrackingNumber) ? Model.Order.TrackingNumber : " ", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="false">
+                                <label class="col-xs-4 control-label">Ship Method</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Order.ShipMethod, !string.IsNullOrEmpty(Model.Order.ShipMethod) ? Model.Order.ShipMethod : " ", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="false">
+                                <label class="col-xs-4 control-label">Special Instructions</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Order.SpecialInstructions, !string.IsNullOrEmpty(Model.Order.SpecialInstructions) ? Model.Order.SpecialInstructions : " ", new { @class = "form-control label-multiline" })
+                                </div>
+                            </div>
+                            <!-- /.form-labels -->
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">First Name</label>
+                                <div class="col-xs-8">
+                                    @Html.TextBox("ShipFirstName", Model.Order.ShipFirstName, new { @class = "form-control", @placeholder = "First Name" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">Last Name</label>
+                                <div class="col-xs-8">
+                                    @Html.TextBox("ShipLastName", Model.Order.ShipLastName, new { @class = "form-control", @placeholder = "Last Name" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">Address 1</label>
+                                <div class="col-xs-8">
+                                    @Html.TextBox("ShipAddress1", Model.Order.ShipAddress1, new { @class = "form-control", @placeholder = "Address 1" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">Address 2</label>
+                                <div class="col-xs-8">
+                                    @Html.TextBox("ShipAddress2", Model.Order.ShipAddress2, new { @class = "form-control", @placeholder = "Address 2" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">City</label>
+                                <div class="col-xs-8">
+                                    @Html.TextBox("ShipCity", Model.Order.ShipCity, new { @class = "form-control", @placeholder = "City" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">Postal Code</label>
+                                <div class="col-xs-8">
+                                    @Html.TextBox("ShipZipcode", Model.Order.ShipZipcode, new { @class = "form-control", @placeholder = "Postal Code" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">Country</label>
+                                <div class="col-xs-8">
+                                    @Html.DropDownList("ShipCountry", Model.Countries, "-- Select --", new { @class = "form-control", @onchange = "defaultCountryChange(this.value, 'ShipState');", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">Region</label>
+                                <div class="col-xs-8">
+                                    @Html.DropDownList("ShipState", Model.Regions, "-- Select --", new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">Tracking No.</label>
+                                <div class="col-xs-8">
+                                    @Html.TextBox("TrackingNumber", Model.Order.TrackingNumber, new { @class = "form-control", @placeholder = "Tracking No." })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">Ship Method</label>
+                                <div class="col-xs-8">
+                                    @Html.TextBox("ShipMethod", Model.Order.ShipMethod, new { @class = "form-control", @placeholder = "Ship Method" })
+                                </div>
+                            </div>
+                            <div class="form-group" data-show="conditional" data-cond-option="EditShipping" data-cond-value="true" style="display: none;">
+                                <label class="col-xs-4 control-label">Special Instructions</label>
+                                <div class="col-xs-8">
+                                    @Html.TextBox("SpecialInstructions", Model.Order.SpecialInstructions, new { @class = "form-control", @placeholder = "Special Instructions" })
+                                </div>
+                            </div>
+                            <!-- /.form-controls -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <span class="panel-title text-uppercase">Billing Details</span>
+                        </div>
+                        <div class="panel-body details">
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Name</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Payment.BillingName, !string.IsNullOrEmpty(Model.Payment.BillingName) ? Model.Payment.BillingName : " ", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Address</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Payment.BillingAddress, Model.Payment.BillingAddress + Environment.NewLine + Model.Payment.BillingCity + ", "
+                                                + Model.Payment.BillingState + " " + Model.Payment.BillingZip + " " + Model.Payment.BillingCountry, new { @class = "form-control label-multiline" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Method</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Payment.PayType, !string.IsNullOrEmpty(Model.Payment.PayType) ? Model.Payment.PayType : " ", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Approved</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Payment.Success, Model.Payment.Success.ToString(), new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Notes</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Payment.Notes, !string.IsNullOrEmpty(Model.Payment.Notes) ? Model.Payment.Notes : " ", new { @class = "form-control label-multiline" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Trans. ID</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Payment.TransID, !string.IsNullOrEmpty(Model.Payment.TransID) ? Model.Payment.TransID : " ", new { @class = "form-control label-ellipsis" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">Auth. Code</label>
+                                <div class="col-xs-8">
+                                    @Html.LabelFor(m => m.Payment.AuthCode, !string.IsNullOrEmpty(Model.Payment.AuthCode) ? Model.Payment.AuthCode : " ", new { @class = "form-control label-ellipsis" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if (Model.Order.OrderID > 0)
+            {
+                @Html.Partial("_OrderEditMenu")
+                <div class="tab-content">
+                    <div class="tab-pane active" id="orderTab1">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Image</th>
+                                                <th>SKU</th>
+                                                <th>Product Name</th>
+                                                <th class="text-right">Unit Cost</th>
+                                                <th class="text-right">Quantity</th>
+                                                <th class="text-right">Line Total</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        @foreach (var item in Model.Order.OrderDetails)
+                                        {
+                                            <tbody class="@(item.Returned ? "item-row strikethrough" : "item-row")">
+                                                <tr>
+                                                    <td rowspan="2">
+                                                        <img class="img-thumbnail cart-image" src="@item.ImageName">
+                                                    </td>
+                                                    <td>@item.ProductSKU</td>
+                                                    <td>@item.ProductName</td>
+                                                    <td class="text-right">@string.Format(Model.Culture, "{0:c}", item.UnitCost)</td>
+                                                    <td class="text-right">@(item.Quantity)</td>
+                                                    <td class="text-right">@string.Format(Model.Culture, "{0:c}", (item.UnitCost * item.Quantity))</td>
+                                                    <td class="text-right icons">
+                                                        <a title="Edit Product" href="@Url.Action("Edit", "Product", new { StoreID = Model.StoreID, ProductID = item.ProductID })"><i class="fa fa-external-link fa-lg"></i></a>
+                                                        @if (!item.Returned)
+                                                        {
+                                                            <a title="Edit Order Item" href="" data-toggle="modal" data-target="#orderModal1" data-backdrop="static" data-keyboard="true" data-item="@item.OrderDetailID"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                                            <a title="Refund Order Item" href="@Url.Action("RefundItem", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID, OrderDetailID = item.OrderDetailID })" onclick="return confirm('Are you sure you want to refund this item?')"><i class="fa fa-undo fa-lg"></i></a>
+                                                        }
+                                                        <a title="Delete Order Item" href="@Url.Action("DeleteItem", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID, OrderDetailID = item.OrderDetailID })" onclick="return confirm('Are you sure you want to delete this item?')"><i class="fa fa-trash-o fa-lg"></i></a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    @if (item.DetailVariants.Count > 0 || item.DetailBooking.IsBooking || item.DetailRecurring.IsRecurring || item.DetailEvent.IsEvent)
+                                                    {
+                                                        <td colspan="6">
+                                                            @if (item.DetailVariants.Count > 0)
+                                                            {
+                                                                <ul>
+                                                                    @foreach (var option in item.DetailVariants)
+                                                                    {
+                                                                        <li>
+                                                                            @Html.Raw(option.VariantHasText ? (option.VariantName + ": " + option.VariantText) : (option.VariantGroup + ": " + option.VariantName))
+                                                                            @(option.PriceCalculated > 0 ? string.Format(Model.Culture, "({0:c})", option.PriceCalculated) : "")
+                                                                        </li>
+                                                                    }
+                                                                </ul>
+                                                            }
+                                                            @if (item.DetailBooking.IsBooking)
+                                                            {
+                                                                <ul>
+                                                                    @if (item.DetailBooking.BookingStart.HasValue)
+                                                                    {
+                                                                        <li>Start: @(item.DetailBooking.ShowTime ? item.DetailBooking.BookingStart.Value.ToString(Model.ShortDateFormat + " " + Model.Culture.DateTimeFormat.ShortTimePattern) : item.DetailBooking.BookingStart.Value.ToString(Model.ShortDateFormat))</li>
+                                                                    }
+                                                                    @if (item.DetailBooking.BookingEnd.HasValue)
+                                                                    {
+                                                                        <li>End: @(item.DetailBooking.ShowTime ? item.DetailBooking.BookingEnd.Value.ToString(Model.ShortDateFormat + " " + Model.Culture.DateTimeFormat.ShortTimePattern) : item.DetailBooking.BookingEnd.Value.ToString(Model.ShortDateFormat))</li>
+                                                                    }
+                                                                </ul>
+                                                            }
+                                                            @if (item.DetailEvent.IsEvent)
+                                                            {
+                                                                <ul>
+                                                                    @if (item.DetailEvent.EventStart.HasValue)
+                                                                    {
+                                                                        <li>Start: @(item.DetailEvent.EventStart.Value.ToString(Model.ShortDateFormat + " " + Model.Culture.DateTimeFormat.ShortTimePattern))</li>
+                                                                    }
+                                                                    @if (item.DetailEvent.EventEnd.HasValue)
+                                                                    {
+                                                                        <li>End: @(item.DetailEvent.EventEnd.Value.ToString(Model.ShortDateFormat + " " + Model.Culture.DateTimeFormat.ShortTimePattern))</li>
+                                                                    }
+                                                                </ul>
+                                                            }
+                                                            @if (item.DetailRecurring.IsRecurring)
+                                                            {
+                                                                <ul>
+                                                                    <li>
+                                                                        @item.DetailRecurring.SubscriptionInterval Recurring Charge for @item.DetailRecurring.RecurringOccurances occurrence(s) to Start at: @item.DetailRecurring.StartDate.ToString(Model.ShortDateFormat)
+                                                                    </li>
+                                                                </ul>
+                                                            }
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            </tbody>
+                                        }
+                                        @if (Model.Order.OrderDetails.Count < 1)
+                                        {
+                                            <tr><td colspan="7">No Order Items found.</td></tr>
+                                        }
+                                    </table>
+                                </div>
+                                <div class="col-lg-4 col-md-5 col-sm-6 col-xs-12">
+                                    @if ((string)Model.StoreConfig["SmithCoupon"] != "NoCoupon")
+                                    {
+                                        <div class="form-group input-group" data-role="form" data-method="post">
+                                            <span class="input-group-addon"><i class="fa fa-tags"></i></span>
+                                            @Html.TextBox("CouponCode", Model.Order.CouponCode, new { @class = "form-control", @placeholder = "Coupon or Gift Card" })
+                                            <span class="input-group-btn">
+                                                <input class="btn btn-default" value="Apply" type="submit" onclick="this.form.action='@Url.Action("Coupon", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })';">
+                                            </span>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-lg-4 col-lg-offset-4 col-md-5 col-md-offset-2 col-sm-6 col-xs-12">
+                                    <div class="tooltip-arrow">
+                                        <a title="Edit Order Totals" href="" class="anchor-top" onclick="$('#EditTotals').val(!JSON.parse($('#EditTotals').val())).trigger('change'); return false;">
+                                            <i class="fa fa-pencil-square-o fa-lg" data-show="conditional" data-cond-option="EditTotals" data-cond-value="false" style="display: none;"></i>
+                                            <i class="fa fa-times fa-lg" data-show="conditional" data-cond-option="EditTotals" data-cond-value="true" style="display: none;"></i>
+                                        </a>
+                                        @Html.Hidden("EditTotals", bool.FalseString.ToLower())
+                                    </div>
+                                    <div class="row text-right">
+                                        <div class="col-md-8 col-xs-8 col-xxs-8">
+                                            <p class="nav">Subtotal</p>
+                                            <p class="nav">Discount</p>
+                                            @if ((string)Model.StoreConfig["SmithDiscounts"] == "OrderDiscountsByRole")
+                                            {
+                                                <p class="nav">Member Discount</p>
+                                            }
+                                            <p class="nav">Shipping Fees</p>
+                                            <p class="nav">Handling Charge</p>
+                                            <p class="nav">Sales Tax @(Model.IsTaxInclusive ? "(Included)" : "")</p>
+                                            <p class="nav">Surcharge</p>
+                                            <p class="nav"><strong>Grand Total</strong></p>
+                                        </div>
+                                        <div class="col-md-4 col-xs-4 col-xxs-4">
+                                            <p class="nav">@string.Format(Model.Culture, "{0:c}", Model.Order.SubTotal)</p>
+                                            <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="false">
+                                                @string.Format(Model.Culture, "{0:c}", Model.Order.Discount)
+                                            </p>
+                                            <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="true" style="display: none;">
+                                                @Html.TextBox("Discount", Model.Order.Discount.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "edit-control", @placeholder = "Discount", @type = "number", @step = "0.01", @required = "required" })
+                                            </p>
+                                            @if ((string)Model.StoreConfig["SmithDiscounts"] == "OrderDiscountsByRole")
+                                            {
+                                                <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="false">
+                                                    @string.Format(Model.Culture, "{0:c}", Model.Order.MemberDiscount)
+                                                </p>
+                                                <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="true" style="display: none;">
+                                                    @Html.TextBox("MemberDiscount", Model.Order.MemberDiscount.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "edit-control", @placeholder = "M. Discount", @type = "number", @step = "0.01", @required = "required" })
+                                                </p>
+                                            }
+                                            <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="false">
+                                                @string.Format(Model.Culture, "{0:c}", Model.Order.ShippingTotal)
+                                            </p>
+                                            <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="true" style="display: none;">
+                                                @Html.TextBox("ShippingTotal", Model.Order.ShippingTotal.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "edit-control", @placeholder = "Shipping", @type = "number", @step = "0.01", @required = "required" })
+                                            </p>
+                                            <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="false">
+                                                @string.Format(Model.Culture, "{0:c}", Model.Order.HandlingCharge)
+                                            </p>
+                                            <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="true" style="display: none;">
+                                                @Html.TextBox("HandlingCharge", Model.Order.HandlingCharge.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "edit-control", @placeholder = "Handling", @type = "number", @step = "0.01", @required = "required" })
+                                            </p>
+                                            <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="false">
+                                                @string.Format(Model.Culture, "{0:c}", Model.Order.TaxTotal)
+                                            </p>
+                                            <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="true" style="display: none;">
+                                                @Html.TextBox("TaxTotal", Model.Order.TaxTotal.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "edit-control", @placeholder = "Tax", @type = "number", @step = "0.01", @required = "required" })
+                                            </p>
+                                            <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="false">
+                                                @string.Format(Model.Culture, "{0:c}", Model.Order.Surcharge)
+                                            </p>
+                                            <p class="nav" data-show="conditional" data-cond-option="EditTotals" data-cond-value="true" style="display: none;">
+                                                @Html.TextBox("Surcharge", Model.Order.Surcharge.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "edit-control", @placeholder = "Surcharge", @type = "number", @step = "0.01", @required = "required" })
+                                            </p>
+                                            <p class="nav"><strong>@string.Format(Model.Culture, "{0:c}", Model.Order.GrandTotal)</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.panel-body -->
+                        </div>
+                        <!-- /.panel -->
+                    </div>
+                    <div class="tab-pane" id="orderTab2">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Pay Method</th>
+                                                <th>Tran Type</th>
+                                                <th>Date</th>
+                                                <th>Paid</th>
+                                                <th>Status</th>
+                                                <th>Name</th>
+                                                <th>Acct No</th>
+                                                <th class="text-right">Amount</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        @foreach (var payment in Model.Payments)
+                                        {
+                                            <tbody>
+                                                <tr>
+                                                    <td>@payment.PayType</td>
+                                                    <td>@payment.TransType</td>
+                                                    <td>@payment.PayDate</td>
+                                                    <td>@payment.Success</td>
+                                                    <td>@payment.Status</td>
+                                                    <td>@payment.BillingName</td>
+                                                    <td>@payment.MaskAcctNo</td>
+                                                    <td class="text-right">@string.Format(Model.Culture, "{0:c}", payment.Amount)</td>
+                                                    <td class="text-right">
+                                                        <a title="Edit Order Payment" href="" data-toggle="modal" data-target="#orderModal2" data-backdrop="static" data-keyboard="true" data-payment="@payment.PayHistID"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                                        @if (payment.Success && "Sale".Equals(payment.TransType, StringComparison.OrdinalIgnoreCase) && Model.Order.PayTotal > 0)
+                                                        {
+                                                            <a title="Refund Order Payment" href="" data-toggle="modal" data-target="#orderModal2" data-backdrop="static" data-keyboard="true" data-refund="@payment.PayHistID"><i class="fa fa-undo fa-lg"></i></a>
+                                                        }
+                                                        <a title="Delete Order Payment" href="@Url.Action("DeletePayment", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID, PayHistID = payment.PayHistID })" onclick="return confirm('Are you sure?')"><i class="fa fa-trash-o fa-lg"></i></a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        }
+                                        @if (Model.Payments.Count < 1)
+                                        {
+                                            <tr><td colspan="9">No Order Payments found.</td></tr>
+                                        }
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- /.panel-body -->
+                        </div>
+                        <!-- /.panel -->
+                    </div>
+                    <div class="tab-pane" id="orderTab3">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Notes</th>
+                                                <th>Created</th>
+                                                <th>Modified</th>
+                                                <th>Modified By</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        @foreach (var note in Model.OrderNotes)
+                                        {
+                                            <tbody>
+                                                <tr>
+                                                    <td>@note.Notes</td>
+                                                    <td>@note.DateCreated.ToString()</td>
+                                                    <td>@note.DateModified.ToString()</td>
+                                                    <td>@note.ModifiedBy</td>
+                                                    <td class="text-right">
+                                                        <a title="Delete Order Note" href="@Url.Action("DeleteNote", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID, NoteID = note.ID })" onclick="return confirm('Are you sure?')">
+                                                            <i class="fa fa-trash-o fa-lg"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        }
+                                        @if (Model.OrderNotes.Count < 1)
+                                        {
+                                            <tr><td colspan="5">No Order Notes found.</td></tr>
+                                        }
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- /.panel-body -->
+                        </div>
+                        <!-- /.panel -->
+                    </div>
+                    <div class="tab-pane" id="orderTab4">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Ship Carrier</th>
+                                                <th>Ship Method</th>
+                                                <th>Ship Date</th>
+                                                <th>Dimensions</th>
+                                                <th>Weight</th>
+                                                <th>Shipped</th>
+                                                <th>Tracking No.</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        @foreach (var fulfillment in Model.Fulfillments)
+                                        {
+                                            <tbody>
+                                                <tr>
+                                                    <td>@fulfillment.ShipCarrier</td>
+                                                    <td>@fulfillment.ShipMethod.ToString()</td>
+                                                    <td>@fulfillment.ShipDate.ToString(Model.ShortDateFormat)</td>
+                                                    <td>@(fulfillment.Width.ToString("0.##"))(W) X @(fulfillment.Height.ToString("0.##"))(H) X @(fulfillment.Length.ToString("0.##"))(L)</td>
+                                                    <td>@string.Format("{0:0.00}", fulfillment.Weight)</td>
+                                                    <td><i class="fa fa-@(fulfillment.Shipped ? "check-circle" : "circle-thin") fa-lg" aria-hidden="true"></i></td>
+                                                    <td>@fulfillment.TrackingNumber</td>
+                                                    <td class="text-right">
+                                                        <a title="Edit Order Shipment" href="" data-toggle="modal" data-target="#orderModal4" data-backdrop="static" data-keyboard="true" data-fulfillment="@fulfillment.FulfillmentID"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                                        <a title="Expand Order Shipment Details" href="" data-toggle="collapse" data-target="#collapseBlock_@(fulfillment.FulfillmentID)" onclick="return false;"><i class="fa fa-plus-square-o fa-lg"></i></a>
+                                                        <a title="Collapse Order Shipment Details" href="" data-toggle="collapse" data-target="#collapseBlock_@(fulfillment.FulfillmentID)" onclick="return false;" style="display: none;"><i class="fa fa-minus-square-o fa-lg"></i></a>
+                                                        <a title="Delete Order Shipment" href="@Url.Action("DeleteFulfillment", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID, FulfillmentID = fulfillment.FulfillmentID })" onclick="return confirm('Are you sure?')"><i class="fa fa-trash-o fa-lg"></i></a>
+                                                    </td>
+                                                </tr>
+                                                <tr id="collapseBlock_@fulfillment.FulfillmentID" class="collapse out">
+                                                    <td colspan="8">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>SKU</th>
+                                                                    <th>Product Name</th>
+                                                                    <th class="text-right">Quantity</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var item in fulfillment.FulfillmentDetails)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@item.ProductSKU</td>
+                                                                        <td>@item.ProductName</td>
+                                                                        <td class="text-right">@item.Quantity</td>
+                                                                        <td class="text-right">
+                                                                            <a href="@Url.Action("DeleteFulfillmentDetail", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID, ID = item.ID, FulfillmentID = fulfillment.FulfillmentID })" onclick="return confirm('Are you sure?')">
+                                                                                <i class="fa fa-trash-o fa-lg"></i>
+                                                                            </a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                        <script type="text/javascript">
+                                                            $('#collapseBlock_@fulfillment.FulfillmentID').on('show.bs.collapse', function (e) {
+                                                                $(e.target).prev().find('[data-toggle="collapse"]').eq(0).hide();
+                                                                $(e.target).prev().find('[data-toggle="collapse"]').eq(1).show();
+                                                                $('html,body').animate({
+                                                                    scrollTop: $(e.target).offset().top
+                                                                }, 1000);
+                                                            });
+                                                            $('#collapseBlock_@fulfillment.FulfillmentID').on('hide.bs.collapse', function (e) {
+                                                                $(e.target).prev().find('[data-toggle="collapse"]').eq(0).show();
+                                                                $(e.target).prev().find('[data-toggle="collapse"]').eq(1).hide();
+                                                            });
+                                                        </script>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        }
+                                        @if (Model.Fulfillments.Count < 1)
+                                        {
+                                            <tr><td colspan="5">No Order Shipments found.</td></tr>
+                                        }
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- /.panel-body -->
+                        </div>
+                        <!-- /.panel -->
+                    </div>
+                </div>
+            }
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    @if (Model.Order.OrderID > 0)
+                    {
+                        <div class="btn-group dropup">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <span class="ng-binding">
+                                    <i class="fa fa-envelope-o"></i> Send Email
+                                </span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="" data-toggle="modal" data-target="#orderModal5" data-backdrop="static" data-keyboard="true" data-item="@Model.Order.OrderID">
+                                        Send Order Email
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="" data-toggle="modal" data-target="#orderModal6" data-backdrop="static" data-keyboard="true" data-item="@Model.Order.OrderID">
+                                        Send Ship Email
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <a class="btn btn-warning" href="@Url.Action("Print", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })"><i class="fa fa-print"></i> Print</a>
+                    }
+                    <a class="btn btn-default" href="@Url.Action("Index", "Order", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+        @Html.Partial("_OrderEditModal")
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        // Init Date Picker
+        $('[data-provide="datetimepicker"]').each(function () {
+            $(this).datetimepicker({
+                format: '@Model.ShortDateFormat.ToUpper()',
+                minDate: moment($(this).data('min-date'), '@Model.ShortDateFormat.ToUpper()').toDate()
+            }).find('input[type="text"]').click(function () {
+                $(this).closest('[data-provide="datetimepicker"]').data("DateTimePicker").toggle();
+            });
+        });
+        // Remember Tabs
+        var url = document.location.toString();
+        if (url.match('#')) {
+            $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+        }
+        // Select-2
+        $('#CustomerID').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            placeholder: "Select a customer",
+            ajax: {
+                type: 'POST',
+                url: '@Url.Action("List", "Customer", new { StoreID = Model.StoreID })',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        'search[value]': params.term,
+                        'length': 25,
+                        'start': 0
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: $.map(data.data, function (item) {
+                            return {
+                                id: item.CustomerID,
+                                text: item.FirstName + ' ' + item.LastName + ' (' + item.DNNLogin + ')'
+                            };
+                        })
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 2,
+        });
+    });
+    function defaultCountryChange(value, region) {
+        var regionDDL = $('select[name="' + region + '"]');
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ListRegions", "Setup", new { StoreID = Model.StoreID })',
+            data: { 'Country': value },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                regionDDL.html('');
+                regionDDL.append($('<option></option>').val('').html('-- Select --'));
+                var data = JSON.parse(JSON.stringify(response));
+                $.each(data, function (index, option) {
+                    regionDDL.append($('<option></option>').val(option.Value).html(option.Text));
+                });
+            },
+            error: function (response, status, error) {
+                console.log(error);
+            }
+        });
+    }
+    function emailTemplateChange(emailTemplate, emailSubject) {
+        var templateDDL = $(emailTemplate);
+        if (templateDDL.val()) {
+            var text = $.trim(templateDDL.find('option[value="' + templateDDL.val() + '"]').text()).split(' - ').slice(1).toString();
+            $('input[name="' + emailSubject + '"]').val(text);
+        }
+    }
+</script>

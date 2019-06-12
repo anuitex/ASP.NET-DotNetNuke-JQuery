@@ -1,0 +1,275 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Checkout.Models.CheckoutModel>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="panel-title text-uppercase">@Dnn.LocalizeString("BillingDetails")</span>
+        <span class="close" ng-switch-when="ShoppingCart"><i class="fa fa-clipboard" title="@Dnn.LocalizeString("CopyShippingDetails")" ng-click="checkout.copyInfo()"></i></span>
+    </div>
+    <div class="panel-body">
+        <div class="row" ng-switch-when="ShoppingCart">
+            @if (Model.GatewayMode == RazorCart.Service.Gateway.GatewayProcessMode.Direct)
+            {
+                <div class="col-xs-12" ng-init="checkout.defaultPayment()" ng-show="checkout.billingPayments.length > 1">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPayment.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billPayment.$invalid }">
+                        <span class="input-group-addon"><i class="fa fa-money"></i></span>
+                        <div class="form-control" style="height: auto;">
+                            <div class="radio" ng-repeat="payment in checkout.billingPayments">
+                                <label>
+                                    <input type="radio" name="billPayment" ng-model="checkout.billing.Payment" value="{{payment.PayMethodID}}" ng-change="checkout.billPaymentChange(); checkout.billing.Wallet = null;" required /> {{payment.Name}}
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                                <div class="alert alert-info" ng-show="checkout.billing.Payment == payment.PayMethodID && false">{{payment.Step2Label1}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billPayment.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPayment.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("PaymentMethodRequired")
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="col-xs-12">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billFullName.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billFullName.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                    <input type="text" name="billFullName" class="form-control" placeholder="@Dnn.LocalizeString("BillingName")" ng-model="checkout.billing.FullName" required>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billFullName.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billFullName.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingNameRequired")
+                    </div>
+                </div>
+            </div>
+            @if (Model.GatewayMode == RazorCart.Service.Gateway.GatewayProcessMode.Direct)
+            {
+                if (Model.ShowWallet)
+                {
+                    <div class="col-xs-12" ng-if="checkout.selectedPayment.ProcessMode == 'Direct' && (checkout.selectedPayment.DisplayType == 'CreditCard' || checkout.selectedPayment.DisplayType == 'ECheck')">
+                        <div class="form-group input-group">
+                            <span class="input-group-addon"><i class="fa fa-suitcase"></i></span>
+                            <select name="billWallet" class="form-control" ng-model="checkout.billing.Wallet" ng-change="checkout.billWalletChange()">
+                                <option value="" selected>-- @Dnn.LocalizeString("WalletItem") --</option>
+                                <option ng-repeat="item in checkout.walletItems" ng-disabled="checkout.selectedPayment.PayType != item.PayType" value="{{item.ID}}">{{item.WalletName + ' ' + item.MaskAcctNo}}</option>
+                            </select>
+                            <span class="input-group-btn">
+                                <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("ManageWallet")" onclick="window.location.href='@Url.Action("Wallet", "Checkout", new { })';" />
+                            </span>
+                        </div>
+                    </div>
+                }
+                <div class="col-xs-12" ng-if="checkout.selectedPayment.ProcessMode == 'Direct' && checkout.selectedPayment.DisplayType == 'CreditCard' && !checkout.billing.Wallet">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCardNumber.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billCardNumber.$invalid }">
+                        <span class="input-group-addon"><i class="fa fa-credit-card"></i></span>
+                        <input type="tel" name="billCardNumber" class="form-control" placeholder="@Dnn.LocalizeString("CreditCardNumber")" ng-model="checkout.billing.CardNumber" autocomplete="off" pattern="^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\d{3})\d{11})$" required>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billCardNumber.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCardNumber.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("CardNumberRequired")
+                        </div>
+                        <div class="form-control-required" ng-message="pattern">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("CardNumberInvalid")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-4" ng-if="checkout.selectedPayment.ProcessMode == 'Direct' && checkout.selectedPayment.DisplayType == 'CreditCard' && !checkout.billing.Wallet">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCVV.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billCVV.$invalid }">
+                        <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                        <input type="tel" name="billCVV" class="form-control" placeholder="@Dnn.LocalizeString("SecurityCode")" ng-model="checkout.billing.CVV" autocomplete="off" pattern="^([0-9]{3,4})$" required>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billCVV.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCVV.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("SecurityCodeRequired")
+                        </div>
+                        <div class="form-control-required" ng-message="pattern">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("SecurityCodeInvalid")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-8" ng-if="checkout.selectedPayment.ProcessMode == 'Direct' && checkout.selectedPayment.DisplayType == 'CreditCard' && !checkout.billing.Wallet">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billExpMonth.$dirty && rzcForm_@(Dnn.ModuleContext.ModuleId).billExpYear.$dirty) && (rzcForm_@(Dnn.ModuleContext.ModuleId).billExpMonth.$invalid || rzcForm_@(Dnn.ModuleContext.ModuleId).billExpYear.$invalid) }">
+                        <select name="billExpMonth" class="form-control" ng-model="checkout.billing.ExpMonth" ng-change="" required>
+                            <option value="" disabled selected ng-init="checkout.billing.ExpMonth = null">-- @Dnn.LocalizeString("ExpirationMonth") --</option>
+                            <option ng-repeat="month in checkout.expMonths" value="{{month.Value}}">{{month.Text}}</option>
+                        </select>
+                        <span class="input-group-addon input-sm"><i class="fa fa-minus"></i></span>
+                        <select name="billExpYear" class="form-control" ng-model="checkout.billing.ExpYear" ng-change="" required>
+                            <option value="" disabled selected ng-init="checkout.billing.ExpYear = null">-- @Dnn.LocalizeString("ExpirationYear") --</option>
+                            <option ng-repeat="year in checkout.expYears" value="{{year.Value}}">{{year.Text}}</option>
+                        </select>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billExpMonth.$error || rzcForm_@(Dnn.ModuleContext.ModuleId).billExpYear.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billExpMonth.$dirty && rzcForm_@(Dnn.ModuleContext.ModuleId).billExpYear.$dirty">
+                        <div class="form-control-required" ng-show="rzcForm_@(Dnn.ModuleContext.ModuleId).billExpMonth.$error.required || rzcForm_@(Dnn.ModuleContext.ModuleId).billExpYear.$error.required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("ExpirationDateRequired")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12" ng-if="checkout.selectedPayment.ProcessMode == 'Direct' && checkout.selectedPayment.DisplayType == 'ECheck' && !checkout.billing.Wallet">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billBankName.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billBankName.$invalid }">
+                        <span class="input-group-addon"><i class="fa fa-university"></i></span>
+                        <input type="text" name="billBankName" class="form-control" placeholder="@Dnn.LocalizeString("BankName")" ng-model="checkout.billing.BankName" required>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billBankName.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billBankName.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BankNameRequired")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12" ng-if="checkout.selectedPayment.ProcessMode == 'Direct' && checkout.selectedPayment.DisplayType == 'ECheck' && !checkout.billing.Wallet">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billAccountNumber.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billAccountNumber.$invalid }">
+                        <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                        <input type="tel" name="billAccountNumber" class="form-control" placeholder="@Dnn.LocalizeString("AccountNumber")" ng-model="checkout.billing.AccountNumber" autocomplete="off" pattern="^([0-9]{4,17})$" required>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billAccountNumber.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billAccountNumber.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("AccountNumberRequired")
+                        </div>
+                        <div class="form-control-required" ng-message="pattern">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("AccountNumberInvalid")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12" ng-if="checkout.selectedPayment.ProcessMode == 'Direct' && checkout.selectedPayment.DisplayType == 'ECheck' && !checkout.billing.Wallet">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billRoutingNumber.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billRoutingNumber.$invalid }">
+                        <span class="input-group-addon"><i class="fa fa-list-alt"></i></span>
+                        <input type="tel" name="billRoutingNumber" class="form-control" placeholder="@Dnn.LocalizeString("RoutingNumber")" ng-model="checkout.billing.RoutingNumber" autocomplete="off" pattern="^([0-9]{9})$" required>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billRoutingNumber.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billRoutingNumber.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("RoutingNumberRequired")
+                        </div>
+                        <div class="form-control-required" ng-message="pattern">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("RoutingNumberInvalid")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12" ng-if="checkout.selectedPayment.ProcessMode == 'Direct' && checkout.selectedPayment.DisplayType == 'PurchaseOrder'">
+                    <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPONumber.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billPONumber.$invalid }">
+                        <span class="input-group-addon"><i class="fa fa-list-alt"></i></span>
+                        <input type="text" name="billPONumber" class="form-control" placeholder="@Dnn.LocalizeString("PONumber")" ng-model="checkout.billing.PONumber" required>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billPONumber.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPONumber.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("PONumberRequired")
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="col-xs-12" ng-if="!checkout.billing.Wallet">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-home"></i></span>
+                    <input type="text" name="billAddress1" class="form-control" placeholder="@Dnn.LocalizeString("Address1")" ng-model="checkout.billing.Address1" required>
+                    <input type="text" name="billAddress2" class="form-control" placeholder="@Dnn.LocalizeString("Address2")" ng-model="checkout.billing.Address2">
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billAddress1.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingAddress1Required")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6" ng-if="!checkout.billing.Wallet">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                    <input type="text" name="billCity" class="form-control" placeholder="@Dnn.LocalizeString("City")" ng-model="checkout.billing.City" required>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCity.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingCityRequired")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6" ng-if="!checkout.billing.Wallet">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                    <input type="text" name="billPostalCode" class="form-control" placeholder="@Dnn.LocalizeString("PostalCode")" ng-model="checkout.billing.PostalCode" required>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billPostalCode.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingPostalCodeRequired")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6" ng-if="!checkout.billing.Wallet">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-globe"></i></span>
+                    <select name="billCountry" class="form-control" ng-model="checkout.billing.CountryID" ng-change="checkout.billCountryChange()" required>
+                        <option value="" disabled selected>-- @Dnn.LocalizeString("Country") --</option>
+                        <option ng-repeat="country in checkout.countries" value="{{country.EntryID}}">{{country.Text}}</option>
+                    </select>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billCountry.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingCountryRequired")
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6" ng-if="!checkout.billing.Wallet">
+                <div class="form-group input-group" ng-class="{ 'has-error has-feedback': (checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$dirty) && rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$invalid }">
+                    <span class="input-group-addon"><i class="fa fa-map"></i></span>
+                    <select name="billRegion" class="form-control" ng-model="checkout.billing.RegionID" required>
+                        <option value="" disabled selected>-- @Dnn.LocalizeString("Region") --</option>
+                        <option ng-repeat="region in checkout.billingRegions" value="{{region.EntryID}}">{{region.Text}}</option>
+                    </select>
+                </div>
+                <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).billRegion.$dirty">
+                    <div class="form-control-required" ng-message="required">
+                        <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("BillingRegionRequired")
+                    </div>
+                </div>
+            </div>
+            @if (Model.ShowAcceptTerms)
+            {
+                <div class="col-xs-12">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
+                        <div class="form-control" style="height: auto;">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="acceptTerms" ng-model="checkout.billing.AcceptTerms" required /> @Dnn.LocalizeString("AcceptTerms")
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-messages="rzcForm_@(Dnn.ModuleContext.ModuleId).acceptTerms.$error" ng-if="checkout.submitted || rzcForm_@(Dnn.ModuleContext.ModuleId).acceptTerms.$dirty">
+                        <div class="form-control-required" ng-message="required">
+                            <i class="fa fa-exclamation-circle fa-lg"></i> @Dnn.LocalizeString("AcceptTermsRequired")
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row" ng-if="checkout.viewState != 'ShoppingCart'">
+            <div class="col-xs-12">
+                <dl>
+                    <dt>@Dnn.LocalizeString("BillTo"):</dt>
+                    <dd>
+                        <div>@Dnn.LocalizeString("FullName"): {{checkout.billing.FullName}}</div>
+                        <div>
+                            @Dnn.LocalizeString("PaymentMethod"):
+                            @if (string.IsNullOrEmpty(Model.GatewayCode) || Model.GatewayMode == RazorCart.Service.Gateway.GatewayProcessMode.Direct)
+                            {
+                                <span>{{checkout.billing.PaymentMethod}} {{checkout.billing.MaskAcctNo}}</span>
+                            }
+                            else
+                            {
+                                <span>@Model.GatewayCode</span>
+                            }
+                        </div>
+                    </dd>
+                    <dt>@Dnn.LocalizeString("FullAddress"):</dt>
+                    <dd>
+                        <div>{{checkout.billing.Address1}}<span ng-if="checkout.billing.Address2.length > 0">, {{checkout.billing.Address2}}</span></div>
+                        <div>
+                            {{checkout.billing.City}}, {{(checkout.billingRegions | filter: {EntryID : checkout.billing.RegionID} : true)[0].Text}} {{checkout.shipping.PostalCode}}
+                        </div>
+                        <div>{{(checkout.countries | filter: {EntryID : checkout.billing.CountryID} : true)[0].Text}}</div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>

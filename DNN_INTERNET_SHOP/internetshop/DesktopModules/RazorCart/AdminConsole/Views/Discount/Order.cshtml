@@ -1,0 +1,72 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.DiscountModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Discount Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Order", "Discount", new { StoreID = Model.StoreID })" autocomplete="off">
+            @Html.Partial("_DiscountMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a class="btn btn-primary pull-right" href="@Url.Action("AddOrder", "Discount", new { StoreID = Model.StoreID })">
+                                        <i class="fa fa-plus"></i> Add Order Discount
+                                    </a>
+                                    <h4>Order Discount</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Security Role</th>
+                                                    <th>Discount Percent</th>
+                                                    <th>Discount Amount</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var discount in Model.OrderDiscounts)
+                                                {
+                                                    <tr>
+                                                        <td>@discount.RoleName</td>
+                                                        <td>@string.Format("{0}%", discount.DiscountPercent)</td>
+                                                        <td>@string.Format(Model.Culture, "{0:c}", discount.DiscountAmount)</td>
+                                                        <td class="text-right">
+                                                            <a href="@Url.Action("EditOrder", "Discount", new { StoreID = Model.StoreID, OrderDiscountID = discount.OrderDiscountID })"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                                            <a href="@Url.Action("DeleteOrder", "Discount", new { StoreID = Model.StoreID, OrderDiscountID = discount.OrderDiscountID })" onclick="return confirm('Are you sure?')">
+                                                                <i class="fa fa-trash-o fa-lg"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.OrderDiscounts.Count < 1)
+                                                {
+                                                    <tr><td colspan="4">No Order Discounts added.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->

@@ -1,0 +1,51 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.MyAccount.Models.AccountModel>
+@using DotNetNuke.Web.Mvc.Helpers;
+
+<div class="rzc-basket" ng-if="!account.subEditMode">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>@Dnn.LocalizeString("OrderNo")</th>
+                    <th>@Dnn.LocalizeString("Active")</th>
+                    <th>@Dnn.LocalizeString("ProductName")</th>
+                    <th>@Dnn.LocalizeString("StartDate")</th>
+                    <th>@Dnn.LocalizeString("NextDate")</th>
+                    <th>@Dnn.LocalizeString("Amount")</th>
+                    <th>@Dnn.LocalizeString("Interval")</th>
+                    <th>@Dnn.LocalizeString("Occurrences")</th>
+                    <th>@Dnn.LocalizeString("PayType")</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody ng-repeat="subscription in account.subscriptionItems">
+                <tr>
+                    <td>{{subscription.Item1.OrderID}}</td>
+                    <td>{{subscription.Item1.Active ? '@Dnn.LocalizeString("Yes")' : '@Dnn.LocalizeString("No")'}}</td>
+                    <td>{{subscription.Item2.ProductName}}</td>
+                    <td>{{subscription.Item2.DetailRecurring.StartDate | date : '@Model.Culture.DateTimeFormat.ShortDatePattern'}}</td>
+                    <td>{{subscription.Item1.Active ? (subscription.Item1.NextPaymentDate | date : '@Model.Culture.DateTimeFormat.ShortDatePattern') : ''}}</td>
+                    <td class="text-right">{{subscription.Item1.Amount | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td>
+                    <td>{{subscription.Item2.DetailRecurring.SubscriptionInterval}}</td>
+                    <td>
+                        {{subscription.Item2.DetailRecurring.RecurringOccurances != 9999 ? subscription.Item2.DetailRecurring.RecurringOccurances : '@Dnn.LocalizeString("Ongoing")'}}
+                    </td>
+                    <td>{{subscription.Item1.PayType + ': ' + subscription.Item1.MaskAcctNo}}</td>
+                    <td class="text-right">
+                        <button type="button" class="btn btn-primary btn-sm" ng-hide="true" ng-disabled="!subscription.Item1.Active" ng-click="account.viewEditPayment(subscription.Item1.OrderID, subscription.Item1.SubscriptionID)">
+                            <i class="fa fa-credit-card" role="button"></i> @Dnn.LocalizeString("Edit")
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" ng-disabled="!subscription.Item1.Active" ng-click="account.unsubscribe(subscription.Item1.OrderID, subscription.Item1.SubscriptionID)">
+                            <i class="fa fa-ban" role="button"></i> @Dnn.LocalizeString("Cancel")
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody ng-if="account.subscriptionItems.length < 1">
+                <tr>
+                    <td colspan="10"><span>@Dnn.LocalizeString("NoSubscriptions")</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

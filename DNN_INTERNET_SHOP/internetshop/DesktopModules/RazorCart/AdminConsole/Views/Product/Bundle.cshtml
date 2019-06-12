@@ -1,0 +1,113 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<!-- Select2 CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2-bootstrap.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Select2 JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/select2.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })" autocomplete="off">
+            @Html.Partial("_ProductMenu")
+            @if (Model.Submitted)
+            {
+                <div class="alert alert-success alert-dismissable">
+                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                    @Model.SaveMessage
+                </div>
+            }
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Bundle Products</h4>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Show Total Bundled Price <i class="fa fa-info-circle" data-toggle="tooltip" title="@Model.Tooltips["ShowTotalBundledPrice"]"></i></label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("ShowTotalBundledPrice", Convert.ToBoolean(Model.StoreConfig["ShowTotalBundledPrice"]), new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Bundle Products</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.ListBox("BundleProducts", Model.ProductBundleList)
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    <a class="btn btn-default" href="@Url.Action("Index", "Product", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Tooltips
+        $('[data-toggle="tooltip"]').tooltip({
+            placement: 'right',
+            container: 'body'
+        });
+        $('#BundleProducts').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            placeholder: "Select products",
+            ajax: {
+                type: 'POST',
+                url: '@Url.Action("List", "Product", new { StoreID = Model.StoreID })',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        'search[value]': params.term,
+                        'length': 25,
+                        'start': 0
+                    };
+                },
+                processResults: function (data, params) {
+                    var selected = this.$element.val().map(Number);
+                    selected.push(@Model.Product.ProductID);
+                    return {
+                        results: $.map(data.data, function (item) {
+                            if ($.inArray(item.ProductID, selected) === -1) {
+                                return {
+                                    id: item.ProductID,
+                                    text: item.ModelName
+                                };
+                            }
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2,
+        }).on('select2:select', function (e) {
+            var id = e.params.data.id;
+            var option = $(e.target).children('[value=' + id + ']');
+            option.detach();
+            $(e.target).append(option).change();
+        });
+    });
+</script>

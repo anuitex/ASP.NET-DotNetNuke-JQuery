@@ -1,0 +1,266 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.HomeModel>
+@using System.Web.Mvc.Html;
+
+<!-- Morris Charts CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/morris.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Morris Charts JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/raphael.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/morris.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="page-header h1">
+            @Model.GetString("Title")
+            <div class="pull-right">
+                <div class="btn-group">
+                    @if (Model.UserInfo.IsSuperUser || Model.UserInfo.IsInRole(Model.PortalSettings.AdministratorRoleName))
+                    {
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#homeModal1" data-backdrop="static" data-keyboard="true">
+                            <i class="fa fa-cog"></i>
+                        </button>
+                    }
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-calendar"></i> @Model.GetString("SummaryStatistics"): @Html.Display("ReportFrame")
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu slidedown" role="menu">
+                        <li>
+                            <a href="@Url.Action("Index", "Home", new { StoreID = Model.StoreID, Frame = "Daily" })">@Model.GetString("Daily")</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="@Url.Action("Index", "Home", new { StoreID = Model.StoreID, Frame = "Weekly" })">@Model.GetString("Weekly")</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="@Url.Action("Index", "Home", new { StoreID = Model.StoreID, Frame = "Monthly" })">@Model.GetString("Monthly")</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="@Url.Action("Index", "Home", new { StoreID = Model.StoreID, Frame = "Quarterly" })">@Model.GetString("Quarterly")</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="@Url.Action("Index", "Home", new { StoreID = Model.StoreID, Frame = "Yearly" })">@Model.GetString("Yearly")</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+    @Html.Partial("_HomeModal")
+</div>
+<!-- /.row -->
+<div class="row">
+    @foreach (var status in Model.StatusDisplayList.Where(s => s.Selected))
+    {
+        <div class="col-lg-3 col-md-6">
+            <div class="panel" style="border-color: @(status.ColorCode);">
+                <div class="panel-heading" style="color: white; border-color: @(status.ColorCode); background-color: @(status.ColorCode);">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="@(status.IconClass)"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">@(Model.GetStateSummary(status.Value).Orders)</div>
+                            <div>@(status.Text)</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="@(Url.Action("Index", "Order", new { StoreID = Model.StoreID }) + status.LookupQuery)" style="color: @(status.ColorCode);">
+                    <div class="panel-footer">
+                        <span class="pull-left">View All @(status.Text) Orders</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    }
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-area-chart fa-fw"></i>
+                    @Model.GetString("RevenueStatistics")
+                </h3>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div id="RevenueStatistics">
+                    <div class="center loader"></div>
+                </div>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pie-chart fa-fw"></i> Top @Model.ReportTop Products Revenue</h3>
+            </div>
+            <div class="panel-body">
+                <div id="TopProductsRevenue">
+                    <div class="center loader"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.col-lg-4 -->
+    <div class="col-lg-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-bell fa-fw"></i> New Notification</h3>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    @foreach (var notification in Model.Notifications)
+                    {
+                        switch (notification.Type)
+                        {
+                            case RazorCart.Service.Data.ModelDataContext.NotificationType.Order:
+                                <a href="@Url.Action("Edit", "Order", new { StoreID = Model.StoreID, OrderID = notification.ID })" class="list-group-item">
+                                    <i class="fa fa-shopping-cart fa-fw"></i> @notification.Description
+                                    <span class="pull-right text-muted small">
+                                        <em>@(RazorCart.AdminConsole.Components.TimeSpanManager.GetRelativeTime(notification.Date))</em>
+                                    </span>
+                                </a>
+                                break;
+                            case RazorCart.Service.Data.ModelDataContext.NotificationType.Customer:
+                                <a href="@Url.Action("Edit", "Customer", new { StoreID = Model.StoreID, CustomerID = notification.ID })" class="list-group-item">
+                                    <i class="fa fa-user fa-fw"></i> @notification.Description
+                                    <span class="pull-right text-muted small">
+                                        <em>@(RazorCart.AdminConsole.Components.TimeSpanManager.GetRelativeTime(notification.Date))</em>
+                                    </span>
+                                </a>
+                                break;
+                            case RazorCart.Service.Data.ModelDataContext.NotificationType.Review:
+                                <a href="@Url.Action("Review", "Product", new { StoreID = Model.StoreID, ReviewID = notification.ID })" class="list-group-item">
+                                    <i class="fa fa-star-half-o fa-fw"></i> @notification.Description
+                                    <span class="pull-right text-muted small">
+                                        <em>@(RazorCart.AdminConsole.Components.TimeSpanManager.GetRelativeTime(notification.Date))</em>
+                                    </span>
+                                </a>
+                                break;
+                            case RazorCart.Service.Data.ModelDataContext.NotificationType.Alert:
+                                <a href="@(Model.SiteUrl + "Admin/LogViewer")" class="list-group-item">
+                                    <i class="fa fa-exclamation-triangle fa-fw"></i> @notification.Description
+                                    <span class="pull-right text-muted small">
+                                        <em>@(RazorCart.AdminConsole.Components.TimeSpanManager.GetRelativeTime(notification.Date))</em>
+                                    </span>
+                                </a>
+                                break;
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.col-lg-4 -->
+    <div class="col-lg-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-money fa-fw"></i> Last Transactions</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Pay Date</th>
+                                <th>Trans. #</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var payment in Model.Payments)
+                            {
+                                <tr>
+                                    <td>@payment.OrderID</td>
+                                    <td>@payment.PayDate.ToShortDateString()</td>
+                                    <td>@payment.TransID</td>
+                                    <td>@string.Format(Model.Culture, "{0:c}", payment.Amount)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.col-lg-4 -->
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    @{
+        string xLabel = string.Empty;
+        IEnumerable<object> chartData = Enumerable.Empty<object>();
+        switch (Model.ReportFrame)
+        {
+            case RazorCart.Service.Data.ModelDataContext.ReportFrame.Daily:
+                xLabel = "day";
+                chartData = Model.RevenueStatistics.Select(rs => new { period = string.Format("{0}-{1}-{2}", rs.Year, rs.Month, rs.Day), revenue = rs.Revenue });
+                break;
+            case RazorCart.Service.Data.ModelDataContext.ReportFrame.Weekly:
+                xLabel = "week";
+                chartData = Model.RevenueStatistics.Select(rs => new { period = string.Format("{0} W{1}", rs.Year, rs.Week), revenue = rs.Revenue });
+                break;
+            case RazorCart.Service.Data.ModelDataContext.ReportFrame.Monthly:
+                xLabel = "month";
+                chartData = Model.RevenueStatistics.Select(rs => new { period = string.Format("{0}-{1}", rs.Year, rs.Month), revenue = rs.Revenue });
+                break;
+            case RazorCart.Service.Data.ModelDataContext.ReportFrame.Quarterly:
+                xLabel = "month";
+                chartData = Model.RevenueStatistics.Select(rs => new { period = string.Format("{0} Q{1}", rs.Year, rs.Quarter), revenue = rs.Revenue });
+                break;
+            case RazorCart.Service.Data.ModelDataContext.ReportFrame.Yearly:
+                xLabel = "year";
+                chartData = Model.RevenueStatistics.Select(rs => new { period = string.Format("{0}", rs.Year), revenue = rs.Revenue });
+                break;
+        }
+    }
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+    });
+    $(function () {
+        // Morris Charts
+        setTimeout(function () {
+            $('#RevenueStatistics').html('');
+            Morris.Area({
+                element: 'RevenueStatistics',
+                data: @Html.Raw(Json.Encode(chartData)),
+                xkey: 'period',
+                xLabels: '@xLabel',
+                ykeys: ['revenue'],
+                labels: ['Revenue'],
+                pointSize: 5,
+                hideHover: 'auto',
+                resize: true,
+                yLabelFormat: function (value) {
+                    return '@Model.CurrencySymbol' + value.toFixed(2);
+                }
+            });
+            $('#TopProductsRevenue').html('');
+            Morris.Donut({
+                element: 'TopProductsRevenue',
+                data: @Html.Raw(Json.Encode(Model.TopProducts.Select(p => new { label = p.ModelName, value = p.Revenue }))),
+                formatter: function (value, data) { return '@Model.CurrencySymbol' + value.toFixed(2) },
+                colors: ['#5cb85c', '#337ab7', '#d9534f', '#f0ad4e', '#ffff00', '#663300', '#ff33cc', '#00ffff', '#666699'],
+                resize: true
+            });
+        }, 100);
+    });
+</script>

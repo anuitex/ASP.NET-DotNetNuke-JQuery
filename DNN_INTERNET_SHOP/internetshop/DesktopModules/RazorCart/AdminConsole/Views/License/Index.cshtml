@@ -1,0 +1,68 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.LicenseModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">License Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Index", "License", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a class="btn btn-primary pull-right" href="@Url.Action("Add", "License", new { StoreID = Model.StoreID })">
+                        <i class="fa fa-plus"></i> Add License Key
+                    </a>
+                    <h4>License Keys</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Hostname</th>
+                                    <th>Modules</th>
+                                    <th>Installed</th>
+                                    <th>Enterprise</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var license in Model.LicenseInfoList)
+                                {
+                                    <tr>
+                                        <td>@license.Hostname</td>
+                                        <td>
+                                            @string.Join(", ", license.Products.Select(p => string.Format("{0} [{1}]", p.Key, p.Value)))
+                                        </td>
+                                        <td class="text-nowrap">@license.CreateDate</td>
+                                        <td>@license.IsEnterprise</td>
+                                        <td>@license.Status</td>
+                                        <td class="text-right">
+                                            <a href="@Url.Action("Delete", "License", new { StoreID = Model.StoreID, LicenseKeyID = license.LicenseKeyID })" onclick="return confirm('Are you sure?')">
+                                                <i class="fa fa-trash-o fa-lg"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.LicenseInfoList.Count < 1)
+                                {
+                                    <tr><td colspan="5">No License Keys added.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->

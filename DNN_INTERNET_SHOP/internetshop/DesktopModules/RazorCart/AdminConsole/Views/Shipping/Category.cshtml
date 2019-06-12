@@ -1,0 +1,117 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ShippingModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Shipping Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("SaveCategory", "Shipping", new { StoreID = Model.StoreID })" autocomplete="off">
+            @Html.Partial("_ShippingMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i>
+                                <strong>Assign Product Categories to Custom Ship Methods.</strong>
+                                <p>&emsp;To select categories with special shipping rates, check the desired category(ies). All other categories will use the default ship rates.</p>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Shipping Categories</h4>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <ul class="list-group checked-list-box">
+                                        @foreach (var category in Model.Categories)
+                                        {
+                                            <li class="list-group-item" data-value="@category.Value" data-checked="@category.Selected.ToString().ToLower()">@category.Text</li>
+                                        }
+                                        @if (Model.Categories.Count() < 1)
+                                        {
+                                            <li class="list-group-item message">No Store Categories added.</li>
+                                        }
+                                    </ul>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    <button type="submit" class="btn btn-danger" onclick="this.form.action='@Url.Action("ClearCategory", "Shipping", new { StoreID = Model.StoreID })'"><i class="fa fa-eraser"></i> Clear</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(function () {
+        $('.list-group.checked-list-box .list-group-item').not('.message').each(function () {
+            // Settings
+            var $widget = $(this),
+                $checkbox = $('<input type="checkbox" class="hidden" />'),
+                color = ($widget.data('color') ? $widget.data('color') : "primary"),
+                style = ($widget.data('style') == "button" ? "btn-" : "list-group-item-"),
+                settings = {
+                    on: {
+                        icon: 'glyphicon glyphicon-check'
+                    },
+                    off: {
+                        icon: 'glyphicon glyphicon-unchecked'
+                    }
+                };
+            $widget.css('cursor', 'pointer');
+            $checkbox[0].name = $widget.data('value');
+            $widget.append($checkbox);
+            // Event Handlers
+            $widget.on('click', function () {
+                $checkbox.prop('checked', !$checkbox.is(':checked'));
+                $checkbox.triggerHandler('change');
+                updateDisplay();
+            });
+            $checkbox.on('change', function () {
+                updateDisplay();
+            });
+            // Actions
+            function updateDisplay() {
+                var isChecked = $checkbox.is(':checked');
+                // Set the button's state
+                $widget.data('state', (isChecked) ? "on" : "off");
+                // Set the button's icon
+                $widget.find('.state-icon')
+                    .removeClass()
+                    .addClass('state-icon ' + settings[$widget.data('state')].icon);
+                // Update the button's color
+                if (isChecked) {
+                    $widget.addClass(style + color);
+                } else {
+                    $widget.removeClass(style + color);
+                }
+            }
+            // Initialization
+            function init() {
+                if ($widget.data('checked') == true) {
+                    $checkbox.prop('checked', !$checkbox.is(':checked'));
+                }
+                updateDisplay();
+                // Inject the icon if applicable
+                if ($widget.find('.state-icon').length == 0) {
+                    $widget.prepend('<span class="state-icon ' + settings[$widget.data('state')].icon + '"></span>');
+                }
+            }
+            init();
+        });
+    });
+</script>

@@ -1,0 +1,64 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ApiModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">RESTful API Setup</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Index", "Api", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a class="btn btn-primary pull-right" href="@Url.Action("Add", "Api", new { StoreID = Model.StoreID })">
+                        <i class="fa fa-plus"></i> Add API Key
+                    </a>
+                    <h4>API Keys</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Client ID</th>
+                                    <th>Application Url</th>
+                                    <th>Callback Url</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var key in Model.ClientCredentials)
+                                {
+                                    <tr>
+                                        <td>@key.Title</td>
+                                        <td>@key.ClientID</td>
+                                        <td>@key.ApplicationUrl</td>
+                                        <td>@key.CallbackUrl</td>
+                                        <td class="text-right">
+                                            <a href="@Url.Action("Delete", "Api", new { StoreID = Model.StoreID, ID = key.ID })" onclick="return confirm('Are you sure?')">
+                                                <i class="fa fa-trash-o fa-lg"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.ClientCredentials.Count < 1)
+                                {
+                                    <tr><td colspan="5">No API Keys added.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->

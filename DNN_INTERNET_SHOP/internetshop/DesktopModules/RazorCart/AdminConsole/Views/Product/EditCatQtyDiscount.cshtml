@@ -1,0 +1,71 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Category: @Model.Category.CategoryName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" enctype="multipart/form-data" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, CategoryID = Model.Category.CategoryID, QtyDiscountID = Model.CatQtyDiscount.QtyDiscountID })" autocomplete="off">
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            @if (Model.Submitted)
+                            {
+                                <div class="alert alert-success alert-dismissable">
+                                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                    @Model.SaveMessage
+                                </div>
+                            }
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4>Category Qty Discount</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        @Html.Label("QtyFrom", "Qty From", new { @class = "col-md-3 col-sm-4 control-label" })
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("QtyFrom", Model.CatQtyDiscount.QtyFrom, new { @class = "form-control", @placeholder = "Qty From", @type = "number", @step = "1", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.Label("QtyTo", "Qty To", new { @class = "col-md-3 col-sm-4 control-label" })
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("QtyTo", Model.CatQtyDiscount.QtyTo, new { @class = "form-control", @placeholder = "Qty To", @type = "number", @step = "1", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.Label("Price", "Discount Amount", new { @class = "col-md-3 col-sm-4 control-label" })
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextBox("Price", Model.CatQtyDiscount.Price, new { @class = "form-control", @placeholder = "Discount", @type = "number", @step = "0.01", @required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.Label("DiscountGroup", "Discount Group", new { @class = "col-md-3 col-sm-4 control-label" })
+                                        <div class="col-md-6 col-sm-8">
+                                            @Html.TextArea("DiscountGroup", Model.CatQtyDiscount.DiscountGroup, new { @class = "form-control", @placeholder = "Discount Group" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("CatQtyDiscounts", "Product", new { StoreID = Model.StoreID, CategoryID = Model.CatQtyDiscount.CategoryID })">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->

@@ -1,0 +1,769 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.OrderModel>
+@using System.Web.Mvc;
+@using System.Web.Mvc.Html;
+
+<!-- Variants JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/rzc-product-variants.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="modal fade" id="orderModal1" role="dialog" tabindex="-1" aria-labelledby="orderModalLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" action="@Url.Action("SaveItem", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })" autocomplete="off">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="orderModalLabel1">Add Order Item</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="ProductID">Product</label>
+                        @Html.DropDownList("ProductID", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { })
+                    </div>
+                    <div class="form-group">
+                        <label for="ProductQty">Quantity</label>
+                        @Html.TextBox("ProductQty", string.Empty, new { @class = "form-control", @placeholder = "Quantity", @type = "number", @step = "1", @required = "required" })
+                    </div>
+                    <div class="form-group">
+                        <label for="ProductCost">Price</label>
+                        <div class="input-group">
+                            @Html.TextBox("ProductCost", string.Empty, new { @class = "form-control", @placeholder = "Base Price", @type = "number", @step = "0.01", @onchange = "rcUpdatePrice();", @required = "required" })
+                            <span class="input-group-btn">
+                                @Html.TextBox("DetailCost", string.Empty, new { @class = "form-control", @placeholder = "Final Price", @type = "number", @style = "width: 120px; -moz-appearance: textfield; -webkit-appearance: none;", @disabled = "disabled" })
+                            </span>
+                        </div>
+                    </div>
+                    <div id="ProductVariants"></div>
+                    <div id="ProductBooking"></div>
+                </div>
+                <div class="modal-footer">
+                    @Html.Hidden("OrderDetailID", string.Empty)
+                    <button type="submit" class="btn btn-primary" id="orderModalSubmit1"><i class="fa fa-plus"></i> Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="orderModal2" role="dialog" tabindex="-1" aria-labelledby="orderModalLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <form class="form-horizontal" method="post" action="@Url.Action("EditPayment", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })" autocomplete="off">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="orderModalLabel2">Add Order Payment</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Transaction Type</label>
+                        <div class="col-sm-7">
+                            @Html.DropDownList("TransType", Model.PaymentTransTypes, "-- Select --", new { @class = "form-control", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="RefundPayID" data-cond-value="" data-cond-operator="==" style="display: none;">
+                        <label class="col-sm-3 control-label">Payment Method</label>
+                        <div class="col-sm-7">
+                            @Html.DropDownList("PayMethodID", Model.PaymentMethods, "-- Select --", new { @class = "form-control", @required = "required", @onchange = "$('[name=ProcessPayment]')[0].checked = false;" })
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="PayMethodID" data-cond-value="@string.Join(",", Model.CreditCardIDs)" data-cond-operator="[]" style="display: none;">
+                        <label class="col-sm-3 control-label">Credit Card</label>
+                        <div class="col-sm-5">
+                            @Html.TextBox("CardNumber", string.Empty, new { @class = "form-control", @placeholder = "Card Number", @required = "required", @type = "tel", @pattern = "^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\\d{3})\\d{11}|[x|X]{4}-[x|X]{4}-[x|X]{4}-[0-9]{4})$" })
+                        </div>
+                        <div class="col-sm-2">
+                            @Html.TextBox("CVV", string.Empty, new { @class = "form-control", @placeholder = "CVV", @type = "tel", @pattern = "^([0-9]{3,4})?$" })
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="PayMethodID" data-cond-value="@string.Join(",", Model.CreditCardIDs)" data-cond-operator="[]" style="display: none;">
+                        <label class="col-sm-3 control-label">Expiration Date</label>
+                        <div class="col-sm-4">
+                            @Html.DropDownList("ExpMonth", Model.ExpMonths, "-- Select --", new { @class = "form-control", @required = "required" })
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("ExpYear", Model.ExpYears, "-- Select --", new { @class = "form-control", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="PayMethodID" data-cond-value="false" data-cond-operator="==" style="display: none;">
+                        <label class="col-sm-3 control-label">Bank Name</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("BankName", string.Empty, new { @class = "form-control", @placeholder = "Bank Name" })
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="PayMethodID" data-cond-value="@string.Join(",", Model.ECheckIDs)" data-cond-operator="[]" style="display: none;">
+                        <label class="col-sm-3 control-label">ACH/ABA</label>
+                        <div class="col-sm-4">
+                            @Html.TextBox("AccountNumber", string.Empty, new { @class = "form-control", @placeholder = "Account Number", @required = "required", @type = "tel", @pattern = "^([0-9]{4,17}|[x|X]{8}[0-9]{4})$" })
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.TextBox("RoutingNumber", string.Empty, new { @class = "form-control", @placeholder = "Routing Number", @required = "required", @type = "tel", @pattern = "^([0-9]{9})$" })
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="PayMethodID" data-cond-value="@string.Join(",", Model.POIDs)" data-cond-operator="[]" style="display: none;">
+                        <label class="col-sm-3 control-label">PO Number</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("PONumber", string.Empty, new { @class = "form-control", @placeholder = "P.O. Number", @required = "required", @type = "text" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Amount</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("Amount", string.Format("{0:0.##}", Model.Order.GrandTotal - Model.Payment.Amount), new { @class = "form-control", @placeholder = "Amount", @required = "required", @type = "number", @step = "any", @min = "0.01" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Billing Name</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("BillingName", Model.Payment.BillingName, new { @class = "form-control", @placeholder = "Billing Name" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Address</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("BillingAddress", Model.Payment.BillingAddress, new { @class = "form-control", @placeholder = "Billing Address" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">City</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("BillingCity", Model.Payment.BillingCity, new { @class = "form-control", @placeholder = "Billing City" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Postal Code</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("BillingZip", Model.Payment.BillingZip, new { @class = "form-control", @placeholder = "Postal Code" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Country</label>
+                        <div class="col-sm-7">
+                            @Html.DropDownList("BillingCountry", Model.Countries, "-- Select --", new { @class = "form-control", @onchange = "defaultCountryChange(this.value, 'BillingState');", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Region</label>
+                        <div class="col-sm-7">
+                            @Html.DropDownList("BillingState", Model.Regions, "-- Select --", new { @class = "form-control", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Invoice No</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("InvoiceNo", string.Empty, new { @class = "form-control", @placeholder = "Invoice No" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Process Payment</label>
+                        <div class="col-sm-7">
+                            <div data-show="conditional" data-cond-option="Success" data-cond-value="false" style="display: none;">
+                                <div class="radio" data-show="conditional" data-cond-option="PayMethodID" data-cond-value="@string.Join(",", Model.CreditCardIDs.Union(Model.ECheckIDs).Union(new List<string>() { "" }).ToArray())" data-cond-operator="[]" style="display: none;">
+                                    <label>
+                                        @Html.RadioButton("ProcessPayment", "Gateway", false, new { @required = "required", @style = "display: block; opacity: 0;" }) Process Payment Gateway
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    @Html.RadioButton("ProcessPayment", "Manual", false, new { @required = "required", @style = "display: block; opacity: 0;" }) Manual Set as Paid
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="ProcessPayment" data-cond-value="Manual" style="display: none;">
+                        <label class="col-sm-3 control-label">Transaction ID</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("TransID", string.Empty, new { @class = "form-control", @placeholder = "Transaction ID" })
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="ProcessPayment" data-cond-value="Manual" style="display: none;">
+                        <label class="col-sm-3 control-label">Authorization Code</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("AuthCode", string.Empty, new { @class = "form-control", @placeholder = "Authorization Code" })
+                        </div>
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="ProcessPayment" data-cond-value="Manual" style="display: none;">
+                        <label class="col-sm-3 control-label">Notes</label>
+                        <div class="col-sm-7">
+                            @Html.TextArea("Notes", string.Empty, new { @class = "form-control", @placeholder = "Notes", @rows = "2" })
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @Html.Hidden("PayHistID", string.Empty)
+                    @Html.Hidden("Success", bool.FalseString.ToLower())
+                    @Html.Hidden("RefundPayID", string.Empty)
+                    <button type="submit" class="btn btn-primary" id="orderModalSubmit2"><i class="fa fa-plus"></i> Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="orderModal3" role="dialog" tabindex="-1" aria-labelledby="orderModalLabel3" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" action="@Url.Action("AddNote", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })" autocomplete="off">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="orderModalLabel3">Add Order Note</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="Notes">Notes</label>
+                        @Html.TextArea("Notes", string.Empty, new { @class = "form-control", @placeholder = "Notes", @rows = "5" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="orderModalSubmit3"><i class="fa fa-plus"></i> Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="orderModal4" role="dialog" tabindex="-1" aria-labelledby="orderModalLabel4" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <form class="form-horizontal" method="post" action="@Url.Action("AddFulfillment", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })" autocomplete="off">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="orderModalLabel4">Add Order Shipment</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-default" id="orderModalTable4">
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>SKU</th>
+                                            <th>Product Name</th>
+                                            <th class="text-right" style="white-space:nowrap;">Unshipped Qty</th>
+                                            <th class="text-right">Ship Qty</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.ReadyToShipItems)
+                                        {
+                                            <tr class="@(item.Returned ? "strikethrough" : string.Empty)">
+                                                <td>@item.ProductSKU</td>
+                                                <td>
+                                                    @item.ProductName
+                                                    <br />
+                                                    @if (item.DetailVariants.Count > 0)
+                                                    {
+                                                        <ul>
+                                                            @foreach (var option in item.DetailVariants)
+                                                            {
+                                                                <li>@(option.VariantHasText ? (option.VariantName + ": " + option.VariantText) : (option.VariantGroup + ": " + option.VariantName))</li>
+                                                            }
+                                                        </ul>
+                                                    }
+                                                    @if (item.DetailBooking.IsBooking)
+                                                    {
+                                                        <ul>
+                                                            @if (item.DetailBooking.BookingStart.HasValue)
+                                                            {
+                                                                <li>Start: @(item.DetailBooking.ShowTime ? item.DetailBooking.BookingStart.Value.ToString(Model.ShortDateFormat + " " + Model.Culture.DateTimeFormat.ShortTimePattern) : item.DetailBooking.BookingStart.Value.ToString(Model.ShortDateFormat))</li>
+                                                            }
+                                                            @if (item.DetailBooking.BookingEnd.HasValue)
+                                                            {
+                                                                <li>End: @(item.DetailBooking.ShowTime ? item.DetailBooking.BookingEnd.Value.ToString(Model.ShortDateFormat + " " + Model.Culture.DateTimeFormat.ShortTimePattern) : item.DetailBooking.BookingEnd.Value.ToString(Model.ShortDateFormat))</li>
+                                                            }
+                                                        </ul>
+                                                    }
+                                                </td>
+                                                <td class="text-right">@item.Quantity</td>
+                                                <td>
+                                                    @if (!item.Returned)
+                                                    {
+                                                        @Html.TextBox("Quantity_" + item.OrderDetailID, item.Quantity, new { @class = "form-control", @placeholder = "Quantity", @type = "number", @step = "1", @min = "0", @max = item.Quantity, @required = "required" })
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.Label("Quantity_" + item.OrderDetailID, " ", new { @class = "form-control" })
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (Model.ReadyToShipItems.Count < 1)
+                                        {
+                                            <tr><td colspan="4">No order items can be shipped at the moment.</td></tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Ship Carrier</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("ShipCarrier", Model.Order.ShipCarrier ?? string.Empty, new { @class = "form-control", @placeholder = "Shipping Carrier" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Ship Method</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("ShipMethod", Model.Order.ShipMethod ?? string.Empty, new { @class = "form-control", @placeholder = "Shipping Method" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Ship Date</label>
+                        <div class="col-sm-7">
+                            <div class="input-group date" data-provide="datetimepicker" data-min-date="@Model.Order.OrderDate.ToString(Model.ShortDateFormat)">
+                                @Html.TextBox("ShipDate", Model.Order.ShipDate > new DateTime(1900, 1, 1) ? Model.Order.ShipDate.ToString(Model.ShortDateFormat) : DateTime.Now.ToString(Model.ShortDateFormat),
+                                        new { @class = "form-control", @placeholder = "Shipping Date" })
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Dimensions</label>
+                        <div class="col-sm-7">
+                            <div class="input-group">
+                                <span class="input-group-addon" style="min-width: 88px;">Width <i class="fa fa-arrows-h"></i></span>
+                                @Html.TextBox("Width", string.Empty, new { @class = "form-control", @placeholder = "Width", @type = "number", @step = "0.01", @min = "-1", @required = "required" })
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon" style="min-width: 88px;">Height <i class="fa fa-arrows-v"></i></span>
+                                @Html.TextBox("Height", string.Empty, new { @class = "form-control", @placeholder = "Height", @type = "number", @step = "0.01", @min = "-1", @required = "required" })
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon" style="min-width: 88px;">Length <i class="fa fa-arrow-up"></i></span>
+                                @Html.TextBox("Length", string.Empty, new { @class = "form-control", @placeholder = "Length", @type = "number", @step = "0.01", @min = "-1", @required = "required" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Tracking No.</label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("TrackingNumber", Model.Order.TrackingNumber ?? string.Empty, new { @class = "form-control", @placeholder = "Tracking Number" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Shipped</label>
+                        <div class="col-sm-7">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("Shipped", false, new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @Html.Hidden("FulfillmentID", string.Empty)
+                    <button type="submit" class="btn btn-primary" id="orderModalSubmit4" @(Model.ReadyToShipItems.Count < 1 ? "disabled" : "")><i class="fa fa-plus"></i> Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="orderModal5" role="dialog" tabindex="-1" aria-labelledby="orderModalLabel5" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" action="@Url.Action("OrderEmail", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })" autocomplete="off">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="orderModalLabel5">Send Order Email</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="CustomerEmail">Customer Email</label>
+                        @Html.TextBox("CustomerEmail", Model.Customer.Email ?? string.Empty, new { @class = "form-control", @required = "required", @type = "email", @placeholder = "Customer Email" })
+                    </div>
+                    <div class="form-group">
+                        <label for="CustomerEmail">CC Email</label>
+                        @Html.TextBox("CCEmail", string.Empty, new { @class = "form-control", @type = "email", @placeholder = "CC Email" })
+                    </div>
+                    <div class="form-group">
+                        <label for="StoreEmailTemplate">Email Template</label>
+                        @Html.DropDownList("StoreEmailTemplate", Model.StoreEmailTemplates, "-- Select --", new { @class = "form-control", @onchange = "emailTemplateChange(this, 'StoreEmailSubject');" })
+                    </div>
+                    <div class="form-group">
+                        <label for="StoreEmailSubject">Email Subject</label>
+                        @Html.TextBox("StoreEmailSubject", Model.StoreEmailSubject, new { @class = "form-control", @placeholder = "Email Subject" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane-o"></i> Send</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="orderModal6" role="dialog" tabindex="-1" aria-labelledby="orderModalLabel6" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" action="@Url.Action("ShipEmail", "Order", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })" autocomplete="off">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="orderModalLabel6">Send Shipping Email</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="CustomerEmail">Customer Email</label>
+                        @Html.TextBox("CustomerEmail", Model.Customer.Email ?? string.Empty, new { @class = "form-control", @required = "required", @type = "email", @placeholder = "Customer Email" })
+                    </div>
+                    @if (Model.Fulfillments.Count > 0)
+                    {
+                        <div class="form-group">
+                            <label for="FulfillmentID">Select Fulfillment</label>
+                            @foreach (var fulfillment in Model.Fulfillments)
+                            {
+                                <div class="radio">
+                                    <label>
+                                        @Html.RadioButton("FulfillmentID", fulfillment.FulfillmentID, fulfillment.FulfillmentID == Model.Fulfillments.FirstOrDefault().FulfillmentID, new { @required = "required", @style = "display: block; opacity: 0;" })
+                                        @(fulfillment.ShipCarrier) - @(fulfillment.ShipMethod) / Items: @(fulfillment.FulfillmentDetails.Count), (Tracking #:@(fulfillment.TrackingNumber))
+                                        <span class="rc-control">
+                                            <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group">
+                            <label for="TrackingNumber">Tracking No.</label>
+                            @Html.TextBox("TrackingNumber", Model.Order.TrackingNumber ?? string.Empty, new { @class = "form-control", @placeholder = "Tracking Number" })
+                        </div>
+                        <div class="form-group">
+                            <label for="ShipDate">Ship Date</label>
+                            <div class="input-group date" data-provide="datetimepicker" data-min-date="@Model.Order.OrderDate.ToString(Model.ShortDateFormat)">
+                                @Html.TextBox("ShipDate", Model.Order.ShipDate > new DateTime(1900, 1, 1) ? Model.Order.ShipDate.ToString(Model.ShortDateFormat) : DateTime.Now.ToString(Model.ShortDateFormat),
+                                        new { @class = "form-control", @required = "required", @placeholder = "Shipping Date" })
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ShipMethod">Ship Method</label>
+                            @Html.TextBox("ShipMethod", Model.Order.ShipMethod ?? string.Empty, new { @class = "form-control", @required = "required", @placeholder = "Shipping Method" })
+                        </div>
+                    }
+                    <div class="form-group">
+                        <label for="ShipEmailTemplate">Email Template</label>
+                        @Html.DropDownList("ShipEmailTemplate", Model.ShipEmailTemplates, "-- Select --", new { @class = "form-control", @onchange = "emailTemplateChange(this, 'ShipEmailSubject');" })
+                    </div>
+                    <div class="form-group">
+                        <label for="ShipEmailSubject">Email Subject</label>
+                        @Html.TextBox("ShipEmailSubject", Model.ShipEmailSubject, new { @class = "form-control", @placeholder = "Email Subject" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane-o"></i> Send</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- /.modal -->
+<script type="text/javascript">
+    $.fn.modal.Constructor.prototype.enforceFocus = function () { };
+    $('#ProductID').select2({
+        width: '100%',
+        theme: 'bootstrap',
+        placeholder: "Select a product",
+        templateSelection: function (container) {
+            $(container.element).attr("data-cost", container.cost);
+            $(container.element).attr("data-sale", container.sale);
+            $(container.element).attr("data-undersale", container.undersale);
+            return container.text;
+        },
+        ajax: {
+            type: 'POST',
+            url: '@Url.Action("List", "Product", new { StoreID = Model.StoreID })',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    'search[value]': params.term,
+                    'length': 25,
+                    'start': 0
+                };
+            },
+            processResults: function (data, params) {
+                return {
+                    results: $.map(data.data, function (item) {
+                        return {
+                            id: item.ProductID,
+                            text: item.ModelName,
+                            cost: item.UnitCost,
+                            sale: item.SalePrice,
+                            undersale: item.IsUnderSale,
+                            hasVariants: item.HasVariants,
+                            bookable: item.Booking
+                        };
+                    })
+                };
+            },
+            cache: false
+        },
+        minimumInputLength: 2,
+    }).on('select2:select', function (e) {
+        var id = JSON.parse($(e.target).select2('data')[0].id);
+        var detailId = JSON.parse($(e.target).select2('data')[0].element.getAttribute('data-detail') || 0);
+        var cost = JSON.parse($(e.target).select2('data')[0].cost !== undefined ? $(e.target).select2('data')[0].cost : $(e.target).select2('data')[0].element.getAttribute('data-cost'));
+        var quantity = JSON.parse($(e.target).select2('data')[0].element.getAttribute('data-quantity'));
+        var sale = JSON.parse($(e.target).select2('data')[0].sale || 0);
+        var underSale = JSON.parse($(e.target).select2('data')[0].undersale || false);
+        var hasVariants = JSON.parse($(e.target).select2('data')[0].hasVariants !== undefined ? $(e.target).select2('data')[0].hasVariants : $(e.target).select2('data')[0].element.getAttribute('data-hasVariants'));
+        var bookable = JSON.parse($(e.target).select2('data')[0].bookable !== undefined ? $(e.target).select2('data')[0].bookable : $(e.target).select2('data')[0].element.getAttribute('data-bookable'));
+        if (underSale && JSON.parse('@(Model.StoreConfig["EnableSalePrices"] ?? bool.FalseString)'.toLowerCase()))
+            $('#ProductCost').val(sale);
+        else
+            $('#ProductCost').val(cost);
+        if(quantity)
+            $('#ProductQty').val(quantity);
+        else
+            $('#ProductQty').val(1);
+        rcUpdatePrice();
+        $('#ProductVariants').empty();
+        if (hasVariants) {
+            $.ajax({
+                url: '@Url.Action("HtmlVariants", "Product", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })',
+                type: 'POST',
+                data: { ProductID: id, OrderDetailID: detailId },
+                success: function(response) {
+                    if (response.html) {
+                        $.when($('#ProductVariants').append(response.html)).then(function () {
+                            $(this).find(':input').each(function () {
+                                var onChange = $(this).attr('onchange');
+                                if (onChange) {
+                                    onChange = onChange.replace('true', 'false');
+                                    eval(onChange);
+                                }
+                            });
+                        });
+                    }
+                }
+            });
+        }
+        $('#ProductBooking').empty();
+        if (bookable) {
+            $.ajax({
+                url: '@Url.Action("HtmlBooking", "Product", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })',
+                type: 'POST',
+                data: { ProductID: id, OrderDetailID: detailId },
+                success: function(response) {
+                    if (response.html) {
+                        $.when($('#ProductBooking').append(response.html)).then(function () {
+                            $(this).find(':input').each(function () {
+                                $(this).trigger('dp.change');
+                            });
+                        });
+                    }
+                }
+            });
+        }
+    }).on('select2:selecting', function (e) {
+        $(e.target).find('option').remove();
+    });
+    // Populate Edit Detail Item
+    $('body').data('Details', @Html.Raw(Json.Encode(Model.Order.OrderDetails)));
+    $('#orderModal1').on('show.bs.modal', function (e) {
+        var detailID = $(e.relatedTarget).data('item');
+        if(detailID) {
+            $('#orderModalLabel1').html('Edit Order Item');
+            $('#orderModalSubmit1').html('<i class="fa fa-floppy-o"></i> Save');
+            $(e.currentTarget).find('#OrderDetailID').val(detailID);
+            var detail = $.grep($('body').data('Details'), function(item) { return item.OrderDetailID == detailID; })[0];
+            if (detail) {
+                var option = new Option(detail.ProductName, detail.ProductID, true, true);
+                option.setAttribute('data-detail', detail.OrderDetailID);
+                option.setAttribute('data-cost', detail.ProductCost);
+                option.setAttribute('data-quantity', detail.Quantity);
+                option.setAttribute('data-hasVariants', (detail.DetailVariants.length > 0));
+                option.setAttribute('data-bookable', detail.DetailBooking.IsBooking);
+                $(e.currentTarget).find('#ProductID').append(option).trigger('select2:select');
+            }
+        }
+        else {
+            $('#orderModalLabel1').html('Add Order Item');
+            $('#orderModalSubmit1').html('<i class="fa fa-plus"></i> Add');
+            $(e.currentTarget).find('#OrderDetailID').val('');
+            $(e.currentTarget).find('#ProductID').find('option').remove();
+            $(e.currentTarget).find('#ProductQty').val('');
+            $(e.currentTarget).find('#ProductCost').val('');
+            $(e.currentTarget).find('#DetailCost').val('');
+            $(e.currentTarget).find('#ProductVariants').empty();
+            $(e.currentTarget).find('#ProductBooking').empty();
+        }
+    });
+    function rcUpdatePrice() {
+        $.ajax({
+            url: '@Url.Action("Price", "Product", new { StoreID = Model.StoreID, OrderID = Model.Order.OrderID })',
+            type: 'POST',
+            data: $('#orderModal1').find(':input').serializeArray(),
+            success: function (response) {
+                if (response) {
+                    $("#DetailCost").fadeTo(100, 0.3, function () {
+                        $(this).val(response.UnitCost);
+                        $(this).fadeTo(500, 1.0);
+                    });
+                }
+            }
+        });
+    }
+    // Populate Edit Payment Info
+    $('body').data('Payments', @Html.Raw(Json.Encode(Model.Payments)));
+    $('#orderModal2').on('show.bs.modal', function (e) {
+        var payHistID = $(e.relatedTarget).data('payment');
+        var refundPayID = $(e.relatedTarget).data('refund');
+        if (payHistID) {
+            $('#orderModalLabel2').html('Edit Order Payment');
+            $('#orderModalSubmit2').html('<i class="fa fa-floppy-o"></i> Save');
+            $(e.currentTarget).find('#PayHistID').val(payHistID);
+            $(e.currentTarget).find('#RefundPayID').val('').change();
+            var paymentMethod = $.grep($('body').data('Payments'), function(method) { return method.PayHistID == payHistID; })[0];
+            if (paymentMethod) {
+                $(e.currentTarget).find('#Success').val(paymentMethod.Success).change();
+                $(e.currentTarget).find('#TransType').val(paymentMethod.TransType).attr('disabled', 'disabled');
+                $(e.currentTarget).find('#PayMethodID').val(paymentMethod.PayMethodID).change();
+                $(e.currentTarget).find('#CardNumber').val(paymentMethod.MaskAcctNo);
+                $(e.currentTarget).find('#CVV').val(paymentMethod.CVV).attr('disabled', 'disabled');
+                $(e.currentTarget).find('#ExpMonth').val(paymentMethod.ExpRoute ? paymentMethod.ExpRoute.substring(0, 2) : '');
+                $(e.currentTarget).find('#ExpYear').val(paymentMethod.ExpRoute ? new Date().getFullYear().toString().substring(0, 2) + paymentMethod.ExpRoute.substring(2, 4) : '');
+                $(e.currentTarget).find('#BankName').val('');
+                $(e.currentTarget).find('#AccountNumber').val(paymentMethod.MaskAcctNo);
+                $(e.currentTarget).find('#RoutingNumber').val(paymentMethod.ExpRoute);
+                $(e.currentTarget).find('#PONumber').val(paymentMethod.PONumber);
+                $(e.currentTarget).find('#Amount').val(paymentMethod.Amount);
+                $(e.currentTarget).find('#BillingName').val(paymentMethod.BillingName);
+                $(e.currentTarget).find('#BillingAddress').val(paymentMethod.BillingAddress);
+                $(e.currentTarget).find('#BillingCity').val(paymentMethod.BillingCity);
+                $(e.currentTarget).find('#BillingZip').val(paymentMethod.BillingZip);
+                $(e.currentTarget).find('#BillingCountry').val(paymentMethod.BillingCountry).change().promise().done(function() {
+                    $(document).ajaxComplete(function() {
+                        $(e.currentTarget).find('#BillingState').val(paymentMethod.BillingState);
+                    });
+                });
+                $(e.currentTarget).find('#InvoiceNo').val(paymentMethod.InvoiceNo);
+                $(e.currentTarget).find('#TransID').val(paymentMethod.TransID);
+                $(e.currentTarget).find('#AuthCode').val(paymentMethod.AuthCode);
+                $(e.currentTarget).find('#Notes').val(paymentMethod.Notes);
+                $('[name=ProcessPayment]')[1].checked = true;
+                $('[name=ProcessPayment]').change();
+            }
+        }
+        else if (refundPayID) {
+            $('#orderModalLabel2').html('Add Order Payment Credit (Refund)');
+            $('#orderModalSubmit2').html('<i class="fa fa-plus"></i> Add');
+            $(e.currentTarget).find('#PayHistID').val('');
+            $(e.currentTarget).find('#RefundPayID').val(refundPayID).change();
+            var paymentMethod = $.grep($('body').data('Payments'), function (method) { return method.PayHistID == refundPayID; })[0];
+            if (paymentMethod) {
+                $(e.currentTarget).find('#Success').val('@bool.FalseString.ToLower()').change();
+                $(e.currentTarget).find('#TransType').val('Credit').attr('disabled', 'disabled');
+                $(e.currentTarget).find('#PayMethodID').val('').change();
+                $(e.currentTarget).find('#Amount').val('@string.Format("{0}", Model.Order.PayTotal)').attr('max', paymentMethod.Amount);
+                $(e.currentTarget).find('#BillingName').val(paymentMethod.BillingName).attr('disabled', 'disabled');
+                $(e.currentTarget).find('#BillingAddress').val(paymentMethod.BillingAddress).attr('disabled', 'disabled');
+                $(e.currentTarget).find('#BillingCity').val(paymentMethod.BillingCity).attr('disabled', 'disabled');
+                $(e.currentTarget).find('#BillingZip').val(paymentMethod.BillingZip).attr('disabled', 'disabled');
+                $(e.currentTarget).find('#BillingCountry').val(paymentMethod.BillingCountry).attr('disabled', 'disabled').change().promise().done(function () {
+                    $(document).ajaxComplete(function () {
+                        $(e.currentTarget).find('#BillingState').val(paymentMethod.BillingState).attr('disabled', 'disabled');
+                    });
+                });
+                $(e.currentTarget).find('#InvoiceNo').val('');
+                $(e.currentTarget).find('#TransID').val('');
+                $(e.currentTarget).find('#AuthCode').val('');
+                $(e.currentTarget).find('#Notes').val('');
+                $('[name=ProcessPayment]')[0].checked = false;
+                $('[name=ProcessPayment]')[1].checked = false;
+                $('[name=ProcessPayment]').change();
+            }
+        }
+        else {
+            $('#orderModalLabel2').html('Add Order Payment');
+            $('#orderModalSubmit2').html('<i class="fa fa-plus"></i> Add');
+            $(e.currentTarget).find('#PayHistID').val('');
+            $(e.currentTarget).find('#RefundPayID').val('').change();
+            $(e.currentTarget).find('#Success').val('@bool.FalseString.ToLower()').change();
+            $(e.currentTarget).find('#TransType').val('').removeAttr('disabled');
+            $(e.currentTarget).find('#PayMethodID').val('').change();
+            $(e.currentTarget).find('#CardNumber').val('');
+            $(e.currentTarget).find('#CVV').val('').removeAttr('disabled');
+            $(e.currentTarget).find('#ExpMonth').val('');
+            $(e.currentTarget).find('#ExpYear').val('');
+            $(e.currentTarget).find('#BankName').val('');
+            $(e.currentTarget).find('#AccountNumber').val('');
+            $(e.currentTarget).find('#RoutingNumber').val('');
+            $(e.currentTarget).find('#PONumber').val('');
+            $(e.currentTarget).find('#Amount').val('@string.Format("{0}", Model.Order.GrandTotal - Model.Order.PayTotal)');
+            $(e.currentTarget).find('#BillingName').val('@Model.Payment.BillingName').removeAttr('disabled');
+            $(e.currentTarget).find('#BillingAddress').val('@Model.Payment.BillingAddress').removeAttr('disabled');
+            $(e.currentTarget).find('#BillingCity').val('@Model.Payment.BillingCity').removeAttr('disabled');
+            $(e.currentTarget).find('#BillingZip').val('@Model.Payment.BillingZip').removeAttr('disabled');
+            $(e.currentTarget).find('#BillingCountry').val('@Model.Payment.BillingCountry').removeAttr('disabled').change().promise().done(function () {
+                $(document).ajaxComplete(function () {
+                    $(e.currentTarget).find('#BillingState').val('@Model.Payment.BillingState').removeAttr('disabled');
+                });
+            });
+            $(e.currentTarget).find('#InvoiceNo').val('');
+            $(e.currentTarget).find('#TransID').val('');
+            $(e.currentTarget).find('#AuthCode').val('');
+            $(e.currentTarget).find('#Notes').val('');
+            $('[name=ProcessPayment]')[0].checked = false;
+            $('[name=ProcessPayment]')[1].checked = false;
+            $('[name=ProcessPayment]').change();
+        }
+        $(e.currentTarget).find('#TransType option[value="Credit"]').attr('disabled', 'disabled');
+    });
+    // Populate Edit Fulfillment Info
+    $('body').data('Fulfillments', @Html.Raw(Json.Encode(Model.Fulfillments)));
+    $('#orderModal4').on('show.bs.modal', function (e) {
+        var fulfillmentID = $(e.relatedTarget).data('fulfillment');
+        if (fulfillmentID) {
+            $('#orderModalLabel4').html('Edit Order Shipment');
+            $('#orderModalSubmit4').html('<i class="fa fa-floppy-o"></i> Save').prop('disabled', false);
+            $(e.currentTarget).find('#FulfillmentID').val(fulfillmentID);
+            var fulfillment = $.grep($('body').data('Fulfillments'), function (fulfillment) { return fulfillment.FulfillmentID == fulfillmentID; })[0];
+            if (fulfillment) {
+                $(e.currentTarget).find('#orderModalTable4').hide();
+                $(e.currentTarget).find('#ShipCarrier').val(fulfillment.ShipCarrier);
+                $(e.currentTarget).find('#ShipMethod').val(fulfillment.ShipMethod);
+                $(e.currentTarget).find('#ShipDate').closest('[data-provide="datetimepicker"]').data("DateTimePicker").date(new Date(parseInt(fulfillment.ShipDate.substr(6))));
+                $(e.currentTarget).find('#Width').val(fulfillment.Width);
+                $(e.currentTarget).find('#Height').val(fulfillment.Height);
+                $(e.currentTarget).find('#Length').val(fulfillment.Length);
+                $(e.currentTarget).find('#TrackingNumber').val(fulfillment.TrackingNumber);
+                if (!$(e.currentTarget).find('#Shipped').is(':checked') && fulfillment.Shipped)
+                    $(e.currentTarget).find('#Shipped').prop('checked', true).change();
+                else if ($(e.currentTarget).find('#Shipped').is(':checked') && !fulfillment.Shipped)
+                    $(e.currentTarget).find('#Shipped').prop('checked', false).change();
+            }
+        }
+        else {
+            $('#orderModalLabel4').html('Add Order Shipment');
+            $('#orderModalSubmit4').html('<i class="fa fa-plus"></i> Add').prop('disabled', @((Model.ReadyToShipItems.Count < 1).ToString().ToLower()));
+            $(e.currentTarget).find('#FulfillmentID').val('');
+            $(e.currentTarget).find('#orderModalTable4').show();
+            $(e.currentTarget).find('#ShipCarrier').val('');
+            $(e.currentTarget).find('#ShipMethod').val('');
+            $(e.currentTarget).find('#ShipDate').val('');
+            $(e.currentTarget).find('#Width').val(-1);
+            $(e.currentTarget).find('#Height').val(-1);
+            $(e.currentTarget).find('#Length').val(-1);
+            $(e.currentTarget).find('#TrackingNumber').val('');
+            if ($(e.currentTarget).find('#Shipped').is(':checked'))
+                $(e.currentTarget).find('#Shipped').prop('checked', false).change();
+        }
+    });
+</script>

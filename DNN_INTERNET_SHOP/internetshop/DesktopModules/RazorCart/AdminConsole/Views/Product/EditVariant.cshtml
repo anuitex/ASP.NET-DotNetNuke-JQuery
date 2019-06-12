@@ -1,0 +1,367 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+@using System.Globalization;
+@using RazorCart.Core.Components.Url;
+
+<!-- Select2 CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/select2-bootstrap.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Select2 JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/select2.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product: @Model.Product.ModelName</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" enctype="multipart/form-data" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID, VariantID = Model.Variant.VariantID })" autocomplete="off">
+            @Html.Partial("_ProductMenu")
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            @if (Model.Submitted)
+                            {
+                                <div class="alert alert-success alert-dismissable">
+                                    <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                                    @Model.SaveMessage
+                                </div>
+                            }
+                            <div class="panel-group" id="accordion">
+                                <div class="lead">
+                                    <a href="#" class="btn btn-default" data-toggle="collapse-all" data-target="#accordion .panel-collapse">
+                                        Collapse All
+                                    </a>
+                                </div>
+                                @* General Setup *@
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <a data-toggle="collapse" href="#collapseGeneral">
+                                            <h4 class="panel-title">General Setup</h4>
+                                        </a>
+                                    </div>
+                                    <div id="collapseGeneral" class="panel-collapse collapse in">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Variant Group</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    @Html.DropDownList("VariantGroupID", Model.ProductVariantGroups, "-- Select --", new { @class = "form-control", @required = "required" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Variant Name</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    @Html.TextBox("VariantName", Model.Variant.VariantName, new { @class = "form-control", @placeholder = "Variant Name", @required = "required" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">SKU</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    @Html.TextBox("Sku", Model.Variant.Sku, new { @class = "form-control", @placeholder = "Variant SKU" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Description</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    @Html.TextBox("VariantDesc", Model.Variant.VariantDesc, new { @class = "form-control", @placeholder = "Variant Description" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Variant Images</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    <select name="VariantImages" id="VariantImages" multiple>
+                                                        @{ string productImageSource = Convert.ToString(Model.StoreConfig["ProductImageSource"]); }
+                                                        @foreach (var img in Model.ProductImages)
+                                                        {
+                                                            <option value="@img.ID" data-src="@(ProductUrl.GetThumbImage(productImageSource, img.ThumbImage))" @(Model.Variant.VariantImages.Contains(img.ID) ? "selected" : "")>@(img.Title ?? img.AltTag ?? img.ThumbImage)</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Required</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            @Html.CheckBox("VariantRequired", Model.Variant.VariantRequired, new { @onchange = "checkBoxChange(this);" })
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.panel-body -->
+                                    </div>
+                                </div>
+                                <!-- /.panel -->
+                                @* Display Setup *@
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <a data-toggle="collapse" href="#collapseDisplay">
+                                            <h4 class="panel-title">Display Setup</h4>
+                                        </a>
+                                    </div>
+                                    <div id="collapseDisplay" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Display Type</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("VariantDisplayType", "DropdownList", Model.Variant.VariantDisplayType == "DropdownList" || string.IsNullOrWhiteSpace(Model.Variant.VariantDisplayType), new { }) Dropdown List
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("VariantDisplayType", "Buttons", Model.Variant.VariantDisplayType == "Buttons", new { }) Buttons
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("VariantDisplayType", "RadioButtons", Model.Variant.VariantDisplayType == "RadioButtons", new { }) Radio Buttons
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("VariantDisplayType", "CheckBox", Model.Variant.VariantDisplayType == "CheckBox", new { }) Check Box
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("VariantDisplayType", "TextBox", Model.Variant.VariantDisplayType == "TextBox", new { }) Text Box
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("VariantDisplayType", "MultiLineTextBox", Model.Variant.VariantDisplayType == "MultiLineTextBox", new { }) Multiline Text Box
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("VariantDisplayType", "Grid", Model.Variant.VariantDisplayType == "Grid", new { }) Grid Layout
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("VariantDisplayType", "Icon", Model.Variant.VariantDisplayType == "Icon", new { }) Icons/Swatches
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("VariantDisplayType", "FileUpload", Model.Variant.VariantDisplayType == "FileUpload", new { }) File Upload
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-show="conditional" data-cond-option="VariantDisplayType" data-cond-value="Icon" style="display: none;">
+                                                <label class="col-md-3 col-sm-4 control-label">Icon Image</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    <div class="input-group">
+                                                        <label class="input-group-btn">
+                                                            <span class="btn btn-primary">
+                                                                Browse&hellip; @Html.TextBox("VariantIconImage", Model.Variant.VariantIconImage, new { @type = "file", @style = "display: none;" })
+                                                            </span>
+                                                        </label>
+                                                        @Html.TextBox("VariantIconImage_FileName", Model.Variant.VariantIconImage, new { @class = "form-control", @placeholder = "Select Icon image file to upload", @readonly = "readonly" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.panel-body -->
+                                    </div>
+                                </div>
+                                <!-- /.panel -->
+                                @* Pricing and Weight *@
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <a data-toggle="collapse" href="#collapsePricing">
+                                            <h4 class="panel-title">Pricing and Weight</h4>
+                                        </a>
+                                    </div>
+                                    <div id="collapsePricing" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Lifecycle Status</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    @Html.DropDownList("LifecycleStatus", Model.LifecycleStatuses, new { @class = "form-control", @required = "required" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Price Adjustment Type</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("PriceType", "NoPriceAdjust", Model.Variant.PriceType == "NoPriceAdjust" || string.IsNullOrWhiteSpace(Model.Variant.PriceType), new { }) No Price Adjustment
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("PriceType", "AbsolutePrice", Model.Variant.PriceType == "AbsolutePrice", new { }) Absolute Price
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("PriceType", "PriceAdjust", Model.Variant.PriceType == "PriceAdjust", new { }) Price Adjustment
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            @Html.RadioButton("PriceType", "PercentAdjust", Model.Variant.PriceType == "PercentAdjust", new { }) Percent Adjustment
+                                                            <span class="rc-control">
+                                                                <i class="rc-icon glyphicon glyphicon-radio" aria-hidden="true"></i>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Price Adjustment</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    @Html.TextBox("PriceAdjustment", Model.Variant.PriceAdjustment.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Price Adjustment", @type = "number", @step = "0.01", @required = "required" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Sale Price Adjustment</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    @Html.TextBox("SalePrice", Model.Variant.SalePrice.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Sale Price Adjustment", @type = "number", @step = "0.01", @required = "required" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-sm-4 control-label">Weight Adjustment</label>
+                                                <div class="col-md-6 col-sm-8">
+                                                    @Html.TextBox("WeightAdjustment", Model.Variant.WeightAdjustment.ToString("0.##", CultureInfo.InvariantCulture), new { @class = "form-control", @placeholder = "Weight Adjustment", @type = "number", @step = "0.01", @required = "required" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.panel-body -->
+                                    </div>
+                                </div>
+                                <!-- /.panel -->
+                                @* Conditional Variants *@
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <a data-toggle="collapse" href="#collapseConditional">
+                                            <h4 class="panel-title">Conditional Variants</h4>
+                                        </a>
+                                    </div>
+                                    <div id="collapseConditional" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-xs-5 control-label">Variant Groups</label>
+                                                <div class="col-xs-2"></div>
+                                                <label class="col-xs-5 control-label">Conditional Variant Groups</label>
+                                                <div class="col-md-12">
+                                                    <div class="row">
+                                                        <div class="col-xs-5">
+                                                            @Html.DropDownList("VariantGroups", Model.ProductVariantGroups, new { @class = "form-control", @multiple = "multiple", @size = "10", @data_source = "true" })
+                                                        </div>
+                                                        <div class="col-xs-2">
+                                                            <button type="button" class="btn btn-block" onclick="multiSelectAdd(this);">Add <i class="fa fa-angle-double-right"></i></button>
+                                                            <button type="button" class="btn btn-block" onclick="multiSelectDel(this);"><i class="fa fa-angle-double-left"></i> Del</button>
+                                                        </div>
+                                                        <div class="col-xs-5">
+                                                            @Html.DropDownList("VariantGroupsText", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @size = "10", @data_text = "VariantGroups" })
+                                                            @Html.DropDownList("VariantGroupsID", Enumerable.Empty<System.Web.Mvc.SelectListItem>(), new { @class = "form-control", @multiple = "multiple", @data_value = "VariantGroups", @style = "display: none;" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.panel-body -->
+                                    </div>
+                                </div>
+                                <!-- /.panel -->
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary" onclick="multiSelectAll(this);"><i class="fa fa-check-square-o"></i> Save</button>
+                                    <a class="btn btn-default" href="@Url.Action("Variants", "Product", new { StoreID = Model.StoreID, ProductID = Model.Product.ProductID })">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    (function () {
+        var formatImage = function (image, height) {
+            if (!image.id) return image.text;
+            return $(
+              '<span style="padding: 4px; display: inline-block;">' +
+                '<img src="' + image.element.getAttribute('data-src') + '" class="img-rounded" style="height: ' + height + 'px;" /> ' + image.text +
+              '</span>'
+            );
+        };
+        var formatImageResult = function  (image) {
+            return formatImage(image, 100);
+        };
+        var formatImageSelection = function  (image) {
+            return formatImage(image, 55);
+        };
+        $('#VariantImages').select2({
+            width: '100%',
+            theme: 'bootstrap',
+            placeholder: 'Select Variant Images',
+            templateResult: formatImageResult,
+            templateSelection: formatImageSelection
+        });
+    })();
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        // Move Selected Conditional Variant Groups
+        var conditional = @Html.Raw(Json.Encode(Model.VariantConditionalGroups.Select(cg => int.Parse(cg.Value))));
+        $.each(conditional, function (index, value) {
+            $('#VariantGroups').val(value).parents('.form-group').find('button[onclick^=multiSelectAdd]').trigger('onclick');
+        });
+    });
+</script>

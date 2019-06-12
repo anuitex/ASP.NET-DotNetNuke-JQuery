@@ -1,0 +1,43 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.ProductDetails.Models.DetailsModel>
+
+<div class="panel-body">
+    <div ng-if="!details.writeReview">
+        <rating ng-model="details.productReviews.Average" max="5" size="2" readonly="true"></rating>
+        @Dnn.LocalizeString("AverageRating") {{details.productReviews.Average}} ({{details.productReviews.Count}} @Dnn.LocalizeString("Reviews"))
+        <input type="button" class="btn btn-primary collapse in help-block" value="@Dnn.LocalizeString("WriteReview")" ng-click="details.writeReview = !details.writeReview;" />
+    </div>
+    <div class="col-md-6" ng-if="details.writeReview">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="col-xs-4 control-label">@Dnn.LocalizeString("Rate")</label>
+                <div class="col-xs-8">
+                    <rating ng-model="details.newRate.Rate" max="5" size="2"></rating>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-4 control-label">@Dnn.LocalizeString("Nickname")</label>
+                <div class="col-xs-8">
+                    <input type="text" class="form-control" ng-model="details.newRate.NickName">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-4 control-label">@Dnn.LocalizeString("ProductReview")</label>
+                <div class="col-xs-8">
+                    <textarea class="form-control" ng-model="details.newRate.Comments"></textarea>
+                </div>
+            </div>
+            <div class="form-group text-center">
+                <div class="btn-group">
+                    <input type="button" class="btn btn-primary" value="@Dnn.LocalizeString("SubmitReview")" ng-click="details.submitReview()" />
+                    <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("Close")" ng-click="details.writeReview = !details.writeReview;" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-repeat="review in details.productReviews.AllReviews">
+        <hr />
+        <rating ng-model="review.Rate" max="5" size="2" readonly="true"></rating>
+        <label>{{review.Comments}}</label><br />
+        @Dnn.LocalizeString("By") {{review.NickName}}, {{review.ReviewDate | date : '@Model.Culture.DateTimeFormat.ShortDatePattern'}}
+    </div>
+</div>

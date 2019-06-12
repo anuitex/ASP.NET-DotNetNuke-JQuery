@@ -1,0 +1,66 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.StoreModel>
+@using System.Web.Mvc.Html;
+
+<!-- Conditionize JS -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/conditionize.jquery.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="modal fade" id="StoreModal" tabindex="-1" role="dialog" aria-labelledby="memberModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" action="@Url.Action("Save", "Store")">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" aria-label="Close" onclick="javascript:window.location = '@Model.SiteUrl'"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="memberModalLabel">RazorCart Admin Console</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="storeID">Stores</label>
+                        @Html.DropDownList("Store", Model.Stores, new { @class = "form-control", @onchange = "selectedStoreChange(this.value);" })
+                    </div>
+                    <div class="form-group" data-show="conditional" data-cond-option="Store" data-cond-value="0" style="display: none;">
+                        <label for="storeName">Store Name</label>
+                        @Html.TextBox("StoreName", string.Empty, new { @class = "form-control", @placeholder = "Store Name" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-xs-12 text-right" data-show="conditional" data-cond-option="Store" data-cond-value="0" data-cond-operator="==" style="display: none;">
+                        <button type="submit" class="btn btn-primary" name="Create">Create Store</button>
+                    </div>
+                    <div class="col-xs-6 text-left" data-show="conditional" data-cond-option="Store" data-cond-value="0" data-cond-operator=">" style="display: none;">
+                        <button type="submit" class="btn btn-danger" name="Delete" onclick="return confirm('Are you sure?')">Delete Store</button>
+                    </div>
+                    <div class="col-xs-6 text-right" data-show="conditional" data-cond-option="Store" data-cond-value="0" data-cond-operator=">" style="display: none;">
+                        <button type="submit" class="btn btn-primary" name="Manage">Manage Store</button>
+                    </div>
+                    <div class="col-xs-6 text-left" data-show="conditional" data-cond-option="Store" data-cond-value="0" data-cond-operator="<" style="display: none;">
+                        <img class="loading" src="@Href("~/DesktopModules/RazorCart/AdminConsole/Images/loading.gif")" alt="Migrating Progress" style="display: none; visibility: hidden;" />
+                    </div>
+                    <div class="col-xs-6 text-right" data-show="conditional" data-cond-option="Store" data-cond-value="0" data-cond-operator="<" style="display: none;">
+                        <button type="submit" class="btn btn-primary" name="Migrate">Migrate Store</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Init Conditionize Form
+        $('[data-show="conditional"]').conditionize();
+        // Init Store Modal
+        $('#StoreModal').modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+        $('button[name="Migrate"]').on('click', function () {
+            $('img[class="loading"]').css('visibility', 'visible').toggle(true);
+            var store = $('#Store');
+            $(this).parent().append($('<input type="hidden" name="' + store.prop('name') + '" value="' + store.val() + '">'));
+            store.prop('disabled', true);
+            $(this).prop('disabled', true);
+        });
+    });
+</script>

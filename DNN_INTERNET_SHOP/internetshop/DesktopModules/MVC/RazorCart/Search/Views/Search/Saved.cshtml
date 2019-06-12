@@ -1,0 +1,51 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Search.Models.SavedSearchesModel>
+@using DotNetNuke.Web.Mvc.Helpers
+@using DotNetNuke.Web.Client.ClientResourceManagement;
+
+@{
+    int tabModuleID = Dnn.ModuleContext.TabModuleId;
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/Search/Content/Scripts/bootbox.min.js");
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/DesktopModules/MVC/RazorCart/Search/Content/Scripts/razorCart.savedSearches.js");
+}
+
+@if (Request.IsAuthenticated)
+{
+    <div class="panel panel-default">
+        <div class="panel-heading @(Model.IsCollapsible ? "show-collapse-icon" : "")">
+            <h4 class="panel-title">
+                <a class="no-underline accordion-toggle @(Model.IsCollapsible && Model.StartCollapsed ? "collapsed" : "")" data-toggle="collapse" href="#savedSearchesCollapse_@tabModuleID">
+                    My Saved Searches
+                </a>
+            </h4>
+        </div>
+        <div id="@(Model.IsCollapsible ? "savedSearchesCollapse_" + tabModuleID : "")" class="panel-collapse collapse @(Model.IsCollapsible && Model.StartCollapsed ? "" : "in")">
+            <div class="panel-body" style="padding: 5px 10px;">
+                @if (Model.SavedSearches.Count > 0)
+                {
+                    <ul class="nav nav-pills nav-stacked saved-searches-list">
+                        @foreach (var savedSearch in Model.SavedSearches)
+                        {
+                            <li>
+                                <a href="#" class="saved-search-item" onclick="return false;">
+                                    <div class="saved-search-select" data-s-name="submitSavedSearches_@tabModuleID" data-s-value="Select" data-id="@savedSearch.SavedSearchID">
+                                        @savedSearch.Name
+                                    </div>
+
+                                    <div class="saved-search-actions" data-s-name="submitSavedSearches_@tabModuleID" data-s-value="Delete" data-name="@savedSearch.Name" data-id="@savedSearch.SavedSearchID">
+                                        <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
+                                    </div>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <span>
+                        No Saved Searches
+                    </span>
+                }
+            </div>
+        </div>
+    </div>
+}

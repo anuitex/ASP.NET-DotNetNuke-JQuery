@@ -1,0 +1,110 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product Reviews</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Review", "Product", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Reviews</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <table class="table table-hover" id="tblReviews" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>ReviewDate</th>
+                                <th>Product</th>
+                                <th>Username</th>
+                                <th>Nick Name</th>
+                                <th>Comments</th>
+                                <th>Rate</th>
+                                <th>Approved</th>
+                                <th>Date Approved</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tblReviews').DataTable({
+            preDrawCallback: function (settings, json) {
+                var reviewID = getParameterByName('ReviewID');
+                if (reviewID)
+                    this.api().column(8).search(reviewID, true, false, true);
+            },
+            responsive: true,
+            language: {
+                infoFiltered: '',
+            },
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            columns: [
+                {
+                    data: 'ReviewDate', render: function (data, type, full, meta) {
+                        return new Date(parseInt(data.substr(6))).toLocaleString();
+                    }, orderable: true
+                },
+                { data: 'ProductName', orderable: true },
+                { data: 'DNNUserName', orderable: true },
+                { data: 'NickName', orderable: true },
+                { data: 'Comments', orderable: false },
+                { data: 'Rate', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits)), orderable: true },
+                {
+                    data: 'Approved', render: function (data, type, full, meta) {
+                        return '<i class="fa fa-' + (data > 0 ? 'check-circle' : 'circle-thin') + ' fa-lg" aria-hidden="true"></i>';
+                    }
+                },
+                {
+                    data: 'DateApproved', render: function (data, type, full, meta) {
+                        return data !== null ? new Date(parseInt(data.substr(6))).toLocaleString() : '';
+                    }, orderable: true
+                },
+                {
+                    data: 'ReviewID', render: function (data, type, full, meta) {
+                        var editUrl = '@Url.Action("EditReview", "Product", new { StoreID = Model.StoreID })' + '?ReviewID=' + data;
+                        var deleteUrl = '@Url.Action("DeleteReview", "Product", new { StoreID = Model.StoreID })' + '?ReviewID=' + data;
+                        if (type == 'display') {
+                            return '<a href="' + editUrl + '"><i class="fa fa-thumbs-o-' + (full.Approved > 0 ? 'down' : 'up') + ' fa-lg" data-toggle="tooltip" title="' + (full.Approved > 0 ? 'Decline' : 'Approve') + '"></i></a>'
+                                + '\n' + '<a href="' + deleteUrl + '" onclick="return confirm(\'Are you sure?\')"><i class="fa fa-trash-o fa-lg"></i></a>';
+                        }
+                        return data;
+                    }, className: 'text-right', orderable: false
+                }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            order: [[0, 'desc']],
+            ajax: {
+                url: '@Url.Action("ListReviews", "Product", new { StoreID = Model.StoreID })',
+                type: 'POST'
+            }
+        }).on('init.dt', function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    });
+</script>

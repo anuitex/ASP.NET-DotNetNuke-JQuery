@@ -1,0 +1,56 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.TemplateModel>
+@using System.Web.Mvc.Html;
+
+<!-- Ace Editor JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/ace.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/ace.mode-razor.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/ace.theme-razor.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Manage Views</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Submitted)
+        {
+            <div class="alert alert-success alert-dismissable">
+                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                @Model.SaveMessage
+            </div>
+        }
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Template", new { StoreID = Model.StoreID, File = Model.ViewFile.FilePath })" autocomplete="off">
+            <div id="editor"></div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    @Html.Hidden("EditorText")
+                    <button type="button" class="btn btn-primary" onclick="$('#EditorText').val(btoa(editor.getValue())); $('form').submit();"><i class="fa fa-check-square-o"></i> Save</button>
+                    <a class="btn btn-default" href="@Url.Action("View", "Template", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    var editor = ace.edit("editor");
+	editor.setTheme("ace/theme/chrome_razor");
+	var RazorMode = require("ace/mode/razor").Mode;
+    editor.getSession().setMode(new RazorMode());
+    editor.setShowPrintMargin(false);
+    $(document).ready(function () {
+        editor.setValue('@(Html.Raw(Model.ViewFile.FileContent))'.fromBase64(), -1);
+        var offset = 260;
+        var height = ((window.innerHeight > 0) ? window.innerHeight : screen.height) - 1;
+        height = height - offset;
+        if (height < 1)
+            height = 1;
+        if (height > offset)
+            $('#editor').css('height', height + 'px');
+        editor.resize();
+    });
+</script>

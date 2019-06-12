@@ -1,0 +1,191 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.SubscriptionModel>
+@using System.Web.Mvc.Html
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- Bootstrap DateTimePicker CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/bootstrap-datetimepicker.min.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Moment JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/moment.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<!-- Bootstrap DateTimePicker JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/bootstrap-datetimepicker.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<style>
+    @@media (max-width : 991px) {
+        .row-sm-pull-left * {
+            text-align: left !important;
+        }
+    }
+
+    div.dataTables_wrapper div.dataTables_filter input {
+        margin-left: 0 !important;
+    }
+</style>
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            Manage Subscriptions
+            @(Model.Customer != null ? (" - " + Model.Customer.FirstName + " " + Model.Customer.LastName) : string.Empty)
+            @(Model.Order != null ? (" - Order #" + Model.Order.OrderID) : string.Empty)
+        </h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Index", "Subscription", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="btn-group pull-right">
+                    </div>
+                    <h4>Subscriptions</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <table class="table table-hover" id="tblSubscriptions" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" id="chkSelectAll">
+                                            <span class="rc-control" style="left: 0;">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </th>
+                                <th>Status</th>
+                                <th>Order No.</th>
+                                <th>Customer</th>
+                                <th>Product</th>
+                                <th>Create Date</th>
+                                <th>Next Date</th>
+                                <th>Amount</th>
+                                <th>Interval</th>
+                                <th>Occurrences</th>
+                                <th>Pay Method</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            @Html.Partial("_SubscriptionListFilters")
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tblSubscriptions').on('preXhr.dt', function (e, settings, data) {
+            if (settings.iDraw == 1) {
+                $('#tblSubscriptions_statusfilter').find('select').eq(0).val(getParameterByName('Status') || 'Active');
+                $('#tblSubscriptions_statusfilter').find('select').eq(1).val(getParameterByName('PayMethod'));
+                $('#tblSubscriptions_statusfilter').find('select').eq(2).val(getParameterByName('Interval'));
+            }
+            data['date'] = {
+                type: $('#tblSubscriptions_datefilter').find('input[type="radio"]:checked').val(),
+                from: $('#tblSubscriptions_datefilter').find('input[type="text"]').eq(0).val(),
+                to: $('#tblSubscriptions_datefilter').find('input[type="text"]').eq(1).val()
+            };
+            data['status'] = { value: $('#tblSubscriptions_statusfilter').find('select').eq(0).val() };
+            data['payMethod'] = { value: $('#tblSubscriptions_statusfilter').find('select').eq(1).val() };
+            data['interval'] = { value: $('#tblSubscriptions_statusfilter').find('select').eq(2).val() };
+            data['customerId'] = { value: getParameterByName('CustomerID') };
+            data['orderId'] = { value: getParameterByName('OrderID') };
+        }).on('init.dt', function (e, settings, data) {
+            $('[data-toggle="tooltip"]').tooltip();
+            $('#tblSubscriptions_datefilter').appendTo('#tblSubscriptions_wrapper .date-filter').show();
+            $('#tblSubscriptions_statusfilter').appendTo('#tblSubscriptions_wrapper .status-filter').show();
+        }).DataTable({
+            responsive: true,
+            language: {
+                infoFiltered: '',
+                search: '_INPUT_',
+                searchPlaceholder: 'Search'
+            },
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            columns: [
+                {
+                    data: 'SubscriptionID', render: function (data, type, full, meta) {
+                        return '<div class="checkbox"><label><input type="checkbox" id="ChkSubscription_' + data + '" name="ChkSubscription" value="' + data + '">' +
+                            '<span class="rc-control" style="left: 0;"><i class="rc-icon glyphicon glyphicon-checkbox"></i></span></label></div>';
+                    }, orderable: false
+                },
+                { data: 'Status', orderable: true },
+                { data: 'OrderID', orderable: true },
+                { data: 'Customer', orderable: true },
+                { data: 'ProductName', orderable: true },
+                {
+                    data: 'CreateDate', render: function (data, type, full, meta) {
+                        var date = new Date(parseInt(data.substr(6)));
+                        return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+                    }, orderable: true
+                },
+                {
+                    data: 'NextPaymentDate', render: function (data, type, full, meta) {
+                        if (!full.Status === 1)
+                            return null;
+                        var date = new Date(parseInt(data.substr(6)));
+                        return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+                    }, orderable: true
+                },
+                { data: 'Amount', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)'), className: 'text-right', orderable: true },
+                { data: 'Interval', orderable: true },
+                {
+                    data: 'Occurrences', render: function (data, type, full, meta) {
+                        return data !== '9999' ? data : 'Ongoing';
+                    }, orderable: true
+                },
+                {
+                    data: 'PayMethod', render: function (data, type, full, meta) {
+                        return data + ': ' + full.MaskAcctNo;
+                    }, className: 'text-right', orderable: true
+                }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            order: [[2, 'desc']],
+            dom: '<"row row-sm-pull-left"<"col-sm-12 col-md-3"l><"col-sm-12 col-md-3 date-filter"><"col-sm-12 col-md-3 status-filter"><"col-sm-12 col-md-3"f>>' + '<"row"<"col-sm-12"tr>>' + '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+            ajax: {
+                url: '@Url.Action("List", "Subscription", new { StoreID = Model.StoreID })',
+                type: 'POST'
+            },
+            oSearch: {
+                sSearch: getParameterByName('Search')
+            }
+        });
+        $('#tblSubscriptions_datefilter').find('input[type="radio"]').each(function () {
+            $(this).on('change', function () {
+                $('#tblSubscriptions').DataTable().draw();
+            });
+        });
+        var dPickers = new RZCDateTimePicker('[data-provide="datepicker"]', { format: '@Model.ShortDateFormat.ToUpper()' });
+        for (var i = 0; i < dPickers.length; i++) {
+            var dPicker = dPickers[i];
+            dPicker.on('dp.change', function (e) {
+                $('#tblSubscriptions').DataTable().draw();
+            });
+        }
+        $('#tblSubscriptions_statusfilter').find('select').each(function () {
+            $(this).on('change', function () {
+                $('#tblSubscriptions').DataTable().draw();
+            });
+        });
+        $('#chkSelectAll').on('click', function () {
+            var checked = $(this).prop('checked');
+            $('#tblSubscriptions input[name="ChkSubscription"]').prop('checked', checked);
+        });
+    });
+</script>

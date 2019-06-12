@@ -1,0 +1,60 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.ProductList.Models.PagerModel>
+
+<!-- This Hidden Div Is Only For SEO Purposes, Since Crawlers cannot execute Javascript -->
+<div ng-hide="true">
+    @if (Model.PageCount > 1)
+    {
+        <a rel="start first begin" href="@(Model.CurrentPage == 1 ? "" : string.Format(Model.PagingURL, 1))" target="_self">
+            First Page
+        </a>
+        <a rel="prev" href="@(Model.CurrentPage == 1 ? "" : string.Format(Model.PagingURL, Model.CurrentPage - 1))" target="_self">
+            Previous page
+        </a>
+        for (int i = Model.StartPage; i < Model.EndPage; i++)
+        {
+            <a href="@(Model.CurrentPage == (i + 1) ? "" : string.Format(Model.PagingURL, i + 1))" target="_self">
+                @(Model.CurrentPage == (i + 1) ? "Current Page" : "Page " + (i + 1))
+            </a>
+        }
+        <a rel="next" href="@(Model.CurrentPage == Model.PageCount ? "" : string.Format(Model.PagingURL, Model.CurrentPage + 1))" target="_self">
+            Next Page
+        </a>
+        <a rel="last end" href="@(Model.CurrentPage == Model.PageCount ? "" : string.Format(Model.PagingURL, Model.PageCount))" target="_self">
+            Last Page
+        </a>
+    }
+</div>
+<nav ng-if="list.pageCount > 1">
+    <ul class="pagination">
+        <li ng-class="{'disabled': list.currentPage === 1}">
+            <a aria-label="go to first page" ng-href="{{list.currentPage === 1 ? '' : '@Model.PagingURL'.replace('{0}', 1)}}"
+               ng-click="!(list.currentPage === 1) && list.goToPage($event, 1)">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li ng-class="{'disabled': list.currentPage === 1}">
+            <a aria-label="go to previous page" ng-href="{{list.currentPage === 1 ? '' : '@Model.PagingURL'.replace('{0}', list.currentPage - 1)}}"
+               ng-click="!(list.currentPage === 1) && list.goToPage($event, (list.currentPage - 1))">
+                <span aria-hidden="true">&lsaquo;</span>
+            </a>
+        </li>
+        <li ng-repeat="i in list.getRangeArray(list.startPage, (list.endPage -1))" ng-class="{'active': list.currentPage === (i + 1)}">
+            <a aria-label="{{'go to page number ' + (i + 1)}}" ng-href="{{list.currentPage === (i + 1) ? '' : '@Model.PagingURL'.replace('{0}', i + 1)}}"
+               ng-click="!(list.currentPage === (i + 1)) && list.goToPage($event, (i + 1))">
+                {{(i + 1)}}
+            </a>
+        </li>
+        <li ng-class="{'disabled': list.currentPage === list.pageCount}">
+            <a aria-label="go to next page" ng-href="{{list.currentPage === list.pageCount ? '' : '@Model.PagingURL'.replace('{0}', list.currentPage + 1)}}"
+               ng-click="!(list.currentPage === list.pageCount) && list.goToPage($event, (list.currentPage + 1))">
+                <span aria-hidden="true">&rsaquo;</span>
+            </a>
+        </li>
+        <li ng-class="{'disabled': list.currentPage === list.pageCount}">
+            <a aria-label="go to last page" ng-href="{{list.currentPage === list.pageCount ? '' : '@Model.PagingURL'.replace('{0}', list.pageCount)}}"
+               ng-click="!(list.currentPage === list.pageCount) && list.goToPage($event, list.pageCount)">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>

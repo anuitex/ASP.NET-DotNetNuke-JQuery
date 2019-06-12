@@ -1,0 +1,10 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+
+<ul class="nav nav-tabs" style="margin-bottom: 1em;">
+    <li @Html.Raw(ViewContext.RouteData.Values["action"].ToString().Equals("EditCategory", StringComparison.OrdinalIgnoreCase) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("EditCategory", "Product", new { StoreID = Model.StoreID, CategoryID = Model.Category.CategoryID })">Category</a>
+    </li>
+   <li @Html.Raw((Model.Culture.CompareInfo.IndexOf(ViewContext.RouteData.Values["action"].ToString(), "CatQtyDiscounts", System.Globalization.CompareOptions.OrdinalIgnoreCase) >= 0) ? @"class=""active""" : string.Empty)>
+        <a href="@Url.Action("CatQtyDiscounts", "Product", new { StoreID = Model.StoreID, CategoryID = Model.Category.CategoryID })">Quantity Discounts</a>
+    </li>
+</ul>

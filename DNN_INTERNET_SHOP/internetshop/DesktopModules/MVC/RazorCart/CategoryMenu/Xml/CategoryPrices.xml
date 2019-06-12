@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+To Allow Decimal Point Prices with Friendly Url Setting ("www.example.com/Store/Prices/20.49-50.99" instead of "www.example.com/Store?Prices=20.49-50.99")
+
+Please set runAllManagedModulesForAllRequests to true in your website's web.config file. like this:
+
+<system.webserver>
+    ....
+    <modules runAllManagedModulesForAllRequests="true">
+      ....
+    </modules>
+    ....
+</system.webServer>
+-->
+
+<CategoryList>
+  <Category>
+    <CategoryID>1</CategoryID>
+    <CategoryName>$25 and less</CategoryName>
+    <ParentID>0</ParentID>
+    <CatSEOURL>down-25</CatSEOURL>
+  </Category>
+  <Category>
+    <CategoryID>2</CategoryID>
+    <CategoryName>$25 - $50</CategoryName>
+    <ParentID>0</ParentID>
+    <CatSEOURL>25-50</CatSEOURL>
+  </Category>
+  <Category>
+    <CategoryID>3</CategoryID>
+    <CategoryName>$50 - $100</CategoryName>
+    <ParentID>0</ParentID>
+    <CatSEOURL>50-100</CatSEOURL>
+  </Category>
+  <Category>
+    <CategoryID>4</CategoryID>
+    <CategoryName>$100 and up</CategoryName>
+    <ParentID>0</ParentID>
+    <CatSEOURL>100-up</CatSEOURL>
+  </Category>
+</CategoryList>

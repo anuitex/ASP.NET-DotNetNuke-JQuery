@@ -1,0 +1,198 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html;
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Product Manufacturers</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        @if (Model.Submitted)
+        {
+            <div class="alert alert-success alert-dismissable">
+                <span class="close" data-dismiss="alert" aria-label="close">×</span>
+                @Model.SaveMessage
+            </div>
+        }
+        <form class="form-horizontal" method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Product", new { StoreID = Model.StoreID, ManufacturerID = Model.Manufacturer.ManufacturerID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Manufacturer Name</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("ManufacturerName", Model.Manufacturer.ManufacturerName, new { @class = "form-control", @placeholder = "Manufacturer Name", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Email Template</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("EmailTemplate", Model.EmailTemplates, "-- Select --", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Invoice Template</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("InvoiceTemplate", Model.InvoiceTemplates, "-- Select --", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">First Name</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("FirstName", Model.Manufacturer.FirstName, new { @class = "form-control", @placeholder = "First Name" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Last Name</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("LastName", Model.Manufacturer.LastName, new { @class = "form-control", @placeholder = "Last Name" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Address Line 1</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Address1", Model.Manufacturer.Address1, new { @class = "form-control", @placeholder = "Address Line 1" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Address Line 2</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Address2", Model.Manufacturer.Address2, new { @class = "form-control", @placeholder = "Address Line 2" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">City</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("City", Model.Manufacturer.City, new { @class = "form-control", @placeholder = "City" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Postal Code</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Zip", Model.Manufacturer.Zip, new { @class = "form-control", @placeholder = "Postal Code" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Country</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("Country", Model.Countries, "-- Select --", new { @class = "form-control", @onchange = "defaultCountryChange(this.value);", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Region</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.DropDownList("State", Model.Regions, "-- Select --", new { @class = "form-control", @required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Phone</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Phone", Model.Manufacturer.Phone, new { @class = "form-control", @placeholder = "Phone" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Fax</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Fax", Model.Manufacturer.Fax, new { @class = "form-control", @placeholder = "Fax" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Email Address</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Email", Model.Manufacturer.Email, new { @class = "form-control", @placeholder = "Email Address", @type = "email" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Fiscal ID</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("IDNumber", Model.Manufacturer.IDNumber, new { @class = "form-control", @placeholder = "Fiscal ID" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Contact Name</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("ContactName", Model.Manufacturer.ContactName, new { @class = "form-control", @placeholder = "Contact Name" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Description</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Description", Model.Manufacturer.Description, new { @class = "form-control", @placeholder = "Description" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Occupation</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("Occupation", Model.Manufacturer.Occupation, new { @class = "form-control", @placeholder = "Occupation" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Account Number</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("AccountNumber", Model.Manufacturer.AccountNumber, new { @class = "form-control", @placeholder = "Account Number" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Routing Number</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextBox("RoutingNumber", Model.Manufacturer.RoutingNumber, new { @class = "form-control", @placeholder = "Routing Number" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Comments</label>
+                        <div class="col-md-6 col-sm-8">
+                            @Html.TextArea("Comments", Model.Manufacturer.Comments, new { @class = "form-control", @placeholder = "Comments" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-sm-4 control-label">Share</label>
+                        <div class="col-md-6 col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.CheckBox("Share", Model.Manufacturer.Share, new { @onchange = "checkBoxChange(this);" })
+                                    <span class="rc-control">
+                                        <i class="rc-icon glyphicon glyphicon-checkbox" aria-hidden="true"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                    <a class="btn btn-default" href="@Url.Action("Manufacturer", "Product", new { StoreID = Model.StoreID })">Back</a>
+                </div>
+            </div>
+        </form>
+        <!-- /.form -->
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    function defaultCountryChange(value) {
+        var regionDDL = $('select[name="State"]');
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ListRegions", "Setup", new { StoreID = Model.StoreID })',
+            data: { 'Country': value },
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                regionDDL.html('');
+                regionDDL.append($('<option></option>').val('').html('-- Select --'));
+                var data = JSON.parse(JSON.stringify(response));
+                $.each(data, function (index, option) {
+                    regionDDL.append($('<option></option>').val(option.Value).html(option.Text));
+                });
+            },
+            error: function (response, status, error) {
+                console.log(error);
+            }
+        });
+    }
+</script>

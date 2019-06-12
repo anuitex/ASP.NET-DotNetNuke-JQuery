@@ -1,0 +1,222 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.ProductModel>
+@using System.Web.Mvc.Html
+
+<!-- DataTables CSS -->
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.bootstrap.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<link href="@Href("~/DesktopModules/RazorCart/AdminConsole/Styles/dataTables.responsive.css?v=" + Model.ProductVersion)" rel="stylesheet" type="text/css" />
+<!-- DataTables JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/jquery.dataTables.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.bootstrap.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/dataTables.responsive.min.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Manage Products</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <form class="form-horizontal" method="post" action="@Url.Action("Index", "Product", new { StoreID = Model.StoreID })" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="btn-group pull-right">
+                        <a class="btn btn-primary" href="@Url.Action("Add", "Product", new { StoreID = Model.StoreID })">
+                            <i class="fa fa-plus"></i> Add
+                        </a>
+                        <a class="btn btn-danger" id="btnDeleteProducts" href="#" data-href="@Url.Action("Delete", "Product", new { StoreID = Model.StoreID })">
+                            <i class="fa fa-trash-o"></i> Delete
+                        </a>
+                        <a class="btn btn-success" href="#" data-toggle="modal" data-target="#productModal2" data-backdrop="static" data-keyboard="true">
+                            <i class="fa fa-download"></i> Import
+                        </a>
+                        <a class="btn btn-warning" href="#" data-toggle="modal" data-target="#productModal3" data-backdrop="static" data-keyboard="true">
+                            <i class="fa fa-upload"></i> Export
+                        </a>
+                    </div>
+                    <h4>Products</h4>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <table class="table table-hover" id="tblProducts" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" id="chkSelectAll">
+                                            <span class="rc-control" style="left: 0;">
+                                                <i class="rc-icon glyphicon glyphicon-checkbox"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </th>
+                                <th>ID</th>
+                                <th>Sort</th>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>SKU</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </form>
+        <!-- /.form -->
+        @Html.Partial("_ProductModal")
+    </div>
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+    //Prevent table row from being collapsed when sorting
+    var fixHelperModified = function (e, tr) {
+        var $originals = tr.children();
+        var $helper = tr.clone();
+        $helper.children().each(function (index) {
+            $(this).width($originals.eq(index).width())
+        });
+        return $helper;
+    }
+    //Update Sort Order values
+    function renumber_table(tableID, sortType) {
+        var sortData = new FormData();
+        $(tableID + ' tbody tr').each(function () {
+            count = $(this).parent().children().index($(this)) + 1;
+            var hndID = $(this).find('[type=hidden][name=tableSortId]');
+            var hndSort = $(this).find('[type=hidden][name=tableSortOrder]');
+            var sortBadge = $(this).find('span.badge');
+            hndSort.val(count);
+            sortBadge.html(count);
+            sortData.append(hndID.val(), hndSort.val());
+        })
+        .promise().done(function () {
+            $.ajax({
+                url: '@Url.Action("Sort", "Product", new { StoreID = Model.StoreID })' + '?SortType=' + sortType,
+                type: 'POST',
+                data: sortData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (data, result) {
+                    console.log(data);
+                },
+                error: function (error) {
+                    console.log(error.status + ' ' + error.statusText);
+                }
+            });
+        });
+    }
+    $(document).ready(function () {
+        $('#btnDeleteProducts').on('click', function (e) {
+            var ids = [];
+            $('#tblProducts input[name="chkProduct"]').each(function () {
+                var $chk = $(this);
+                if ($chk.prop('checked')) {
+                    ids.push(parseInt($chk.val()));
+                }
+            });
+            var $a = $(this);
+            $a.attr('href', '#');
+            if (ids.length) {
+                if (confirm('Are you sure?')) {
+                    $a.attr('href', $a.attr('data-href') + '?' + $.param({ ProductIDs: ids }, true));
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                alert('Please select products to delete!');
+                return false;
+            }
+        });
+        $('#tblProducts').DataTable({
+            initComplete: function (settings, json) {
+                //jQuery UI Sortable: (https://jqueryui.com/sortable/)
+                $('#tblProducts tbody').sortable({
+                    handle: 'span.glyphicon-sort, span.badge',
+                    helper: fixHelperModified,
+                    stop: function (event, ui) { renumber_table('#tblProducts', 'Product') }
+                });
+            },
+            drawCallback: function (settings) {
+                if ($('#tblProducts tbody').hasClass('ui-sortable'))
+                    $('#tblProducts tbody').sortable('refresh');
+            },
+            responsive: true,
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            language: {
+                infoFiltered: '',
+            },
+            columns: [
+                {
+                    data: 'ProductID', render: function (data, type, full, meta) {
+                        return '<div class="checkbox"><label><input type="checkbox" id="chkProduct_' + data + '" name="chkProduct" value="' + data + '">' +
+                            '<span class="rc-control" style="left: 0;"><i class="rc-icon glyphicon glyphicon-checkbox"></i></span></label></div>';
+                    }, orderable: false
+                },
+                { data: 'ProductID', orderable: true },
+                {
+                    data: 'SortOrder', render: function (data, type, full, meta) {
+                        if (type == 'display') {
+                            return '<span class="glyphicon glyphicon-sort"></span>' +
+                                '<span class="text-muted badge">' + data + '</span>' +
+                                '<input type="hidden" name="tableSortId" value="' + full.ProductID + '" disabled />' +
+                                '<input type="hidden" name="tableSortOrder" value="' + data + '" disabled />';
+                        }
+                        return data;
+                    }, orderable: true
+                },
+                {
+                    data: 'ThumbImage', render: function (data, type, full, meta) {
+                        return '<img style="display: inline-block;" src="' + data + '" alt="' + full.ModelName + '" class="img-responsive img-thumbnail catalog-image">';
+                    }, orderable: false
+                },
+                { data: 'ModelName', className: 'all', orderable: true },
+                { data: 'ModelNumber', orderable: true },
+                { data: 'UnitCost', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits), '@(Model.CurrencySymbol)'), className: 'text-right', orderable: true },
+                { data: 'QuantityOnHand', render: $.fn.dataTable.render.number('@(Model.GroupSeparator)', '@(Model.DecimalSeparator)', @(Model.DecimalDigits)), className: 'text-right', orderable: true },
+                {
+                    data: 'ProductID', render: function (data, type, full, meta) {
+                        var imagesUrl = '@Url.Action("Images", "Product", new { StoreID = Model.StoreID })' + '?ProductID=' + data;
+                        var editUrl = '@Url.Action("Edit", "Product", new { StoreID = Model.StoreID })' + '?ProductID=' + data;
+                        var deleteUrl = '@Url.Action("Delete", "Product", new { StoreID = Model.StoreID })' + '?ProductIDs=' + data;
+                        return '<a title="Edit Product" href="' + editUrl + '"><i class="fa fa-pencil-square-o fa-lg"></i></a>' + '\n'
+                            + '<a title="Edit Product Images" href="' + imagesUrl + '"><i class="fa fa-picture-o fa-lg"></i></a>' + '\n'
+                            + '<a title="Clone Product" href="" data-toggle="modal" data-target="#productModal1" data-backdrop="static" onclick="$(\'#ProductID\').val(' + data + ')"><i class="fa fa-clone fa-lg"></i></a>' + '\n'
+                            + '<a title="Delete Product"href="' + deleteUrl + '" onclick="return confirm(\'Are you sure?\')"><i class="fa fa-trash-o fa-lg"></i></a>';
+                    }, className: 'text-right', orderable: false
+                }
+            ],
+            processing: false,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            order: [[2, 'asc']],
+            ajax: {
+                url: '@Url.Action("List", "Product", new { StoreID = Model.StoreID })',
+                type: 'POST'
+            },
+            oSearch: {
+                sSearch: getParameterByName('Search')
+            }
+        }).on('init.dt', function () {
+            $('#SearchDt').val($('.dataTables_filter input').val());
+            $('#ColumnDt').val('SortOrder');
+            $('#DirectionDt').val('ASC');
+        }).on('preXhr.dt', function (e, settings, data) {
+            $('#SearchDt').val(data.search.value);
+            $('#ColumnDt').val(data.columns[data.order[0].column].data);
+            $('#DirectionDt').val(data.order[0].dir.toUpperCase());
+            });
+        $('#chkSelectAll').on('click', function () {
+            var checked = $(this).prop('checked');
+            $('#tblProducts input[name="chkProduct"]').prop('checked', checked);
+        });
+    });
+</script>

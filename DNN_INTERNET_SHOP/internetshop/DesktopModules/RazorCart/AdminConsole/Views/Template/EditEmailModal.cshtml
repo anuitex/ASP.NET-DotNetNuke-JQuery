@@ -1,0 +1,60 @@
+﻿@inherits System.Web.Mvc.WebViewPage<RazorCart.AdminConsole.Models.TemplateModel>
+@using System.Web.Mvc.Html;
+
+<!-- Ace Editor JavaScript -->
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/ace.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/ace.mode-razor.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+<script src="@Href("~/DesktopModules/RazorCart/AdminConsole/Scripts/ace.theme-razor.js?v=" + Model.ProductVersion)" type="text/javascript"></script>
+
+<div class="modal fade" id="emailModal1" role="dialog" tabindex="-1" aria-labelledby="emailModalLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" action="@Url.Action(ViewContext.RouteData.Values["action"].ToString(), "Template", new { StoreID = Model.StoreID, TemplateID = Model.EmailTemplate.TemplateID, MVC = true })">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="emailModalLabel1">MVC Editor: @Model.ViewFile.FilePath</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="editor"></div>
+                </div>
+                <div class="modal-footer">
+                    @Html.Hidden("EditorText")
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                    <button type="button" class="btn btn-primary" onclick="$('#EditorText').val(btoa(editor.getValue())); $('form').submit();"><i class="fa fa-check-square-o"></i> Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- /.modal -->
+<style type="text/css">
+    .modal-dialog {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+    }
+</style>
+<script type="text/javascript">
+    var editor = ace.edit("editor");
+	editor.setTheme("ace/theme/chrome_razor");
+	var RazorMode = require("ace/mode/razor").Mode;
+    editor.getSession().setMode(new RazorMode());
+    editor.setShowPrintMargin(false);
+    $(document).ready(function () {
+        editor.setValue('@(Html.Raw(Model.ViewFile.FileContent))'.fromBase64(), -1);
+        var offset = 160;
+        var height = ((window.innerHeight > 0) ? window.innerHeight : screen.height) - 1;
+        height = height - offset;
+        if (height < 1)
+            height = 1;
+        if (height > offset)
+            $('#editor').css('height', height + 'px');
+        editor.resize();
+    });
+</script>

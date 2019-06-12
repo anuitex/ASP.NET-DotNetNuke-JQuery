@@ -1,0 +1,18 @@
+﻿<script type="text/ng-template" id="subCategoryTree">
+    <div class="inner-list-info" ng-class="{'rzc-selected-category': (catMenu.highlightSelectedCategories && category.IsSelected)}">
+        <a ng-click="catMenu.getExpandableClass(category) != 'glyphicon-none' && catMenu.expandNode($event, category)">
+            <i class="glyphicon" ng-class="catMenu.getExpandableClass(category)"></i>
+            <i ng-if="category.loadingChilds" class="glyphicon glyphicon-refresh spinning"></i>
+        </a>
+        <a ng-href="{{catMenu.categoryMenuURL.replace('{0}', category.CatSEOURL)}}">
+            <i class="glyphicon" ng-if="catMenu.showCheckBoxes" ng-class="category.IsSelected ? 'glyphicon-check' : 'glyphicon-unchecked'"></i>
+            <span class="rzc-category-name">{{category.CategoryName}}</span>
+        </a>
+    </div>
+    <div ng-if="catMenu.checkIfExpanded(category)">
+        <div class="list-group-item inner-list-group-item" ng-repeat="category in category.Childs" ng-click="catMenu.toggleCategory($event, category)">
+            <div class="inner-space" ng-style="{ 'width': (category.Depth * 16 + 'px') }">&nbsp;</div>
+            <div ng-include="'subCategoryTree'"></div>
+        </div>
+    </div>
+</script>

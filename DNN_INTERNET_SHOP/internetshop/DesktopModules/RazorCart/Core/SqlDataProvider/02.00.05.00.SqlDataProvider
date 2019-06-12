@@ -1,0 +1,847 @@
+﻿/************************************************************/
+/*****              SqlDataProvider                     *****/
+/*****                                                  *****/
+/*****                                                  *****/
+/***** Note: To manually execute this script you must   *****/
+/*****       perform a search and replace operation     *****/
+/*****       for {databaseOwner} and {objectQualifier}  *****/
+/*****                                                  *****/
+/************************************************************/
+
+
+
+/************************************************************/
+/*****               Create Tables                      *****/
+/************************************************************/
+
+
+
+/************************************************************/
+/*****                Alter Tables                      *****/
+/************************************************************/
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_Products') AND type IN (N'U'))
+BEGIN
+	IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_Products') AND name = N'ManufacturerID')
+	BEGIN
+		ALTER TABLE
+			{databaseOwner}{objectQualifier}RZC_Products
+		ADD
+			[ManufacturerID] INT
+		EXEC('
+			UPDATE
+				P
+			SET
+				P.[ManufacturerID] = ISNULL((
+					SELECT TOP 1
+						M.[ManufacturerID]
+					FROM
+						{databaseOwner}{objectQualifier}RZC_Manufacturer M
+					WHERE
+						M.[StoreID] = P.[StoreID]
+						AND M.[PortalID] = P.[PortalID]
+						AND M.[ManufacturerName] = P.[Manufacturer]
+				), 0)
+			FROM
+				{databaseOwner}{objectQualifier}RZC_Products P
+		')
+	END
+END
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_InvoiceTemplate') AND type IN (N'U'))
+BEGIN
+	IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_InvoiceTemplate') AND name = N'Title')
+	BEGIN
+		ALTER TABLE
+			{databaseOwner}{objectQualifier}RZC_InvoiceTemplate
+		ADD
+			[Title] NVARCHAR(255)
+		EXEC('
+			UPDATE
+				{databaseOwner}{objectQualifier}RZC_InvoiceTemplate
+			SET
+				[Title] = [Name]
+		')
+	END
+END
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_Manufacturer') AND type IN (N'U'))
+BEGIN
+	IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_Manufacturer') AND name = N'EmailTemplateID')
+	BEGIN
+		ALTER TABLE
+			{databaseOwner}{objectQualifier}RZC_Manufacturer
+		ADD
+			[EmailTemplateID] INT
+	END
+	IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_Manufacturer') AND name = N'InvoiceTemplateID')
+	BEGIN
+		ALTER TABLE
+			{databaseOwner}{objectQualifier}RZC_Manufacturer
+		ADD
+			[InvoiceTemplateID] INT
+	END
+END
+GO
+
+
+
+/************************************************************/
+/*****                Drop Sprocs                       *****/
+/************************************************************/
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_CreateProduct') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateProduct
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_UpdateProduct') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_UpdateProduct
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_GetManufacturerByName') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_GetManufacturerByName
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_CreateInvoiceTemplate') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateInvoiceTemplate
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_UpdateInvoiceTemplate') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_UpdateInvoiceTemplate
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_CreateManufacturer') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateManufacturer
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_UpdateManufacturer') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_UpdateManufacturer
+GO
+IF EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}RZC_GetInvoiceTemplateByName') AND type IN (N'P', N'PC'))
+	DROP PROCEDURE {databaseOwner}{objectQualifier}RZC_GetInvoiceTemplateByName
+GO
+
+
+
+/************************************************************/
+/*****               Create Sprocs                      *****/
+/************************************************************/
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateProduct
+	@ManufacturerID INT = NULL,
+	@Manufacturer NVARCHAR(50) = NULL,
+	@ModelNumber NVARCHAR(50) = NULL,
+	@ModelName NVARCHAR(200) = NULL,
+	@UnitCost MONEY = NULL,
+	@QuantityOnHand INT = NULL,
+	@Summary NVARCHAR(1000) = NULL,
+	@Description NTEXT = NULL,
+	@DownloadUrl NVARCHAR(1000) = NULL,
+	@Featured BIT = NULL,
+	@Archived BIT = NULL,
+	@Weight DECIMAL(12,2) = NULL,
+	@SortOrder INT = NULL,
+	@ExcludeCoupon BIT = NULL,
+	@Items INT = NULL,
+	@Share BIT = NULL,
+	@CreatedByUser NVARCHAR(100) = NULL,
+	@CreatedDate DATETIME = NULL,
+	@LogicallyDeleted BIT = NULL,
+	@Recurring BIT = NULL,
+	@SubscriptionInterval VARCHAR(50) = NULL,
+	@RecurringOccurances INT = NULL,
+	@UrlGUID VARCHAR(1000) = NULL,
+	@EncryptUrl BIT = NULL,
+	@AddDNNRole VARCHAR(50) = NULL,
+	@RequireLogin BIT = NULL,
+	@MasterBundleID INT = NULL,
+	@BundleID INT = NULL,
+	@RoleExpireDays NVARCHAR(500) = NULL,
+	@MemberPrice MONEY = NULL,
+	@TaxExempt BIT = NULL,
+	@PortalID INT = NULL,
+	@ShipCodes VARCHAR(100) = NULL,
+	@ShipText NVARCHAR(500) = NULL,
+	@AffiliateURL NVARCHAR(1000) = NULL,
+	@TitleTag VARCHAR(85) = NULL,
+	@DescriptionTag NVARCHAR(200) = NULL,
+	@KeywordTag NVARCHAR(300) = NULL,
+	@ShipCost MONEY = NULL,
+	@RequireCoupon BIT = NULL,
+	@Description2 NTEXT = NULL,
+	@Description3 NTEXT = NULL,
+	@Description4 NTEXT = NULL,
+	@Description5 NTEXT = NULL,
+	@TabName1 VARCHAR(50) = NULL,
+	@TabName2 VARCHAR(50) = NULL,
+	@TabName3 VARCHAR(50) = NULL,
+	@TabName4 VARCHAR(50) = NULL,
+	@TabName5 VARCHAR(50) = NULL,
+	@AutoGUID BIT = NULL,
+	@SEOURL VARCHAR(80) = NULL,
+	@HideThumbnail BIT = NULL,
+	@HidePrice BIT = NULL,
+	@PriceClass VARCHAR(20) = NULL,
+	@MinOrderQty INT = NULL,
+	@ChargeHandling BIT = NULL,
+	@LeadTime VARCHAR(50) = NULL,
+	@HideQuantity BIT = NULL,
+	@PriceUnits NVARCHAR(50) = NULL,
+	@MaxOrderQty INT = NULL,
+	@Width INT = NULL,
+	@Height INT = NULL,
+	@Length INT = NULL,
+	@RecurringStartDate VARCHAR(15) = NULL,
+	@ExcludeVariantRecur BIT = NULL,
+	@WholesalePrice MONEY = NULL,
+	@SalePrice MONEY = NULL,
+	@HideProduct BIT = NULL,
+	@RemoveDNNRole VARCHAR(70) = NULL,
+	@ShowProductRole BIT = NULL,
+	@TaxRate FLOAT = NULL,
+	@Upsell BIT = NULL,
+	@EnableTrial BIT = NULL,
+	@TrialInterval VARCHAR(50) = NULL,
+	@TrialOccurences VARCHAR(50) = NULL,
+	@TrialAmount MONEY = NULL,
+	@UseCompanyLogo BIT = NULL,
+	@UserEnteredAmount BIT = NULL,
+	@Booking BIT = NULL,
+	@BookingUnits NVARCHAR(100) = NULL,
+	@RecurStartDateSetup VARCHAR(50) = NULL,
+	@UpdatedDate DATETIME = NULL,
+	@ProductDetailUrl NVARCHAR(1000) = NULL,
+	@GiftCard BIT = NULL,
+	@TaxableAmount MONEY = NULL,
+	@SaleStartDate DATETIME = NULL,
+	@SaleEndDate DATETIME = NULL,
+	@CompareGroup NVARCHAR(150) = NULL,
+	@ProductTypeID INT = NULL,
+	@MaxDownloadAttempts INT = NULL,
+	@MaxDownloadDays INT = NULL,
+	@ActiveFrom DATETIME = NULL,
+	@ActiveTo DATETIME = NULL,
+	@StoreID INT = NULL
+AS
+BEGIN
+	INSERT INTO
+		{databaseOwner}{objectQualifier}RZC_Products
+		([ManufacturerID]
+		,[Manufacturer]
+		,[ModelNumber]
+		,[ModelName]
+		,[UnitCost]
+		,[QuantityOnHand]
+		,[Summary]
+		,[Description]
+		,[DownloadUrl]
+		,[Featured]
+		,[Archived]
+		,[Weight]
+		,[SortOrder]
+		,[ExcludeCoupon]
+		,[Items]
+		,[Share]
+		,[CreatedByUser]
+		,[CreatedDate]
+		,[LogicallyDeleted]
+		,[Recurring]
+		,[SubscriptionInterval]
+		,[RecurringOccurances]
+		,[UrlGUID]
+		,[EncryptUrl]
+		,[AddDNNRole]
+		,[RequireLogin]
+		,[MasterBundleID]
+		,[BundleID]
+		,[RoleExpireDays]
+		,[MemberPrice]
+		,[TaxExempt]
+		,[PortalID]
+		,[ShipCodes]
+		,[ShipText]
+		,[AffiliateURL]
+		,[TitleTag]
+		,[DescriptionTag]
+		,[KeywordTag]
+		,[ShipCost]
+		,[RequireCoupon]
+		,[Description2]
+		,[Description3]
+		,[Description4]
+		,[Description5]
+		,[TabName1]
+		,[TabName2]
+		,[TabName3]
+		,[TabName4]
+		,[TabName5]
+		,[AutoGUID]
+		,[SEOURL]
+		,[HideThumbnail]
+		,[HidePrice]
+		,[PriceClass]
+		,[MinOrderQty]
+		,[ChargeHandling]
+		,[LeadTime]
+		,[HideQuantity]
+		,[PriceUnits]
+		,[MaxOrderQty]
+		,[Width]
+		,[Height]
+		,[Length]
+		,[RecurringStartDate]
+		,[ExcludeVariantRecur]
+		,[WholesalePrice]
+		,[SalePrice]
+		,[HideProduct]
+		,[RemoveDNNRole]
+		,[ShowProductRole]
+		,[TaxRate]
+		,[Upsell]
+		,[EnableTrial]
+		,[TrialInterval]
+		,[TrialOccurences]
+		,[TrialAmount]
+		,[UseCompanyLogo]
+		,[UserEnteredAmount]
+		,[Booking]
+		,[BookingUnits]
+		,[RecurStartDateSetup]
+		,[UpdatedDate]
+		,[ProductDetailUrl]
+		,[GiftCard]
+		,[TaxableAmount]
+		,[SaleStartDate]
+		,[SaleEndDate]
+		,[CompareGroup]
+		,[ProductTypeID]
+		,[MaxDownloadAttempts]
+		,[MaxDownloadDays]
+		,[ActiveFrom]
+		,[ActiveTo]
+		,[StoreID])
+	VALUES
+		(@ManufacturerID
+		,@Manufacturer
+		,@ModelNumber
+		,@ModelName
+		,@UnitCost
+		,@QuantityOnHand
+		,@Summary
+		,@Description
+		,@DownloadUrl
+		,@Featured
+		,@Archived
+		,@Weight
+		,@SortOrder
+		,@ExcludeCoupon
+		,@Items
+		,@Share
+		,@CreatedByUser
+		,@CreatedDate
+		,@LogicallyDeleted
+		,@Recurring
+		,@SubscriptionInterval
+		,@RecurringOccurances
+		,@UrlGUID
+		,@EncryptUrl
+		,@AddDNNRole
+		,@RequireLogin
+		,@MasterBundleID
+		,@BundleID
+		,@RoleExpireDays
+		,@MemberPrice
+		,@TaxExempt
+		,@PortalID
+		,@ShipCodes
+		,@ShipText
+		,@AffiliateURL
+		,@TitleTag
+		,@DescriptionTag
+		,@KeywordTag
+		,@ShipCost
+		,@RequireCoupon
+		,@Description2
+		,@Description3
+		,@Description4
+		,@Description5
+		,@TabName1
+		,@TabName2
+		,@TabName3
+		,@TabName4
+		,@TabName5
+		,@AutoGUID
+		,@SEOURL
+		,@HideThumbnail
+		,@HidePrice
+		,@PriceClass
+		,@MinOrderQty
+		,@ChargeHandling
+		,@LeadTime
+		,@HideQuantity
+		,@PriceUnits
+		,@MaxOrderQty
+		,@Width
+		,@Height
+		,@Length
+		,@RecurringStartDate
+		,@ExcludeVariantRecur
+		,@WholesalePrice
+		,@SalePrice
+		,@HideProduct
+		,@RemoveDNNRole
+		,@ShowProductRole
+		,@TaxRate
+		,@Upsell
+		,@EnableTrial
+		,@TrialInterval
+		,@TrialOccurences
+		,@TrialAmount
+		,@UseCompanyLogo
+		,@UserEnteredAmount
+		,@Booking
+		,@BookingUnits
+		,@RecurStartDateSetup
+		,@UpdatedDate
+		,@ProductDetailUrl
+		,@GiftCard
+		,@TaxableAmount
+		,@SaleStartDate
+		,@SaleEndDate
+		,@CompareGroup
+		,@ProductTypeID
+		,@MaxDownloadAttempts
+		,@MaxDownloadDays
+		,@ActiveFrom
+		,@ActiveTo
+		,@StoreID)
+	SELECT SCOPE_IDENTITY()
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_UpdateProduct
+	@ProductID INT = NULL,
+	@ManufacturerID INT = NULL,
+	@Manufacturer NVARCHAR(50) = NULL,
+	@ModelNumber NVARCHAR(50) = NULL,
+	@ModelName NVARCHAR(200) = NULL,
+	@UnitCost MONEY = NULL,
+	@QuantityOnHand INT = NULL,
+	@Summary NVARCHAR(1000) = NULL,
+	@Description NTEXT = NULL,
+	@DownloadUrl NVARCHAR(1000) = NULL,
+	@Featured BIT = NULL,
+	@Archived BIT = NULL,
+	@Weight DECIMAL(12,2) = NULL,
+	@SortOrder INT = NULL,
+	@ExcludeCoupon BIT = NULL,
+	@Items INT = NULL,
+	@Share BIT = NULL,
+	@CreatedByUser NVARCHAR(100) = NULL,
+	@CreatedDate DATETIME = NULL,
+	@LogicallyDeleted BIT = NULL,
+	@Recurring BIT = NULL,
+	@SubscriptionInterval VARCHAR(50) = NULL,
+	@RecurringOccurances INT = NULL,
+	@UrlGUID VARCHAR(1000) = NULL,
+	@EncryptUrl BIT = NULL,
+	@AddDNNRole VARCHAR(50) = NULL,
+	@RequireLogin BIT = NULL,
+	@MasterBundleID INT = NULL,
+	@BundleID INT = NULL,
+	@RoleExpireDays NVARCHAR(500) = NULL,
+	@MemberPrice MONEY = NULL,
+	@TaxExempt BIT = NULL,
+	@PortalID INT = NULL,
+	@ShipCodes VARCHAR(100) = NULL,
+	@ShipText NVARCHAR(500) = NULL,
+	@AffiliateURL NVARCHAR(1000) = NULL,
+	@TitleTag VARCHAR(85) = NULL,
+	@DescriptionTag NVARCHAR(200) = NULL,
+	@KeywordTag NVARCHAR(300) = NULL,
+	@ShipCost MONEY = NULL,
+	@RequireCoupon BIT = NULL,
+	@Description2 NTEXT = NULL,
+	@Description3 NTEXT = NULL,
+	@Description4 NTEXT = NULL,
+	@Description5 NTEXT = NULL,
+	@TabName1 VARCHAR(50) = NULL,
+	@TabName2 VARCHAR(50) = NULL,
+	@TabName3 VARCHAR(50) = NULL,
+	@TabName4 VARCHAR(50) = NULL,
+	@TabName5 VARCHAR(50) = NULL,
+	@AutoGUID BIT = NULL,
+	@SEOURL VARCHAR(80) = NULL,
+	@HideThumbnail BIT = NULL,
+	@HidePrice BIT = NULL,
+	@PriceClass VARCHAR(20) = NULL,
+	@MinOrderQty INT = NULL,
+	@ChargeHandling BIT = NULL,
+	@LeadTime VARCHAR(50) = NULL,
+	@HideQuantity BIT = NULL,
+	@PriceUnits NVARCHAR(50) = NULL,
+	@MaxOrderQty INT = NULL,
+	@Width INT = NULL,
+	@Height INT = NULL,
+	@Length INT = NULL,
+	@RecurringStartDate VARCHAR(15) = NULL,
+	@ExcludeVariantRecur BIT = NULL,
+	@WholesalePrice MONEY = NULL,
+	@SalePrice MONEY = NULL,
+	@HideProduct BIT = NULL,
+	@RemoveDNNRole VARCHAR(70) = NULL,
+	@ShowProductRole BIT = NULL,
+	@TaxRate FLOAT = NULL,
+	@Upsell BIT = NULL,
+	@EnableTrial BIT = NULL,
+	@TrialInterval VARCHAR(50) = NULL,
+	@TrialOccurences VARCHAR(50) = NULL,
+	@TrialAmount MONEY = NULL,
+	@UseCompanyLogo BIT = NULL,
+	@UserEnteredAmount BIT = NULL,
+	@Booking BIT = NULL,
+	@BookingUnits NVARCHAR(100) = NULL,
+	@RecurStartDateSetup VARCHAR(50) = NULL,
+	@UpdatedDate DATETIME = NULL,
+	@ProductDetailUrl NVARCHAR(1000) = NULL,
+	@GiftCard BIT = NULL,
+	@TaxableAmount MONEY = NULL,
+	@SaleStartDate DATETIME = NULL,
+	@SaleEndDate DATETIME = NULL,
+	@CompareGroup NVARCHAR(150) = NULL,
+	@ProductTypeID INT = NULL,
+	@MaxDownloadAttempts INT = NULL,
+	@MaxDownloadDays INT = NULL,
+	@ActiveFrom DATETIME = NULL,
+	@ActiveTo DATETIME = NULL,
+	@StoreID INT = NULL
+AS
+BEGIN
+	UPDATE
+		{databaseOwner}{objectQualifier}RZC_Products
+	SET
+		[ManufacturerID] = @ManufacturerID,
+		[Manufacturer] = @Manufacturer,
+		[ModelNumber] = @ModelNumber,
+		[ModelName] = @ModelName,
+		[UnitCost] = @UnitCost,
+		[QuantityOnHand] = @QuantityOnHand,
+		[Summary] = @Summary,
+		[Description] = @Description,
+		[DownloadUrl] = @DownloadUrl,
+		[Featured] = @Featured,
+		[Archived] = @Archived,
+		[Weight] = @Weight,
+		[SortOrder] = @SortOrder,
+		[ExcludeCoupon] = @ExcludeCoupon,
+		[Items] = @Items,
+		[Share] = @Share,
+		[CreatedByUser] = @CreatedByUser,
+		[CreatedDate] = @CreatedDate,
+		[LogicallyDeleted] = @LogicallyDeleted,
+		[Recurring] = @Recurring,
+		[SubscriptionInterval] = @SubscriptionInterval,
+		[RecurringOccurances] = @RecurringOccurances,
+		[UrlGUID] = @UrlGUID,
+		[EncryptUrl] = @EncryptUrl,
+		[AddDNNRole] = @AddDNNRole,
+		[RequireLogin] = @RequireLogin,
+		[MasterBundleID] = @MasterBundleID,
+		[BundleID] = @BundleID,
+		[RoleExpireDays] = @RoleExpireDays,
+		[MemberPrice] = @MemberPrice,
+		[TaxExempt] = @TaxExempt,
+		[PortalID] = @PortalID,
+		[ShipCodes] = @ShipCodes,
+		[ShipText] = @ShipText,
+		[AffiliateURL] = @AffiliateURL,
+		[TitleTag] = @TitleTag,
+		[DescriptionTag] = @DescriptionTag,
+		[KeywordTag] = @KeywordTag,
+		[ShipCost] = @ShipCost,
+		[RequireCoupon] = @RequireCoupon,
+		[Description2] = @Description2,
+		[Description3] = @Description3,
+		[Description4] = @Description4,
+		[Description5] = @Description5,
+		[TabName1] = @TabName1,
+		[TabName2] = @TabName2,
+		[TabName3] = @TabName3,
+		[TabName4] = @TabName4,
+		[TabName5] = @TabName5,
+		[AutoGUID] = @AutoGUID,
+		[SEOURL] = @SEOURL,
+		[HideThumbnail] = @HideThumbnail,
+		[HidePrice] = @HidePrice,
+		[PriceClass] = @PriceClass,
+		[MinOrderQty] = @MinOrderQty,
+		[ChargeHandling] = @ChargeHandling,
+		[LeadTime] = @LeadTime,
+		[HideQuantity] = @HideQuantity,
+		[PriceUnits] = @PriceUnits,
+		[MaxOrderQty] = @MaxOrderQty,
+		[Width] = @Width,
+		[Height] = @Height,
+		[Length] = @Length,
+		[RecurringStartDate] = @RecurringStartDate,
+		[ExcludeVariantRecur] = @ExcludeVariantRecur,
+		[WholesalePrice] = @WholesalePrice,
+		[SalePrice] = @SalePrice,
+		[HideProduct] = @HideProduct,
+		[RemoveDNNRole] = @RemoveDNNRole,
+		[ShowProductRole] = @ShowProductRole,
+		[TaxRate] = @TaxRate,
+		[Upsell] = @Upsell,
+		[EnableTrial] = @EnableTrial,
+		[TrialInterval] = @TrialInterval,
+		[TrialOccurences] = @TrialOccurences,
+		[TrialAmount] = @TrialAmount,
+		[UseCompanyLogo] = @UseCompanyLogo,
+		[UserEnteredAmount] = @UserEnteredAmount,
+		[Booking] = @Booking,
+		[BookingUnits] = @BookingUnits,
+		[RecurStartDateSetup] = @RecurStartDateSetup,
+		[UpdatedDate] = @UpdatedDate,
+		[ProductDetailUrl] = @ProductDetailUrl,
+		[GiftCard] = @GiftCard,
+		[TaxableAmount] = @TaxableAmount,
+		[SaleStartDate] = @SaleStartDate,
+		[SaleEndDate] = @SaleEndDate,
+		[CompareGroup] = @CompareGroup,
+		[ProductTypeID] = @ProductTypeID,
+		[MaxDownloadAttempts] = @MaxDownloadAttempts,
+		[MaxDownloadDays] = @MaxDownloadDays,
+		[ActiveFrom] = @ActiveFrom,
+		[ActiveTo] = @ActiveTo,
+		[StoreID] = @StoreID
+	WHERE
+		[ProductID] = @ProductID
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_GetManufacturerByName
+	@ManufacturerName NVARCHAR(50) = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	SELECT
+		M.*
+	FROM
+		{databaseOwner}{objectQualifier}RZC_Manufacturer M
+	WHERE
+		M.[ManufacturerName] = @ManufacturerName
+		AND M.[PortalID] = @PortalID
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateInvoiceTemplate
+	@Name NVARCHAR(100) = NULL,
+	@Title NVARCHAR(255) = NULL,
+	@Template NTEXT = NULL,
+	@PortalID INT = NULL,
+	@LanguageLocale NVARCHAR(20) = NULL,
+	@StoreID INT = NULL
+AS
+BEGIN
+	INSERT INTO
+		{databaseOwner}{objectQualifier}RZC_InvoiceTemplate
+		([Name]
+		,[Title]
+		,[Template]
+		,[PortalID]
+		,[LanguageLocale]
+		,[StoreID])
+	VALUES
+		(@Name
+		,@Title
+		,@Template
+		,@PortalID
+		,@LanguageLocale
+		,@StoreID)
+	SELECT SCOPE_IDENTITY()
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_UpdateInvoiceTemplate
+	@TemplateID INT = NULL,
+	@Name NVARCHAR(100) = NULL,
+	@Title NVARCHAR(255) = NULL,
+	@Template NTEXT = NULL,
+	@PortalID INT = NULL,
+	@LanguageLocale NVARCHAR(20) = NULL,
+	@StoreID INT = NULL
+AS
+BEGIN
+	UPDATE
+		{databaseOwner}{objectQualifier}RZC_InvoiceTemplate
+	SET
+		[Name] = @Name,
+		[Title] = @Title,
+		[Template] = @Template,
+		[PortalID] = @PortalID,
+		[LanguageLocale] = @LanguageLocale,
+		[StoreID] = @StoreID
+	WHERE
+		[TemplateID] = @TemplateID
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_CreateManufacturer
+	@ManufacturerName NVARCHAR(50) = NULL,
+	@EmailTemplateID INT = NULL,
+	@InvoiceTemplateID INT = NULL,
+	@PortalID INT = NULL,
+	@FirstName NVARCHAR(50) = NULL,
+	@LastName NVARCHAR(50) = NULL,
+	@Address1 NVARCHAR(50) = NULL,
+	@Address2 NVARCHAR(50) = NULL,
+	@City NVARCHAR(50) = NULL,
+	@State NVARCHAR(50) = NULL,
+	@Country NVARCHAR(50) = NULL,
+	@Zip VARCHAR(50) = NULL,
+	@Phone VARCHAR(50) = NULL,
+	@Fax VARCHAR(50) = NULL,
+	@Email VARCHAR(50) = NULL,
+	@IDNumber VARCHAR(50) = NULL,
+	@ContactName NVARCHAR(75) = NULL,
+	@Description NVARCHAR(100) = NULL,
+	@Occupation NVARCHAR(50) = NULL,
+	@Comments NTEXT = NULL,
+	@AccountNumber VARCHAR(50) = NULL,
+	@RoutingNumber VARCHAR(50) = NULL,
+	@Share BIT = NULL,
+	@StoreID INT = NULL
+AS
+BEGIN
+	INSERT INTO
+		{databaseOwner}{objectQualifier}RZC_Manufacturer
+		([ManufacturerName]
+		,[EmailTemplateID]
+		,[InvoiceTemplateID]
+		,[PortalID]
+		,[FirstName]
+		,[LastName]
+		,[Address1]
+		,[Address2]
+		,[City]
+		,[State]
+		,[Country]
+		,[Zip]
+		,[Phone]
+		,[Fax]
+		,[Email]
+		,[IDNumber]
+		,[ContactName]
+		,[Description]
+		,[Occupation]
+		,[Comments]
+		,[AccountNumber]
+		,[RoutingNumber]
+		,[Share]
+		,[StoreID])
+	VALUES
+		(@ManufacturerName
+		,@EmailTemplateID
+		,@InvoiceTemplateID
+		,@PortalID
+		,@FirstName
+		,@LastName
+		,@Address1
+		,@Address2
+		,@City
+		,@State
+		,@Country
+		,@Zip
+		,@Phone
+		,@Fax
+		,@Email
+		,@IDNumber
+		,@ContactName
+		,@Description
+		,@Occupation
+		,@Comments
+		,@AccountNumber
+		,@RoutingNumber
+		,@Share
+		,@StoreID)
+	SELECT SCOPE_IDENTITY()
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_UpdateManufacturer
+	@ManufacturerID INT = NULL,
+	@ManufacturerName NVARCHAR(50) = NULL,
+	@EmailTemplateID INT = NULL,
+	@InvoiceTemplateID INT = NULL,
+	@PortalID INT = NULL,
+	@FirstName NVARCHAR(50) = NULL,
+	@LastName NVARCHAR(50) = NULL,
+	@Address1 NVARCHAR(50) = NULL,
+	@Address2 NVARCHAR(50) = NULL,
+	@City NVARCHAR(50) = NULL,
+	@State NVARCHAR(50) = NULL,
+	@Country NVARCHAR(50) = NULL,
+	@Zip VARCHAR(50) = NULL,
+	@Phone VARCHAR(50) = NULL,
+	@Fax VARCHAR(50) = NULL,
+	@Email VARCHAR(50) = NULL,
+	@IDNumber VARCHAR(50) = NULL,
+	@ContactName NVARCHAR(75) = NULL,
+	@Description NVARCHAR(100) = NULL,
+	@Occupation NVARCHAR(50) = NULL,
+	@Comments NTEXT = NULL,
+	@AccountNumber VARCHAR(50) = NULL,
+	@RoutingNumber VARCHAR(50) = NULL,
+	@Share BIT = NULL,
+	@StoreID INT = NULL
+AS
+BEGIN
+	UPDATE
+		{databaseOwner}{objectQualifier}RZC_Manufacturer
+	SET
+		[ManufacturerName] = @ManufacturerName,
+		[EmailTemplateID] = @EmailTemplateID,
+		[InvoiceTemplateID] = @InvoiceTemplateID,
+		[PortalID] = @PortalID,
+		[FirstName] = @FirstName,
+		[LastName] = @LastName,
+		[Address1] = @Address1,
+		[Address2] = @Address2,
+		[City] = @City,
+		[State] = @State,
+		[Country] = @Country,
+		[Zip] = @Zip,
+		[Phone] = @Phone,
+		[Fax] = @Fax,
+		[Email] = @Email,
+		[IDNumber] = @IDNumber,
+		[ContactName] = @ContactName,
+		[Description] = @Description,
+		[Occupation] = @Occupation,
+		[Comments] = @Comments,
+		[AccountNumber] = @AccountNumber,
+		[RoutingNumber] = @RoutingNumber,
+		[Share] = @Share,
+		[StoreID] = @StoreID
+	WHERE
+		[ManufacturerID] = @ManufacturerID
+END
+GO
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE PROCEDURE {databaseOwner}{objectQualifier}RZC_GetInvoiceTemplateByName
+	@Name NVARCHAR(100) = NULL,
+	@LanguageLocale NVARCHAR(20) = NULL,
+	@StoreID INT = NULL,
+	@PortalID INT = NULL
+AS
+BEGIN
+	SELECT TOP 1
+		IT.*
+	FROM
+		{databaseOwner}{objectQualifier}RZC_InvoiceTemplate IT
+	WHERE
+		IT.[Name] = @Name
+		AND (IT.[LanguageLocale] = @LanguageLocale OR NULLIF(@LanguageLocale, '') IS NULL)
+		AND IT.[StoreID] = @StoreID
+		AND IT.[PortalID] = @PortalID
+	ORDER BY
+		IT.[TemplateID] DESC
+END
+GO
+
+
+
+/************************************************************/
+/*****               End of Script                      *****/
+/************************************************************/

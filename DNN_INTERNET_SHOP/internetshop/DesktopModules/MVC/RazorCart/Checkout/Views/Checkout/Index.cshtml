@@ -1,0 +1,255 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<RazorCart.Checkout.Models.CheckoutModel>
+@using DotNetNuke.Web.Mvc.Helpers
+
+<div class="row" ng-switch="checkout.viewState">
+    <div class="col-sm-12">
+        <div class="alert alert-default" ng-switch-when="OrderStatus" ng-if="checkout.orderStatus.Success" scroll-to>
+            <h1>@Dnn.LocalizeString("ThankYou")</h1>
+            <h4>@Dnn.LocalizeString("YourOrder") <b>{{checkout.orderStatus.OrderID}}</b></h4>
+        </div>
+        <div class="alert alert-danger" ng-switch-when="OrderStatus" ng-if="!checkout.orderStatus.Success" scroll-to>
+            <span>@Dnn.LocalizeString("OrderFailed")</span><br />
+            <span>@Dnn.LocalizeString("OrderNote") {{checkout.orderStatus.Notes}}</span><br />
+        </div>
+    </div>
+</div>
+@if (!Model.EnableRegistration || Request.IsAuthenticated || ViewBag.AllowGuestCheckout)
+{
+    <div class="row" ng-switch="checkout.viewState">
+        @Html.Partial("_ControlsTop")
+    </div>
+}
+<div class="rzc-basket">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>@Dnn.LocalizeString("Image")</th>
+                    @if (Model.ShowManufacturer)
+                        { <th>@Dnn.LocalizeString("Manufacturer")</th> }
+                    <th>@Dnn.LocalizeString("SKU")</th>
+                    <th>@Dnn.LocalizeString("ProductName")</th>
+                    @if (!Model.IsPriceHidden)
+                        { <th class="text-right">@Dnn.LocalizeString("UnitCost")</th> }
+                    else
+                        { <th>@Dnn.LocalizeString("UnitCost")</th> }
+                    <th class="text-right">@Dnn.LocalizeString("Quantity")</th>
+                    @if (!Model.IsPriceHidden)
+                        { <th class="text-right">@Dnn.LocalizeString("LineTotal")</th> }
+                </tr>
+            </thead>
+            <tbody ng-repeat="cartItem in checkout.cartList">
+                <tr>
+                    <td rowspan="3"><img ng-src="{{cartItem.ImageName}}" class="img-thumbnail cart-image" alt="{{cartItem.ProductName}}" err-src="@DotNetNuke.Common.Globals.DesktopModulePath" err-size="200" /></td>
+                    @if (Model.ShowManufacturer)
+                        { <td>{{cartItem.Manufacturer}}</td> }
+                    <td>{{cartItem.ProductSku}}</td>
+                    <td><a ng-href="{{cartItem.ProductDetailUrl}}">{{cartItem.ProductName}}</a></td>
+                    @if (!Model.IsPriceHidden)
+                    {
+                        <td class="text-right">
+                            {{cartItem.UnitCost | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}
+                            <span class="rc-regular" ng-if="cartItem.RegularCost"><br />@Dnn.LocalizeString("RegularCost") {{cartItem.RegularCost | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</span>
+                        </td>
+                    }
+                    else
+                        { <td>@Dnn.LocalizeString("RequestQuote")</td> }
+                    <td class="text-right" ng-if="checkout.viewState == 'ShoppingCart'">
+                        <div ng-hide="cartItem.BundleID">
+                            <input type="number" step="1" min="1" max="999999" ng-model="cartItem.ClientQuantity" ng-init="cartItem.ClientQuantity = cartItem.Quantity" class="form-control" style="max-width: 80px; display: inline;" />
+                            <i class="fa fa-trash-o fa-lg" role="button" ng-click="checkout.delete($index)"></i>
+                        </div>
+                        <div ng-show="cartItem.BundleID">
+                            {{cartItem.Quantity | number : 2}}
+                        </div>
+                    </td>
+                    <td class="text-right" ng-if="checkout.viewState != 'ShoppingCart'">{{cartItem.Quantity | number : 2}}</td>
+                    @if (!Model.IsPriceHidden)
+                        { <td class="text-right">{{cartItem.UnitCost * cartItem.Quantity | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</td> }
+                </tr>
+                <tr>
+                    <td colspan="5" ng-if="cartItem.CartVariants.length > 0 || cartItem.CartBooking.IsBooking || cartItem.CartRecurring.IsRecurring || cartItem.CartEvent.IsEvent">
+                        <ul ng-if="cartItem.CartVariants.length > 0">
+                            <li ng-repeat="itemVariant in cartItem.CartVariants">
+                                {{itemVariant.VariantHasText ? (itemVariant.VariantName + ': ' + itemVariant.VariantText) : (itemVariant.VariantGroup + ': ' + itemVariant.VariantName)}}
+                                {{itemVariant.PriceCalculated ? '- ' + (itemVariant.PriceCalculated | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits) : ''}}
+                            </li>
+                        </ul>
+                        <ul ng-if="cartItem.CartBooking.IsBooking">
+                            <li ng-if="cartItem.CartBooking.BookingStart">
+                                Start: {{cartItem.CartBooking.BookingStart | date: [cartItem.CartBooking.ShowTime ? '@(Model.Culture.DateTimeFormat.ShortDatePattern + " " + Model.Culture.DateTimeFormat.ShortTimePattern.Replace("tt", "a"))' : '@Model.Culture.DateTimeFormat.ShortDatePattern'] }}
+                            </li>
+                            <li ng-if="cartItem.CartBooking.BookingEnd">
+                                End: {{cartItem.CartBooking.BookingEnd | date: [cartItem.CartBooking.ShowTime ? '@(Model.Culture.DateTimeFormat.ShortDatePattern + " " + Model.Culture.DateTimeFormat.ShortTimePattern.Replace("tt", "a"))' : '@Model.Culture.DateTimeFormat.ShortDatePattern'] }}
+                            </li>
+                        </ul>
+                        <ul ng-if="cartItem.CartEvent.IsEvent">
+                            <li ng-if="cartItem.CartEvent.EventStart">
+                                Start: {{cartItem.CartEvent.EventStart | date: ['@(Model.Culture.DateTimeFormat.ShortDatePattern + " " + Model.Culture.DateTimeFormat.ShortTimePattern.Replace("tt", "a"))'] }}
+                            </li>
+                            <li ng-if="cartItem.CartEvent.EventEnd">
+                                End: {{cartItem.CartEvent.EventEnd | date: ['@(Model.Culture.DateTimeFormat.ShortDatePattern + " " + Model.Culture.DateTimeFormat.ShortTimePattern.Replace("tt", "a"))'] }}
+                            </li>
+                        </ul>
+                        <ul ng-if="cartItem.CartRecurring.IsRecurring">
+                            <li>
+                                <span ng-switch="cartItem.CartRecurring.SubscriptionInterval">
+                                    {{cartItem.CartRecurring.RecurringOccurances == 9999 ? '@Dnn.LocalizeString("Ongoing")' : (cartItem.CartRecurring.RecurringOccurances + ' @Dnn.LocalizeString("Times")')}}
+                                    <span ng-switch-when="Weekly">
+                                        @Dnn.LocalizeString("WeeklyRecurring")
+                                    </span>
+                                    <span ng-switch-when="2Weeks">
+                                        @Dnn.LocalizeString("2WeeksRecurring")
+                                    </span>
+                                    <span ng-switch-when="Monthly">
+                                        @Dnn.LocalizeString("MonthlyRecurring")
+                                    </span>
+                                    <span ng-switch-when="2Months">
+                                        @Dnn.LocalizeString("2MonthsRecurring")
+                                    </span>
+                                    <span ng-switch-when="Quarterly">
+                                        @Dnn.LocalizeString("QuarterlyRecurring")
+                                    </span>
+                                    <span ng-switch-when="Semiannual">
+                                        @Dnn.LocalizeString("SemiannualRecurring")
+                                    </span>
+                                    <span ng-switch-when="Yearly">
+                                        @Dnn.LocalizeString("YearlyRecurring")
+                                    </span>
+                                    {{cartItem.CartRecurring.StartDate | date: ['@Model.Culture.DateTimeFormat.ShortDatePattern']}}
+                                </span>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="5" ng-if="checkout.viewState == 'OrderStatus' && checkout.orderStatus.Success && cartItem.CartDownload.IsDownloadable">
+                        <button type="button" class="btn btn-default btn-sm active" ng-click="checkout.download($index)">
+                            <i class="fa fa-download" role="button"></i> @Dnn.LocalizeString("Download")
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody ng-if="checkout.cartList.length < 1">
+                <tr>
+                    <td colspan="6"><span>@Dnn.LocalizeString("NoCartItems")</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-4 col-md-5 col-sm-6 col-xs-6 col-xxs-12">
+        @if (Model.EnableDonation && Model.DonationProduct != null && Model.DonationProduct.IsEligible)
+        {
+            <div class="form-group" ng-hide="checkout.viewState != 'ShoppingCart' || (checkout.cartList | filter: { 'ProductID': @(Model.DonationProduct.ProductID) }).length">
+                @Html.Partial("_Donation")
+            </div>
+        }
+        @if (Model.ShowCoupon)
+        {
+            <div class="form-group input-group" ng-hide="checkout.viewState != 'ShoppingCart' && (!checkout.cartTotals.Coupon || checkout.cartTotals.Coupon == '')">
+                <span class="input-group-addon"><i class="fa fa-tags"></i></span>
+                <input type="text" class="form-control" placeholder="@Dnn.LocalizeString("Coupon")" ng-model="checkout.cartTotals.Coupon" ng-if="checkout.viewState == 'ShoppingCart'">
+                <span class="input-group-btn" ng-if="checkout.viewState == 'ShoppingCart'"><input type="button" class="btn btn-default" value="@Dnn.LocalizeString("ApplyCoupon")" ng-click="checkout.coupon()" ng-disabled="(checkout.cartList.length < 1) || checkout.applying" /></span>
+                <label class="form-control" ng-if="checkout.viewState != 'ShoppingCart'">{{checkout.cartTotals.Coupon}}</label>
+            </div>
+        }
+    </div>
+    <div class="col-lg-4 col-lg-offset-4 col-md-5 col-md-offset-2 col-sm-6 col-xs-6 col-xxs-12">
+        @if (!Model.IsTotalsHidden)
+        {
+            <div class="row  text-right">
+                <div class="col-md-8 col-xs-8 col-xxs-8">
+                    <p class="nav">@Dnn.LocalizeString("Subtotal")</p>
+                    @if (Model.ShowCoupon)
+                    {
+                        <p class="nav">@Dnn.LocalizeString("CouponDiscount")</p>
+                    }
+                    @if (Model.UseMemberDiscount)
+                    {
+                        <p class="nav">@Dnn.LocalizeString("MemberDiscount")</p>
+                    }
+                    @if (Model.CombineShipAndHandle)
+                    {
+                        <p class="nav">@Dnn.LocalizeString("ShippingHandlingCharge")</p>
+                    }
+                    else
+                    {
+                        <p class="nav">@Dnn.LocalizeString("ShippingFees")</p>
+                        <p class="nav">@Dnn.LocalizeString("HandlingCharge")</p>
+                    }
+                    <p class="nav" ng-if="checkout.cartTotals.TaxIncInclusive == 0">@Dnn.LocalizeString("SalesTax") ({{checkout.cartTotals.TaxName ? checkout.cartTotals.TaxName : (checkout.cartTotals.TaxRate | percentage : 2) }})</p>
+                    <p class="nav">@Dnn.LocalizeString("Surcharge")</p>
+                    <p class="nav"><strong>@Dnn.LocalizeString("GrandTotal")</strong></p>
+                    <p class="nav" ng-if="checkout.cartTotals.TaxIncInclusive > 0">{{checkout.cartTotals.TaxName}}</p>
+                </div>
+                <div class="col-md-4 col-xs-4 col-xxs-4">
+                    <p class="nav">{{checkout.cartTotals.SubTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</p>
+                    @if (Model.ShowCoupon)
+                    {
+                        <p class="nav">{{checkout.cartTotals.Discount | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</p>
+                    }
+                    @if (Model.UseMemberDiscount)
+                    {
+                        <p class="nav">{{checkout.cartTotals.MemberDiscount | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</p>
+                    }
+                    @if (Model.CombineShipAndHandle)
+                    {
+                        <p class="nav">{{(checkout.cartTotals.ShippingTotal + checkout.cartTotals.HandlingCharge) | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</p>
+                    }
+                    else
+                    {
+                        <p class="nav">{{checkout.cartTotals.ShippingTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</p>
+                        <p class="nav">{{checkout.cartTotals.HandlingCharge | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</p>
+                    }
+                    <p class="nav" ng-if="checkout.cartTotals.TaxIncInclusive == 0">{{checkout.cartTotals.TaxTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</p>
+                    <p class="nav">{{checkout.cartTotals.Surcharge | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</p>
+                    <p class="nav"><strong>{{checkout.cartTotals.GrandTotal | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</strong></p>
+                    <p class="nav" ng-if="checkout.cartTotals.TaxIncInclusive > 0">{{checkout.cartTotals.TaxIncInclusive | currency : '@Model.Culture.NumberFormat.CurrencySymbol' : @Model.Culture.NumberFormat.CurrencyDecimalDigits}}</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<hr />
+<div class="row form-group" ng-if="checkout.viewState == 'ShoppingCart' && checkout.cartList.length > 0">
+    <div class="col-xxs-6 text-left">
+        <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("ClearCart")" ng-click="checkout.clear()" ng-disabled="(checkout.cartList.length < 1) || checkout.deleting" />
+    </div>
+    <div class="col-xxs-6 text-right">
+        <input type="button" class="btn btn-default" value="@Dnn.LocalizeString("UpdateCart")" ng-click="checkout.update()" ng-disabled="(checkout.cartList.length < 1) || checkout.updating" />
+    </div>
+</div>
+<div class="row" ng-switch="checkout.viewState" ng-if="checkout.cartList.length > 0">
+    @if (Model.EnableRegistration && !Request.IsAuthenticated && !ViewBag.AllowGuestCheckout)
+    {
+        <div class="col-md-12">
+            @Html.Partial("_Registration")
+        </div>
+    }
+    else
+    {
+        if (!Model.IsPriceHidden)
+        {
+            <div class="col-md-6">
+                @Html.Partial("_Shipping")
+            </div>
+            <div class="col-md-6">
+                @Html.Partial("_Billing")
+            </div>
+        }
+        else
+        {
+            <div class="col-md-12">
+                @Html.Partial("_Shipping")
+            </div>
+        }
+    }
+</div>
+@if (!Model.EnableRegistration || Request.IsAuthenticated || ViewBag.AllowGuestCheckout)
+{
+    <div class="row" ng-switch="checkout.viewState">
+        @Html.Partial("_ControlsBottom")
+    </div>
+}
